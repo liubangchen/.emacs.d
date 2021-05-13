@@ -1,0 +1,68 @@
+# -*- org -*-
+#+STARTUP: indent
+#+STARTUP: showall
+#+OPTIONS: ^:nil
+
+* checkout Centaur Emacs
+#+BEGIN_SRC shell
+  cd ~/
+  git clone https://github.com/seagle0128/.emacs.d.git
+  spaceline-all-the-icons-theme
+  # git config
+  git remote set-url --push origin https://github.com/liubangchen/.emacs.d.git
+  #设置远程原始仓库
+  git remote add origin-pull https://github.com/seagle0128/.emacs.d.git
+  #拉取数据
+  git fetch origin-pull
+  #从origin-pull/master merge 到 本地master分支
+  git merge origin-pull/master
+#+END_SRC
+* checkout lib-lisp
+
+#+BEGIN_SRC shell
+  cd ~/.emcas.d
+  git clone https://github.com/djcb/mu.git
+  ./autogen.sh
+  ./configure --prefix=/Users/chenlong/application/mu
+  git clone https://github.com/liubangchen/lib-lisp.git
+#+END_SRC
+
+* modfiy custom.el
+
+#+BEGIN_SRC shell
+  cd ~/.emacs.d/lib-lisp
+  cp custom.el ../
+#+END_SRC
+
+* modfiy init.el
+
+#+BEGIN_SRC emacs-lisp
+  ;; add lib-lisp to load path for update-load-path
+  (push (expand-file-name "lib-lisp" user-emacs-directory) load-path)
+
+  ;; add modules
+  (require 'init-java)
+  (require 'init-keybinds)
+  (require 'init-execshell)
+  (require 'init-plantuml)
+  (require 'init-protobuf)
+  (require 'init-tabbar)
+  (require 'init-latex)
+  (require 'init-imenu)
+  (require 'init-sql)
+  (require 'init-taskjuggle)
+  (require 'init-golint)
+  (require 'org-publish-docs)
+  (require 'init-ag)
+  (require 'init-vue)
+  (require 'init-javascript)
+(require 'init-scala)
+(require 'init-org-mind)
+(require 'init-cquery)
+(require 'init-ggtags)
+(require 'init-orgwebtools)
+(require 'init-w3m)
+(require 'init-config)
+(require 'init-email)
+(require 'init-function)
+#+END_SRC

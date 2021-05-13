@@ -507,6 +507,26 @@
      ;; Java support
      (when emacs/>=25.2p
        (use-package lsp-java
+         :config
+         (setq lsp-keep-workspace-alive nil
+               lsp-signature-auto-activate nil
+               lsp-enable-file-watchers nil
+               lsp-java-format-enabled nil
+               lsp-java-format-on-type-enabled nil
+               lsp-java-max-concurrent-builds 8
+               lsp-java-format-comments-enabled nil
+               lsp-java-import-gradle-enabled nil
+               lsp-java-import-maven-enabled nil
+               lsp-java-format-settings-profile "GoogleStyle"
+               lsp-java-format-settings-url "~/.emacs.d/javalibs/eclipse-java-google-style.xml"
+               lsp-java-configuration-maven-user-settings  "~/.emacs.d/javalibs/settings.xml"
+               lsp-java-vmargs '("-noverify" "-Xmx4G" "-XX:+UseG1GC" "-server" "-XX:+DisableExplicitGC")
+               lsp-java-server-install-dir "~/.emacs.d/javalibs/jdt")
+         :bind
+         (("s-e" . 'lsp-find-implementation)
+          ("s-t" . 'lsp-ui-find-workspace-symbol)
+          ("s-r" . 'lsp-find-references)
+          ("s-i" . 'lsp-java-add-import))
          :hook (java-mode . (lambda () (require 'lsp-java)))))))
 
   (when centaur-lsp

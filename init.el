@@ -165,5 +165,19 @@ decrease this. If you experience stuttering, increase this.")
 (require 'init-elixir)
 (require 'init-web)
 
+
+(require 'init-keybinds)
+(require 'init-config)
+(require 'init-devops)
+(require 'init-tabbar)
+(require 'org-publish-docs)
+(require 'init-orgtools)
+(require 'init-latex)
+(require 'init-taskjuggle)
+(require 'init-email)
+(require 'init-sql)
+(require 'init-plantuml)
+(require 'init-function)
+(require 'init-scala)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here

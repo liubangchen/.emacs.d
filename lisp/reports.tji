@@ -1,0 +1,101 @@
+navigator navbar {
+  hidereport 0
+}
+
+textreport report "Plan" {
+  formats html
+  #formats csv
+  header '== %title =='
+  center -8<-
+  [#Plan 任务甘特图] | [#Dashboard 任务面板] | [#Resource 资源视图]
+  ----
+  === Plan ===
+  <[report id="plan"]>
+  ----
+  === Dashboard ===
+  <[report id="dashboard"]>
+  ----
+  === Resource ===
+  <[report id="resourceGraph"]>
+  ->8-
+}
+
+macro TaskTip [
+tooltip istask() -8<-
+'''开始日期: ''' <-query attribute='start'->
+'''结束日期: ''' <-query attribute='end'->
+----
+'''资源分配:'''
+
+<-query attribute='resources'->
+----
+'''前置任务: '''
+
+<-query attribute='precursors'->
+----
+'''后续任务: '''
+
+<-query attribute='followers'->
+->8-
+]
+
+macro AlertColor [
+    cellcolor plan.alert = 0 "#00D000" # green
+    cellcolor plan.alert = 1 "#D0D000" # yellow
+    cellcolor plan.alert = 2 "#D00000" # red
+]
+
+# A traditional Gantt chart with a project overview.
+taskreport plan "" {
+  headline "Project Plan"
+  scenarios plan
+  timeformat "%Y-%m-%d"
+  timezone "Asia/Shanghai"
+  columns bsi{title '序号'},
+	name{title '需求'} ,
+	start{title '开始时间'} ,
+	end{title '结束时间'} ,
+	duration{title '工作量(day)'} ,
+	effortdone{title '已关闭(day)'} ,
+	effortleft{title '开放窗口(day)'} ,
+	complete{title '进度'} ,
+	status{title '任务状态' width 150} ,
+	resources{title '资源'},
+	chart {${TaskTip}  width 1200 }
+  loadunit days
+  hideresource @all
+  caption '工作量以每人每天计算'
+}
+
+taskreport dashboard "" {
+  headline "任务状态 (<-query attribute='now'->)"
+  columns name { title '名称' ${AlertColor} width 200},
+  resources { title '资源'
+    width 200 ${AlertColor}
+    listtype bullets
+    listitem "<-query attribute='name'->"
+    start ${projectstart} end ${projectend} },
+    alerttrend { title '倾向' ${AlertColor} width 50 },
+    journal { title '日志' width 350 ${AlertColor} }
+    journalmode status_up
+    journalattributes headline, author, date, summary, details
+    hidetask ~hasalert(0)
+    sorttasks alert.down, plan.end.up
+    period %{${now} - 1w} +1w
+}
+
+    # A graph showing resource allocation. It identifies whether each
+    # resource is under- or over-allocated for.
+    resourcereport resourceGraph "" {
+      headline "开发资源试图"
+      timeformat "%Y-%m-%d"
+      timezone "Asia/Shanghai"	
+      columns no{title '序号'},
+      name{title '企业微信'},
+      email{title '方向'},
+	    effort{title '工作量'},
+	    weekly { width 900 }
+      loadunit days
+      hidetask ~(isleaf() & isleaf_())
+      sorttasks plan.start.up
+    }
