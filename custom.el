@@ -11,7 +11,7 @@
 ;; (setq centaur-server nil)                      ; Enable `server-mode' or not: t or nil
 (setq centaur-icon t)                        ; Display icons or not: t or nil
 (setq centaur-package-archives 'netease)         ; Package repo: melpa, emacs-china, netease, ustc, tencent or tuna
-(setq centaur-theme 'doom-solarized)                     ; Color theme: auto, random, system, default, pro, dark, light, warm, cold, day or night doom-solarized-dark
+(setq centaur-theme 'default)                     ; Color theme: auto, random, system, default, pro, dark, light, warm, cold, day or night doom-solarized-dark
 (setq centaur-completion-style 'childframe)    ; Completion display style: minibuffer or childframe
 (setq centaur-org-directory "~/notes/org")
 ;; (setq centaur-dashboard nil)                   ; Use dashboard at startup or not: t or nil
@@ -74,16 +74,16 @@
 ;; (when (and (> (length (display-monitor-attributes-list)) 1)
 ;;            (> (display-pixel-width) 1920))
 ;;   (set-frame-parameter nil 'left 1920))
-
+;;; custom.el ends here
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(centaur-package-archives 'netease)
- '(centaur-theme 'pro)
+ '(centaur-theme 'default)
  '(custom-safe-themes
-   '("be9645aaa8c11f76a10bcf36aaf83f54f4587ced1b9b679b55639c87404e2499" default))
+   '("0fe24de6d37ea5a7724c56f0bb01efcbb3fe999a6e461ec1392f3c3b105cc5ac" default))
  '(org-display-custom-times t)
  '(org-refile-targets
    '(("inbox.org" :level . 1)
@@ -92,7 +92,6 @@
      ("started.org" :level . 1)
      ("finished.org" :level . 1)))
  '(org-time-stamp-custom-formats '("<%Y-%m-%d %A>" . "<%Y %m %d  %A [%H:%M]>")))
-
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -102,26 +101,26 @@
  '(aw-minibuffer-leading-char-face ((t (:inherit font-lock-keyword-face :bold t :height 1.0))))
  '(aw-mode-line-face ((t (:inherit mode-line-emphasis :bold t))))
  '(dashboard-heading ((t (:inherit (font-lock-string-face bold)))))
- '(diff-hl-change ((t (:foreground "#FCFCFA" :background nil))))
+ '(diff-hl-change ((t (:foreground "#51afef" :background nil))))
  '(diff-hl-delete ((t (:inherit diff-removed :background nil))))
  '(diff-hl-insert ((t (:inherit diff-added :background nil))))
  '(doom-modeline-buffer-file ((t (:inherit (mode-line bold)))))
  '(flycheck-posframe-background-face ((t (:inherit tooltip))))
  '(flycheck-posframe-border-face ((t (:inherit font-lock-comment-face))))
- '(flycheck-posframe-face ((t (:foreground "#A9DC76"))))
- '(flycheck-posframe-info-face ((t (:foreground "#A9DC76"))))
+ '(flycheck-posframe-face ((t (:foreground "#98be65"))))
+ '(flycheck-posframe-info-face ((t (:foreground "#98be65"))))
  '(git-timemachine-minibuffer-author-face ((t (:inherit success))))
  '(git-timemachine-minibuffer-detail-face ((t (:inherit warning))))
  '(ivy-minibuffer-match-face-1 ((t (:inherit font-lock-doc-face :foreground nil))))
- '(ivy-posframe-border ((t (:background "#727072"))))
- '(lsp-headerline-breadcrumb-path-error-face ((t :underline (:style wave :color "#CC6666") :inherit lsp-headerline-breadcrumb-path-face)))
- '(lsp-headerline-breadcrumb-path-hint-face ((t :underline (:style wave :color "#A9DC76") :inherit lsp-headerline-breadcrumb-path-face)))
- '(lsp-headerline-breadcrumb-path-info-face ((t :underline (:style wave :color "#A9DC76") :inherit lsp-headerline-breadcrumb-path-face)))
- '(lsp-headerline-breadcrumb-path-warning-face ((t :underline (:style wave :color "#FFD866") :inherit lsp-headerline-breadcrumb-path-face)))
- '(lsp-headerline-breadcrumb-symbols-error-face ((t :inherit lsp-headerline-breadcrumb-symbols-face :underline (:style wave :color "#CC6666"))))
- '(lsp-headerline-breadcrumb-symbols-hint-face ((t :inherit lsp-headerline-breadcrumb-symbols-face :underline (:style wave :color "#A9DC76"))))
- '(lsp-headerline-breadcrumb-symbols-info-face ((t :inherit lsp-headerline-breadcrumb-symbols-face :underline (:style wave :color "#A9DC76"))))
- '(lsp-headerline-breadcrumb-symbols-warning-face ((t :inherit lsp-headerline-breadcrumb-symbols-face :underline (:style wave :color "#FFD866"))))
+ '(ivy-posframe-border ((t (:background "#5B6268"))))
+ '(lsp-headerline-breadcrumb-path-error-face ((t :underline (:style wave :color "#ff6c6b") :inherit lsp-headerline-breadcrumb-path-face)))
+ '(lsp-headerline-breadcrumb-path-hint-face ((t :underline (:style wave :color "#98be65") :inherit lsp-headerline-breadcrumb-path-face)))
+ '(lsp-headerline-breadcrumb-path-info-face ((t :underline (:style wave :color "#98be65") :inherit lsp-headerline-breadcrumb-path-face)))
+ '(lsp-headerline-breadcrumb-path-warning-face ((t :underline (:style wave :color "#ECBE7B") :inherit lsp-headerline-breadcrumb-path-face)))
+ '(lsp-headerline-breadcrumb-symbols-error-face ((t :inherit lsp-headerline-breadcrumb-symbols-face :underline (:style wave :color "#ff6c6b"))))
+ '(lsp-headerline-breadcrumb-symbols-hint-face ((t :inherit lsp-headerline-breadcrumb-symbols-face :underline (:style wave :color "#98be65"))))
+ '(lsp-headerline-breadcrumb-symbols-info-face ((t :inherit lsp-headerline-breadcrumb-symbols-face :underline (:style wave :color "#98be65"))))
+ '(lsp-headerline-breadcrumb-symbols-warning-face ((t :inherit lsp-headerline-breadcrumb-symbols-face :underline (:style wave :color "#ECBE7B"))))
  '(lsp-ui-sideline-code-action ((t (:inherit warning))))
  '(macrostep-expansion-highlight-face ((t (:inherit tooltip :extend t))))
  '(org-ellipsis ((t (:foreground nil))))
@@ -131,8 +130,8 @@
  '(pulse-highlight-face ((t (:inherit region))))
  '(pulse-highlight-start-face ((t (:inherit region))))
  '(symbol-overlay-default-face ((t (:inherit (region bold)))))
- '(transient-posframe-border ((t (:background "#727072"))))
- '(which-key-posframe-border ((t (:background "#727072"))))
+ '(transient-posframe-border ((t (:background "#5B6268"))))
+ '(which-key-posframe-border ((t (:background "#5B6268"))))
  '(ztreep-arrow-face ((t (:inherit font-lock-comment-face))))
  '(ztreep-diff-header-face ((t (:inherit (diff-header bold)))))
  '(ztreep-diff-header-small-face ((t (:inherit diff-file-header))))
@@ -144,5 +143,3 @@
  '(ztreep-header-face ((t (:inherit diff-header))))
  '(ztreep-leaf-face ((t (:inherit diff-index))))
  '(ztreep-node-face ((t (:inherit font-lock-variable-name-face)))))
-
-;;; custom.el ends here
