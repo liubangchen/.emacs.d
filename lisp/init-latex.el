@@ -37,7 +37,7 @@
 \\setCJKmainfont{微软雅黑}
 \\setCJKsansfont{微软雅黑}
 \\setCJKmonofont{微软雅黑}
-\\usepackage[dvipsnames]{xcolor}
+%\\usepackage[dvipsnames]{xcolor}
 %\\usepackage[margin=1.6cm]{geometry}
 \\XeTeXlinebreaklocale ``zh''
 \\XeTeXlinebreakskip = 0pt plus 1pt
