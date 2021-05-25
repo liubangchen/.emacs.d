@@ -66,12 +66,9 @@
       ;; Make certain buffers grossly incandescent
       ;; Must before loading the theme
       (use-package solaire-mode
-        :functions persp-load-state-from-file
         :hook (((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
                (minibuffer-setup . solaire-mode-in-minibuffer))
-        :init
-        (solaire-global-mode 1)
-        (advice-add #'persp-load-state-from-file :after #'solaire-mode-restore-persp-mode-buffers))
+        :init (solaire-global-mode 1))
 
       (use-package doom-themes
         :custom-face
@@ -396,6 +393,22 @@
 (use-package page-break-lines
   :diminish
   :hook (after-init . global-page-break-lines-mode))
+
+;; Child frame
+(when (childframe-workable-p)
+  (use-package posframe
+    :config
+    (with-no-warnings
+      (defun my-posframe--prettify-frame (&rest _)
+        (set-face-background 'fringe nil posframe--frame))
+      (advice-add #'posframe--create-posframe :after #'my-posframe--prettify-frame)
+
+      (defun posframe-poshandler-frame-center-near-bottom (info)
+        (cons (/ (- (plist-get info :parent-frame-width)
+                    (plist-get info :posframe-width))
+                 2)
+              (/ (plist-get info :parent-frame-height)
+                 2))))))
 
 (with-no-warnings
   (when sys/macp
