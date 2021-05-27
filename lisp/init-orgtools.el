@@ -95,21 +95,22 @@
       '(
         ("t" "待办任务" entry (file+olp "~/GTD/inbox.org" "Tasks" "计划任务")
          "* TODO %?  \n " :empty-lines 1)
-        ("a" "社区组件" entry (file+olp "~/GTD/inbox.org" "Apache" "待处理Patch")
+        ("a" "社区组件" entry (file+olp "~/GTD/inbox.org" "Apache" "社区issues")
          "* TODO %?  \n " :empty-lines 1)
-        ("n" "笔记待办" entry (file+olp "~/GTD/inbox.org" "笔记待办")
+        ("n" "笔记待办" entry (file+olp "~/GTD/inbox.org" "Notes" "笔记待办")
+         "*  %?  \n " :empty-lines 1)
+        ("n" "会议安排" entry (file+olp "~/GTD/inbox.org" "Meetings" "会议安排")
          "*  %?  \n " :empty-lines 1)
         ("j" "Journal entry" entry (file+weektree "~/GTD/journal/journal.org")
          "* %U - %^{heading}\n  %?")
-        ("p" "私人事项" entry (file+olp "~/GTD/personal.org" "私人事项")
+        ("p" "个人待办" entry (file+olp "~/GTD/personal.org" "Tasks" "个人待办")
          "*  %?  \n " :empty-lines 1)
         )
       ;;显示他们的内容
       org-agenda-files
       (list "~/GTD/inbox.org"
             "~/GTD/personal.org"
-            "~/GTD/job.org"
-            "~/GTD/work.org"
+            "~/GTD/doing.org"
             "~/GTD/finished.org"))
 
 
@@ -117,7 +118,7 @@
 (custom-set-variables
  '(org-refile-targets
    (quote
-    (("inbox.org" :level . 1) ("job.org" :level . 1) ("personal.org" :level . 1) ("started.org" :level . 1) ("finished.org":level . 1))
+    (("inbox.org" :level . 1) ("doing.org" :level . 1) ("personal.org" :level . 1) ("finished.org":level . 1))
     )))
 
 ;; ! : 切换到该状态时会自动添加时间戳
