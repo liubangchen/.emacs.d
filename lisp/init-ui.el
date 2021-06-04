@@ -1,6 +1,6 @@
 ;; init-ui.el --- Better lookings and appearances.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2020 Vincent Zhang
+;; Copyright (C) 2006-2021 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -392,6 +392,12 @@
 ;; Child frame
 (when (childframe-workable-p)
   (use-package posframe
+    :hook (after-load-theme . posframe-delete-all)
+    :init
+    (with-eval-after-load 'persp-mode
+      (add-hook 'persp-load-buffer-functions
+                (lambda (&rest _)
+                  (posframe-delete-all))))
     :config
     (with-no-warnings
       (defun my-posframe--prettify-frame (&rest _)

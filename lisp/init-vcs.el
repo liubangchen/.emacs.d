@@ -1,6 +1,6 @@
 ;; init-vcs.el --- Initialize version control system configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2016-2020 Vincent Zhang
+;; Copyright (C) 2016-2021 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -217,7 +217,7 @@
                                 :background-color (face-background 'tooltip nil t))
                  (unwind-protect
                      (push (read-event) unread-command-events)
-                   (posframe-delete buffer-name))))
+                   (posframe-hide buffer-name))))
               ((and (fboundp 'pos-tip-show) (display-graphic-p))
                (pos-tip-show popuped-message))
               ((fboundp 'lv-message)

@@ -1,6 +1,6 @@
 ;;; init-ivy.el --- Initialize ivy configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2016-2020 Vincent Zhang
+;; Copyright (C) 2016-2021 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -380,7 +380,7 @@
   (use-package ivy-prescient
     :commands ivy-prescient-re-builder
     :custom-face
-    (ivy-minibuffer-match-face-1 ((t (:inherit font-lock-doc-face :foreground nil))))
+    (ivy-minibuffer-match-face-1 ((t (:foreground ,(face-foreground 'font-lock-doc-face nil t)))))
     :init
     (defun ivy-prescient-non-fuzzy (str)
       "Generate an Ivy-formatted non-fuzzy regexp list for the given STR.
@@ -409,7 +409,8 @@ This is for use in `ivy-re-builders-alist'."
             lsp-ivy-workspace-symbol ivy-resume ivy--restore-session
             counsel-grep counsel-git-grep counsel-rg counsel-ag
             counsel-ack counsel-fzf counsel-pt counsel-imenu
-            counsel-org-capture counsel-load-theme counsel-yank-pop
+            counsel-org-capture counsel-outline counsel-org-goto
+            counsel-load-theme counsel-yank-pop
             counsel-recentf counsel-buffer-or-recentf
             centaur-load-theme))
 
@@ -424,32 +425,11 @@ This is for use in `ivy-re-builders-alist'."
       (setq hydra-hint-display-type 'posframe)
 
       (with-no-warnings
-        (defun my-hydra-posframe-show (str)
-          (require 'posframe)
-          (when hydra--posframe-timer
-            (cancel-timer hydra--posframe-timer))
-          (setq hydra--posframe-timer nil)
-          (apply #'posframe-show
-                 " *hydra-posframe*"
-                 :string (concat (propertize "\n" 'face '(:height 0.5))
-                                 str
-                                 (propertize "\n" 'face '(:height 0.5)))
-                 hydra-posframe-show-params))
-        (advice-add #'hydra-posframe-show :override #'my-hydra-posframe-show)
-
-        (defun hydra-posframe-delete ()
-          (require 'posframe)
-          (unless hydra--posframe-timer
-            (setq hydra--posframe-timer
-                  (run-with-idle-timer
-                   0 nil (lambda ()
-                           (setq hydra--posframe-timer nil)
-                           (posframe-delete " *hydra-posframe*"))))))
-
-        (setq hydra-hint-display-alist
-              (list (list 'lv #'lv-message #'lv-delete-window)
-                    (list 'message (lambda (str) (message "%s" str)) (lambda () (message "")))
-                    (list 'posframe #'hydra-posframe-show #'hydra-posframe-delete)))
+        (defun my-hydra-posframe-prettify-string (fn str)
+          (funcall fn (concat (propertize "\n" 'face '(:height 0.5))
+                              str
+                              (propertize "\n" 'face '(:height 0.5)))))
+        (advice-add #'hydra-posframe-show :around #'my-hydra-posframe-prettify-string)
 
         (defun ivy-hydra-poshandler-frame-center-below (info)
           (let ((num 0)
@@ -582,7 +562,6 @@ This is for use in `ivy-re-builders-alist'."
 ;; Display completion in child frame
 (when (childframe-workable-p)
   (use-package ivy-posframe
-    :defines persp-load-buffer-functions
     :custom-face
     (ivy-posframe ((t (:inherit tooltip))))
     (ivy-posframe-border ((t (:background ,(face-foreground 'font-lock-comment-face nil t)))))
@@ -592,11 +571,6 @@ This is for use in `ivy-re-builders-alist'."
           ivy-posframe-border-width 3
           ivy-posframe-parameters '((left-fringe . 8)
                                     (right-fringe . 8)))
-
-    (with-eval-after-load 'persp-mode
-      (add-hook 'persp-load-buffer-functions
-                (lambda (&rest _)
-                  (posframe-delete-all))))
     :config
     (add-hook 'after-load-theme-hook
               (lambda ()
@@ -605,6 +579,7 @@ This is for use in `ivy-re-builders-alist'."
                  `(ivy-posframe-border ((t (:background ,(face-foreground 'font-lock-comment-face nil t))))))))
 
     (with-no-warnings
+      ;; FIXME: hide minibuffer with same colors
       (defun my-ivy-posframe--minibuffer-setup (fn &rest args)
         "Advice function of FN, `ivy--minibuffer-setup' with ARGS."
         (if (not (display-graphic-p))
@@ -618,8 +593,8 @@ This is for use in `ivy-re-builders-alist'."
               (overlay-put ov 'window (selected-window))
               (overlay-put ov 'ivy-posframe t)
               (overlay-put ov 'face
-                           (let* ((face (if (facep 'solaire-minibuffer-face)
-                                            'solaire-minibuffer-face
+                           (let* ((face (if (facep 'solaire-default-face)
+                                            'solaire-default-face
                                           'default))
                                   (bg-color (face-background face nil t)))
                              `(:background ,bg-color :foreground ,bg-color

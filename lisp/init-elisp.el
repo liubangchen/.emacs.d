@@ -1,6 +1,6 @@
 ;; init-elisp.el --- Initialize Emacs Lisp configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2020 Vincent Zhang
+;; Copyright (C) 2006-2021 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -228,9 +228,9 @@ Lisp function does not specify a special indentation."
   :ensure nil
   :diminish
   :config
-  ;; Display `eldoc' in child frame
   (with-no-warnings
-    (when (childframe-workable-p)
+    ;; Display `eldoc' in child frame
+    (when (and (require 'posframe nil t) (posframe-workable-p))
       (defvar eldoc-posframe-buffer "*eldoc-posframe-buffer*"
         "The posframe buffer name use by eldoc-posframe.")
 

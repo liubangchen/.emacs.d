@@ -1,6 +1,6 @@
 ;; init-utils.el --- Initialize ultilities.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2020 Vincent Zhang
+;; Copyright (C) 2006-2021 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -237,7 +237,7 @@ of the buffer text to be displayed in the popup"
               (unwind-protect
                   (push (read-event) unread-command-events)
                 (progn
-                  (posframe-delete youdao-dictionary-buffer-name)
+                  (posframe-hide youdao-dictionary-buffer-name)
                   (other-frame 0))))
           (message "Nothing to look up"))))
     (advice-add #'youdao-dictionary--posframe-tip
