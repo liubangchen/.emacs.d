@@ -544,9 +544,17 @@ This is for use in `ivy-re-builders-alist'."
 
 ;; Better experience with icons
 ;; Enable it before`ivy-rich-mode' for better performance
-(use-package all-the-icons-ivy-rich
-  :if (icons-displayable-p)
-  :hook (ivy-mode . all-the-icons-ivy-rich-mode))
+(when (icons-displayable-p)
+  (use-package all-the-icons-ivy-rich
+    :hook (ivy-mode . all-the-icons-ivy-rich-mode)
+    :config
+    (plist-put all-the-icons-ivy-rich-display-transformers-list
+               'centaur-load-theme
+               '(:columns
+                 ((all-the-icons-ivy-rich-theme-icon)
+                  (ivy-rich-candidate))
+                 :delimiter "\t"))
+    (all-the-icons-ivy-rich-reload)))
 
 ;; More friendly display transformer for Ivy
 (use-package ivy-rich
@@ -603,12 +611,14 @@ This is for use in `ivy-re-builders-alist'."
               (setq-local cursor-type nil)))))
       (advice-add #'ivy-posframe--minibuffer-setup :override #'my-ivy-posframe--minibuffer-setup)
 
-      (defun my-ivy-posframe--adjust-prompt (&rest _)
-        "Add top margin to the prompt."
+      (defun my-ivy-posframe--prettify-buffer (&rest _)
+        "Add top and bottom margin to the prompt."
         (with-current-buffer ivy-posframe-buffer
           (goto-char (point-min))
+          (insert (propertize "\n" 'face '(:height 0.3)))
+          (goto-char (point-max))
           (insert (propertize "\n" 'face '(:height 0.3)))))
-      (advice-add #'ivy-posframe--add-prompt :after #'my-ivy-posframe--adjust-prompt)
+      (advice-add #'ivy-posframe--display :after #'my-ivy-posframe--prettify-buffer)
 
       (defun ivy-posframe-display-at-frame-center-near-bottom (str)
         (ivy-posframe--display str #'posframe-poshandler-frame-center-near-bottom))
