@@ -146,6 +146,30 @@
 (when (executable-find "fd")
   (use-package fd-dired))
 
+(use-package dired-subtree
+  :ensure t
+  :config
+  (bind-keys :map dired-mode-map
+    ("i" . dired-subtree-insert)
+    (";" . dired-subtree-remove)))
+
+(use-package fd-dired
+  :init
+  (setq fd-dired-program "/Users/chenlong/application/coreutils/bin/ls"))
+
+;; wget http://ftp.gnu.org/gnu/coreutils/coreutils-8.32.tar.gz
+;; ./configure --prefix=/Users/chenlong/application/coreutils
+;; (setq insert-directory-program "/Users/chenlong/application/coreutils/bin/ls")
+;; (setq dired-listing-switches "-aBhl --group-directories-first")
+(setq insert-directory-program "/Users/chenlong/application/coreutils/bin/ls")
+(setq dired-listing-switches "-aBhl --group-directories-first")
+
+(use-package dired-quick-sort
+  :ensure t
+  :bind (:map dired-mode-map
+         ("s" . hydra-dired-quick-sort/body)))
+
+(dired-quick-sort-setup)
 (provide 'init-dired)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
