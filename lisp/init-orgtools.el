@@ -83,19 +83,46 @@
     (org-edit-src-code)))
 
 
-(require 'org-journal)
-(setq org-ellipsis "…"
+(defun org-journal-file-header-func (time)
+  "Custom function to create journal header."
+  (concat
+   (pcase org-journal-file-type
+     (`daily "#+TITLE: Daily Journal\n#+STARTUP: showeverything")
+     (`weekly "#+TITLE: Weekly Journal\n#+STARTUP: folded")
+     (`monthly "#+TITLE: Monthly Journal\n#+STARTUP: folded")
+     (`yearly "#+TITLE: Yearly Journal\n#+STARTUP: folded"))))
+
+(defun org-journal-save-entry-and-exit()
+  "Simple convenience function.
+  Saves the buffer of the current day's entry and kills the window
+  Similar to org-capture like behavior"
+  (interactive)
+  (save-buffer)
+  (kill-buffer-and-window))
+
+(use-package org-journal
+  :ensure t
+  :defer t
+  :init
+  ;; Change default prefix key; needs to be set before loading org-journal
+  (setq org-journal-prefix-key "C-c j ")
+  :config
+  (setq org-journal-dir "~/GTD/journal"
+        org-journal-file-format "%Y-%m-%d"
+        org-journal-file-type 'monthly
+        org-journal-file-header 'org-journal-file-header-func
+        org-journal-date-format "%Y-%m-%d %A"))
+
+(setq org-ellipsis "⤵"
       ;; ➡, ⚡, ▼, ↴, , ∞, ⬎, ⤷, ⤵
       org-deadline-warning-days 7
-      org-journal-dir "~/GTD/journal"
-      org-journal-date-format "%Y-%m-%d %A"
       org-default-notes-file "~/GTD/inbox.org"
       org-directory "~/GTD/"
       org-capture-templates
       '(
-        ("t" "待办任务" entry (file+olp "~/GTD/inbox.org" "Tasks" "计划任务")
+        ("t" "待办任务" entry (file+olp "~/GTD/inbox.org" "Tasks" "待办任务")
          "* TODO %?  \n " :empty-lines 1)
-        ("a" "社区组件" entry (file+olp "~/GTD/inbox.org" "Apache" "社区issues")
+        ("a" "临时需求表" entry (file+olp "~/GTD/inbox.org" "Demand" "临时需求表")
          "* TODO %?  \n " :empty-lines 1)
         ("n" "笔记待办" entry (file+olp "~/GTD/inbox.org" "Notes" "笔记待办")
          "*  %?  \n " :empty-lines 1)
