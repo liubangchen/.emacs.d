@@ -128,7 +128,7 @@
          "*  %?  \n " :empty-lines 1)
         ("n" "会议安排" entry (file+olp "~/GTD/inbox.org" "Meetings" "会议安排")
          "*  %?  \n " :empty-lines 1)
-        ("j" "Journal entry" entry (file+weektree "~/GTD/journal/journal.org")
+        ("j" "Journal entry" entry (file+datetree "~/GTD/journal/journal.org")
          "* %U - %^{heading}\n  %?")
         ("p" "个人待办" entry (file+olp "~/GTD/personal.org" "Tasks" "个人待办")
          "*  %?  \n " :empty-lines 1)
