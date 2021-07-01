@@ -82,6 +82,7 @@
     (previous-line 2)
     (org-edit-src-code)))
 
+(set-time-zone-rule "Asia/Shanghai")
 
 (defun org-journal-file-header-func (time)
   "Custom function to create journal header."
