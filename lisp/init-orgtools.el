@@ -203,4 +203,17 @@
 (setq org-confirm-babel-evaluate nil)
 
 
+(defun org-screenshot ()
+  "Take a screenshot into a time stamped unique-named file in the
+same directory as the org-buffer and insert a link to this file."
+  (interactive)
+  (setq filename
+        (concat
+         (make-temp-name
+          (concat "images\/ss"
+                  "_"
+                  (format-time-string "%Y%m%d_%H%M%S_")) ) ".png"))
+  (call-process "screencapture" nil nil nil "-i" filename)
+  (insert (concat "[[./" filename "]]")))
+
 (provide 'init-orgtools)
