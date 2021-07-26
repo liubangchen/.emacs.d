@@ -178,7 +178,7 @@ For example:
                     centaur-theme-alist)
                  symbol))
 
-(defcustom centaur-completion-style 'minibuffer
+(defcustom centaur-completion-style 'childframe
   "Completion display style."
   :group 'centaur
   :type '(choice (const :tag "Minibuffer" minibuffer)
@@ -206,7 +206,6 @@ nil means disabled."
   :group 'centaur
   :type '(choice (const :tag "LSP Mode" lsp-mode)
                  (const :tag "Eglot" eglot)
-                 (const :tag "tags" tags)
                  (const :tag "Disable" nil)))
 
 (defcustom centaur-lsp-format-on-save-ignore-modes
