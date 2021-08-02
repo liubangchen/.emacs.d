@@ -126,7 +126,10 @@
   (setq swiper-action-recenter t)
 
   (setq counsel-find-file-at-point t
+        counsel-preselect-current-file t
+        counsel-find-file-ignore-regexp "\\(?:^[#.]\\)\\|\\(?:[#~]$\\)\\|\\(?:^Icon?\\)"
         counsel-yank-pop-separator "\n────────\n")
+  (add-hook 'counsel-grep-post-action-hook #'recenter)
 
   ;; Use the faster search tool: ripgrep (`rg')
   (when (executable-find "rg")
@@ -611,14 +614,6 @@ This is for use in `ivy-re-builders-alist'."
                                :overline nil :strike-through nil)))
               (setq-local cursor-type nil)))))
       (advice-add #'ivy-posframe--minibuffer-setup :override #'my-ivy-posframe--minibuffer-setup)
-
-      ;; Abort the command that requested the minibuffer input
-      (defun my-ivy-posframe-hidehandler (_)
-        "Hidehandler used by ivy-posframe."
-        (unless (minibufferp)
-          (abort-recursive-edit)
-          t))
-      (advice-add #'ivy-posframe-hidehandler :override #'my-ivy-posframe-hidehandler)
 
       ;; Prettify the buffer
       (defun my-ivy-posframe--prettify-buffer (&rest _)
