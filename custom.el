@@ -58,7 +58,7 @@
                       (font-spec :family chinese :size chinese-size))))
 
 ;;(set-font   "Monaco" "Hiragino Sans GB" 14 16)
-(set-font   "Sarasa Mono SC" "Sarasa Mono SC" 18 18)
+(set-font   "Sarasa Mono SC" "Sarasa Mono SC" 16 16)
 
 ;; Mail
 ;; (setq message-send-mail-function 'smtpmail-send-it
