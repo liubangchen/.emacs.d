@@ -58,7 +58,7 @@
           treemacs-width                   30
           treemacs-no-png-images           (not centaur-icon))
     :config
-    (treemacs-follow-mode t)
+    (treemacs-follow-mode nil)
     (treemacs-filewatch-mode t)
     (pcase (cons (not (null (executable-find "git")))
                  (not (null (executable-find "python3"))))
