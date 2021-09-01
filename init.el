@@ -163,5 +163,6 @@
 (require 'init-plantuml)
 (require 'init-function)
 (require 'init-scala)
+(require 'init-dirtree)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here
