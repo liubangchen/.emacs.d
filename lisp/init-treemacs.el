@@ -55,7 +55,11 @@
           treemacs-missing-project-action  'remove
           treemacs-sorting                 'alphabetic-asc
           treemacs-follow-after-init       t
-          treemacs-width                   30
+          treemacs-width                   40
+          treemacs-file-name-transformer           #'identity
+          treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
+          treemacs-show-cursor                     nil
+          treemacs-show-hidden-files               t
           treemacs-no-png-images           (not centaur-icon))
     :config
     (treemacs-follow-mode nil)
@@ -80,6 +84,11 @@
               magit-post-stage
               magit-post-unstage)
              . treemacs-magit--schedule-update))
+
+    (use-package treemacs-icons-dired
+      :after (treemacs dired)
+      :ensure t
+      :config (treemacs-icons-dired-mode))
 
     (use-package treemacs-persp
       :after persp-mode
