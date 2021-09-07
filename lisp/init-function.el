@@ -65,6 +65,13 @@
   (interactive)
   (mapc 'kill-buffer (buffer-list)))
 
+(defun nxml-pretty-format ()
+  (interactive)
+  (save-excursion
+    (shell-command-on-region (point-min) (point-max) "xmllint --format -" (buffer-name) t)
+    (nxml-mode)
+    (indent-region begin end)))
+
 (add-hook 'c-mode-common-hook   'hs-minor-mode)
 (add-hook 'emacs-lisp-mode-hook 'hs-minor-mode)
 (add-hook 'java-mode-hook       'hs-minor-mode)
