@@ -53,13 +53,13 @@
   :ensure t
   :defer t)
 
-(use-package gitconfig-mode
-  :ensure t
-  :defer t)
+;;(use-package gitconfig-mode
+;;  :ensure t
+;;  :defer t)
 
-(use-package gitignore-mode
-  :ensure t
-  :defer t)
+;;(use-package gitignore-mode
+;;  :ensure t
+;;  :defer t)
 
 (defun close-all-buffers ()
   (interactive)
