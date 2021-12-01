@@ -324,7 +324,8 @@
 (if (fboundp 'display-line-numbers-mode)
     (use-package display-line-numbers
       :ensure nil
-      :hook ((prog-mode yaml-mode) . display-line-numbers-mode))
+      :hook ((prog-mode yaml-mode) . display-line-numbers-mode)
+      :init (setq display-line-numbers-width-start t))
   (use-package linum-off
     :demand
     :defines linum-format
@@ -374,13 +375,14 @@
       scroll-preserve-screen-position t)
 
 ;; Good pixel line scrolling
-(when (and emacs/>=27p
-           (not sys/macp))
-  (use-package good-scroll
-    :diminish
-    :hook (after-init . good-scroll-mode)
-    :bind (([remap next] . good-scroll-up-full-screen)
-           ([remap prior] . good-scroll-down-full-screen))))
+(if (boundp 'pixel-scroll-precision-mode)
+    (pixel-scroll-precision-mode t)
+  (when (and emacs/>=27p (not sys/macp))
+    (use-package good-scroll
+      :diminish
+      :hook (after-init . good-scroll-mode)
+      :bind (([remap next] . good-scroll-up-full-screen)
+             ([remap prior] . good-scroll-down-full-screen)))))
 
 ;; Smooth scrolling over images
 (when emacs/>=26p
