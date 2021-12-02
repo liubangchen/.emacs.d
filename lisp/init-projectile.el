@@ -36,7 +36,7 @@
 (use-package projectile
   :diminish
   :bind (:map projectile-mode-map
-         ("s-t" . projectile-find-file) ; `cmd-t' or `super-t'
+         ("s-t" . projectile--find-file) ; `cmd-t' or `super-t'
          ("C-c p" . projectile-command-map))
   :hook (after-init . projectile-mode)
   :init
@@ -44,6 +44,9 @@
         projectile-sort-order 'recentf
         projectile-use-git-grep t)
   :config
+  (mapc (lambda (item)
+          (add-to-list 'projectile-globally-ignored-directories item))
+        '(".ccls-cache" "build" "release" ".github" ".circleci" ".vscode"))
   ;; Use the faster searcher to handle project files: ripgrep `rg'.
   (when (and (not (executable-find "fd"))
              (executable-find "rg"))

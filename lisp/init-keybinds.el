@@ -15,7 +15,7 @@
 (global-set-key (kbd "RET") 'newline)
 (global-set-key (kbd "C-z") 'undo)
 (global-set-key (kbd "C-S-z") 'redo)
-(global-set-key (kbd "s-o") 'projectile-find-file-dwim)
+(global-set-key (kbd "s-o") 'projectile--find-file)
 (global-set-key (kbd "s-p") 'counsel-find-file)
 ;;buffer跳转
 (global-set-key (kbd "M-<left>") 'back-button-global-backward)
