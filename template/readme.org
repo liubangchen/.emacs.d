@@ -1,0 +1,10 @@
+#+startup: showall
+
+* docx模板
+- [[https://elements.envato.com/graphic-templates/report/compatible-with-adobe-indesign][参考链接]]
+- 使用方式
+
+  #+BEGIN_SRC shell
+    pandoc --reference-doc=/Users/chenlong/Downloads/reference.docx --from latex --to docx EMR共建计划.tex -o ./EMR共建计划.docx
+  #+END_SRC
+
