@@ -244,4 +244,5 @@ same directory as the org-buffer and insert a link to this file."
   (call-process "screencapture" nil nil nil "-i" filename)
   (insert (concat "[[./" filename "]]")))
 
+(setq org-babel-python-command "python3")
 (provide 'init-orgtools)
