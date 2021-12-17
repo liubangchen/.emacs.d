@@ -5,7 +5,7 @@
 ;;(global-set-key (kbd "C-v") 'yank)
 (global-set-key (kbd "C-.") 'revert-buffer)
 (global-set-key (kbd "C-k") 'kill-whole-line)
-(global-set-key (kbd "C-b") 'counsel-switch-buffer)
+(global-set-key (kbd "C-b") 'ido-switch-buffer);;counsel-switch-buffer
 (global-set-key (kbd "C-s") 'swiper-isearch)
 (global-set-key (kbd "C-S-f") 'lsp-format-buffer)
 ;;(global-set-key (kbd "M-x") 'helm-smex)
@@ -21,6 +21,7 @@
 (global-set-key (kbd "M-<left>") 'back-button-global-backward)
 (global-set-key (kbd "M-<right>") 'back-button-global-forward)
 (global-set-key (kbd "M-h") 'hs-toggle-hiding)
+(global-set-key (kbd "s-.") 'ggtags-find-definition)
 
 (add-hook 'term-mode-hook '(lambda()
                              (define-key term-raw-map (kbd "C-y") 'term-paste)
