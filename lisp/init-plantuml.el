@@ -2,7 +2,7 @@
   :ensure t
   :mode ("\\.plu\\'" "\\.plantuml\\'" "\\.puml\\'")
   :config
-  (setq plantuml-jar-path (expand-file-name "~/.emacs.d/lib-lisp/javalibs/plantuml.jar")
+  (setq plantuml-jar-path (expand-file-name "~/.emacs.d/javalibs/plantumllib/plantuml.jar")
         plantuml-default-exec-mode 'jar))
 
 (use-package flycheck-plantuml
