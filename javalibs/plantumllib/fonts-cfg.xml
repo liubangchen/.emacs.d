@@ -1,0 +1,18 @@
+<configuration>
+  <entry>
+    <key>strokeSVGText</key>
+    <value>false</value>
+  </entry>
+  
+  <fonts>
+    <!-- register all the fonts found in a directory -->
+    <directory>/Users/chenlong/Library/Fonts/</directory>
+
+    <!-- register all the fonts found in a directory
+         and all of its sub directories (use with care) -->
+    <!--directory recursive="true">/System/Library/Fonts/</directory-->
+
+    <!-- automatically detect operating system installed fonts -->
+    <auto-detect/>
+  </fonts>
+</configuration>

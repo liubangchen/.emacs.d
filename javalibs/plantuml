@@ -1,3 +1,4 @@
 #!/bin/bash
 curdir=`pwd`
-java -cp ${curdir}/plantumllib/  -jar ${curdir}/plantumllib/plantuml.jar "${@}"
+#java -cp "$(printf %s: *.jar)"  org.apache.fop.fonts.apps.TTFReader -ttcname "Microsoft YaHei" /Users/chenlong/Library/Fonts/WeiRuanYaHei-1.ttf yahei.xml
+java -cp "$(printf %s: plantumllib/*.jar)"    net.sourceforge.plantuml.Run "${@}"
