@@ -54,10 +54,10 @@
     (setq treemacs-collapse-dirs           (if treemacs-python-executable 3 0)
           treemacs-missing-project-action  'remove
           treemacs-sorting                 'alphabetic-asc
-          treemacs-follow-after-init       t
+          treemacs-follow-after-init       nil
           treemacs-width                   40
           treemacs-file-name-transformer           #'identity
-          treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
+          treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask" "/.ccls-cache" "/.git")
           treemacs-show-cursor                     nil
           treemacs-show-hidden-files               t
           treemacs-no-png-images           (not centaur-icon))
