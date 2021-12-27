@@ -59,7 +59,7 @@
 
 ;;(set-font   "Monaco" "Hiragino Sans GB" 14 16)
 (if window-system
-    (set-font   "Sarasa Mono SC" "Sarasa Mono SC" 16 16))
+    (set-font   "Sarasa Mono SC" "Sarasa Mono SC" 14 14))
 ;;(set-font   "Sarasa Mono SC" "Sarasa Mono SC" 16 16)
 
 ;; Mail
