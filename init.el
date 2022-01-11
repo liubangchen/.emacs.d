@@ -75,7 +75,7 @@
 (add-hook 'emacs-startup-hook
           (lambda ()
             "Recover GC values after startup."
-            (setq gc-cons-threshold 800000
+            (setq gc-cons-threshold 104857600
                   gc-cons-percentage 0.1)))
 
 ;; Load path
