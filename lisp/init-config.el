@@ -81,7 +81,21 @@
   (ssh-deploy-hydra "C-c C-z") ;; If you want the hydra feature
   )
 (setenv "TZ" "Asia/Beijing")
-(setq tramp-shell-prompt-pattern       "\\(?:^\\|\r\\)[^]#$%>\n]*#?[]#$%>].* *\\(^[\\[[0-9;]*[a-zA-Z] *\\)*")
-
+(customize-set-variable 'tramp-encoding-shell "/bin/zsh")
+;;(setq tramp-shell-prompt-pattern       "\\(?:^\\|\r\\)[^]#$%>\n]*#?[]#$%>].* *\\(^[\\[[0-9;]*[a-zA-Z] *\\)*")
+(customize-set-variable
+ 'tramp-password-prompt-regexp
+ (concat
+  "^.*"
+  (regexp-opt
+   '("passphrase" "Passphrase"
+     ;; English
+     "password" "Password"
+     ;; Deutsch
+     "passwort" "Passwort"
+     ;; Français
+     "mot de passe" "Mot de passe")
+   t)
+  ".*:\0? *"))
 
 (provide 'init-config)
