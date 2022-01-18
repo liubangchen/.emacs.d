@@ -62,7 +62,7 @@
           treemacs-show-hidden-files               t
           treemacs-no-png-images           (not centaur-icon))
     :config
-    (treemacs-follow-mode nil)
+    (treemacs-follow-mode -1)
     (treemacs-filewatch-mode t)
     (pcase (cons (not (null (executable-find "git")))
                  (not (null (executable-find "python3"))))
