@@ -56,6 +56,7 @@
         company-idle-delay 0
         company-echo-delay (if (display-graphic-p) nil 0)
         company-minimum-prefix-length 1
+        company-icon-margin 3
         company-require-match nil
         company-dabbrev-ignore-case nil
         company-dabbrev-downcase nil
@@ -178,26 +179,25 @@
 
                       ;; Handle hr lines of markdown
                       ;; @see `lsp-ui-doc--handle-hr-lines'
-                      (with-current-buffer (company-box--get-buffer "doc")
-                        (let (bolp next before after)
-                          (goto-char 1)
-                          (while (setq next (next-single-property-change (or next 1) 'markdown-hr))
-                            (when (get-text-property next 'markdown-hr)
-                              (goto-char next)
-                              (setq bolp (bolp)
-                                    before (char-before))
-                              (delete-region (point) (save-excursion (forward-visible-line 1) (point)))
-                              (setq after (char-after (1+ (point))))
-                              (insert
-                               (concat
-                                (and bolp (not (equal before ?\n)) (propertize "\n" 'face '(:height 0.5)))
-                                (propertize "\n" 'face '(:height 0.5))
-                                (propertize " "
-                                            'display '(space :height (1))
-                                            'company-box-doc--replace-hr t
-                                            'face `(:background ,(face-foreground 'font-lock-comment-face)))
-                                (propertize " " 'display '(space :height (1)))
-                                (and (not (equal after ?\n)) (propertize " \n" 'face '(:height 0.5)))))))))
+                      (let (bolp next before after)
+                        (goto-char 1)
+                        (while (setq next (next-single-property-change (or next 1) 'markdown-hr))
+                          (when (get-text-property next 'markdown-hr)
+                            (goto-char next)
+                            (setq bolp (bolp)
+                                  before (char-before))
+                            (delete-region (point) (save-excursion (forward-visible-line 1) (point)))
+                            (setq after (char-after (1+ (point))))
+                            (insert
+                             (concat
+                              (and bolp (not (equal before ?\n)) (propertize "\n" 'face '(:height 0.5)))
+                              (propertize "\n" 'face '(:height 0.5))
+                              (propertize " "
+                                          'display '(space :height (1))
+                                          'company-box-doc--replace-hr t
+                                          'face `(:background ,(face-foreground 'font-lock-comment-face)))
+                              (propertize " " 'display '(space :height (1)))
+                              (and (not (equal after ?\n)) (propertize " \n" 'face '(:height 0.5))))))))
 
                       (setq mode-line-format nil
                             display-line-numbers nil
