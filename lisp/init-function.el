@@ -19,10 +19,11 @@
   (let ((filename (buffer-file-name (current-buffer))))
     (shell-command-to-string
      (concat "pandoc "
+             "-V geometry:a4paper,margin=2cm "
              filename
              " -o "
              (file-name-sans-extension filename)
-             ".pdf -V mainfont=IPAPGothic -V fontsize=16pt --pdf-engine=lualatex"))
+             ".pdf --pdf-engine=xelatex --variable mainfont=\"微软雅黑\" --variable sansfont=\"微软雅黑\""))
     (shell-command-to-string
      (concat "xdg-open "
              (file-name-sans-extension filename)
