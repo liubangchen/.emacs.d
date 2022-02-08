@@ -543,6 +543,7 @@
        :defines projectile-project-root-files-top-down-recurring
        :hook ((c-mode c++-mode objc-mode cuda-mode) . (lambda () (require 'ccls)))
        :config
+       (setq ccls-initialization-options '(:index (:comments 2 :onChange t :threads 3) :completion (:detailedLabel t)))
        (with-eval-after-load 'projectile
          (setq projectile-project-root-files-top-down-recurring
                (append '("compile_commands.json" ".ccls")
