@@ -70,12 +70,12 @@
                       (delete-dups (append file-name-handler-alist
                                            old-file-name-handler-alist)))))))
 
-(setq gc-cons-threshold most-positive-fixnum
+(setq gc-cons-threshold 404857600
       gc-cons-percentage 0.5)
 (add-hook 'emacs-startup-hook
           (lambda ()
             "Recover GC values after startup."
-            (setq gc-cons-threshold 104857600
+            (setq gc-cons-threshold 404857600
                   gc-cons-percentage 0.1)))
 
 ;; Load path
