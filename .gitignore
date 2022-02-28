@@ -76,6 +76,7 @@ rust-playground/
 server/
 session*
 snippets/
+site-lisp/
 thumbs/
 tldr/
 tmp*
