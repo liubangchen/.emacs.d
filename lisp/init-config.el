@@ -98,4 +98,8 @@
    t)
   ".*:\0? *"))
 
+(progn
+  (global-set-key [mouse-1] 'mouse-set-point)
+  (global-unset-key [down-mouse-1])
+  (global-unset-key [drag-mouse-1]))
 (provide 'init-config)
