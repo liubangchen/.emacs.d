@@ -175,19 +175,29 @@ prepended to the element after the #+HEADER: tag."
     (bind-key [remap org-set-tags-command] #'counsel-org-tag org-mode-map))
 
   ;; Prettify UI
-  (when emacs/>=26p
-    (use-package org-superstar
-      :if (and (display-graphic-p) (char-displayable-p ?⚫))
-      :hook (org-mode . org-superstar-mode)
-      :init (setq org-superstar-headline-bullets-list '("⚫" "⚫" "⚫" "⚫"))))
-
-  (use-package org-fancy-priorities
-    :diminish
-    :hook (org-mode . org-fancy-priorities-mode)
-    :init (setq org-fancy-priorities-list
-                (if (and (display-graphic-p) (char-displayable-p ?⯀))
-                    '("⯀" "⯀" "⯀" "⯀")
-                  '("HIGH" "MEDIUM" "LOW" "OPTIONAL"))))
+  (if emacs/>=27p
+      (use-package org-modern
+        :hook ((org-mode . org-modern-mode)
+               (org-modern-mode . (lambda ()
+                                    "Adapt `org-modern-mode'."
+                                    ;; Looks better for tags
+                                    (setq line-spacing 0.1)
+                                    ;; Disable Prettify Symbols mode
+                                    (setq prettify-symbols-alist nil)
+                                    (prettify-symbols-mode -1)))))
+    (progn
+      (when emacs/>=26p
+        (use-package org-superstar
+          :if (and (display-graphic-p) (char-displayable-p ?◉))
+          :hook (org-mode . org-superstar-mode)
+          :init (setq org-superstar-headline-bullets-list '("◉""○""◈""◇""⁕"))))
+      (use-package org-fancy-priorities
+        :diminish
+        :hook (org-mode . org-fancy-priorities-mode)
+        :init (setq org-fancy-priorities-list
+                    (if (and (display-graphic-p) (char-displayable-p ?🅐))
+                        '("🅐" "🅑" "🅒" "🅓")
+                      '("HIGH" "MEDIUM" "LOW" "OPTIONAL"))))))
 
   ;; Babel
   (setq org-confirm-babel-evaluate nil
