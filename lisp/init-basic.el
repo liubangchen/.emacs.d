@@ -268,11 +268,8 @@ Also, delete any process that is exited or signaled."
   :init (setq display-time-24hr-format t
               display-time-day-and-date t))
 
-(when emacs/>=27p
-  (use-package so-long
-    :ensure nil
-    :hook (after-init . global-so-long-mode)
-    :config (setq so-long-threshold 400)))
+(use-package so-long
+  :hook (after-init . global-so-long-mode))
 
 ;; Misc
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -294,13 +291,15 @@ Also, delete any process that is exited or signaled."
       sentence-end-double-space nil
       word-wrap-by-category t)
 
-;; Fullscreen
+;; Frame
 (when (display-graphic-p)
   (add-hook 'window-setup-hook #'fix-fullscreen-cocoa)
   (bind-keys ("C-<f11>" . toggle-frame-fullscreen)
              ("C-s-f" . toggle-frame-fullscreen) ; Compatible with macOS
              ("S-s-<return>" . toggle-frame-fullscreen)
-             ("M-S-<return>" . toggle-frame-fullscreen)))
+             ("M-S-<return>" . toggle-frame-fullscreen))
+  (when sys/mac-x-p
+    (bind-key "C-M-<return>" #'toggle-frame-maximized)))
 
 (provide 'init-basic)
 
