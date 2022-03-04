@@ -83,7 +83,6 @@ Same as `replace-string C-q C-m RET RET'."
   (unless (minibuffer-window-active-p (selected-window))
     (revert-buffer t t)
     (message "Reverted this buffer")))
-(global-set-key (kbd "s-r") #'revert-this-buffer)
 
 (defun delete-this-file ()
   "Delete the current file, and kill the buffer."
@@ -94,7 +93,6 @@ Same as `replace-string C-q C-m RET RET'."
                              (file-name-nondirectory buffer-file-name)))
     (delete-file (buffer-file-name))
     (kill-this-buffer)))
-(global-set-key (kbd "C-x K") #'delete-this-file)
 
 (defun rename-this-file (new-name)
   "Renames both current buffer and file it's visiting to NEW-NAME."
@@ -170,7 +168,6 @@ NEW-SESSION specifies whether to create a new xwidget-webkit session."
   (interactive)
   (load user-init-file))
 (defalias 'centaur-reload-init-file #'reload-init-file)
-(global-set-key (kbd "C-c C-l") #'reload-init-file)
 
 ;; Browse the homepage
 (defun browse-homepage ()
@@ -259,7 +256,6 @@ Save to `custom-file' if NO-SAVE is nil."
       (and (fboundp 'olivetti-mode) (olivetti-mode -1))
       (and (fboundp 'mixed-pitch-mode) (mixed-pitch-mode -1))
       (text-scale-set 0))))
-(global-set-key (kbd "M-<f7>") #'centaur-read-mode)
 
 ;; Pakcage repository (ELPA)
 (defun set-package-archives (archives &optional refresh async no-save)
@@ -617,7 +613,91 @@ If SYNC is non-nil, the updating process is synchronous."
          (centaur--load-theme (centaur--theme-name 'default)))))
     ('random (centaur-load-random-theme))
     (_ (centaur--load-theme (centaur--theme-name theme)))))
-(global-set-key (kbd "C-c T") #'centaur-load-theme)
+
+
+
+;; Frame
+(defvar centaur-frame--geometry nil)
+(defun centaur-frame--save-geometry ()
+  "Save current frame's geometry."
+  (setq-local centaur-frame--geometry
+              `((left . ,(frame-parameter nil 'left))
+                (top . ,(frame-parameter nil 'top))
+                (width . ,(frame-parameter nil 'width))
+                (height . ,(frame-parameter nil 'height))
+                (fullscreen . ,(frame-parameter nil 'fullscreen)))))
+
+(defun centaur-frame--fullscreen-p ()
+  "Returns Non-nil if the frame is fullscreen."
+  (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth)))
+
+(defun centaur-frame-maximize ()
+  "Maximize the frame."
+  (interactive)
+  (centaur-frame--save-geometry)
+  (unless (eq (frame-parameter nil 'fullscreen) 'maximized)
+    (set-frame-parameter nil 'fullscreen 'maximized)))
+
+(defun centaur-frame-restore ()
+  "Restore the frame's size and position."
+  (interactive)
+  (modify-frame-parameters nil centaur-frame--geometry))
+
+(defun centaur-frame-left-half ()
+  "Put the frame to the left-half."
+  (interactive)
+  (unless (centaur-frame--fullscreen-p)
+    (centaur-frame--save-geometry)
+    (let* ((attr (frame-monitor-workarea))
+           (width (- (/ (nth 2 attr) 2) 20))
+           (height (- (nth 3 attr) 30))
+           (left (nth 0 attr))
+           (top (nth 1 attr)))
+      (set-frame-parameter nil 'fullscreen nil)
+      (set-frame-position nil left top)
+      (set-frame-size nil width height t))))
+
+(defun centaur-frame-right-half ()
+  "Put the frame to the right-half."
+  (interactive)
+  (unless (centaur-frame--fullscreen-p)
+    (centaur-frame--save-geometry)
+    (let* ((attr (frame-monitor-workarea))
+           (width (- (/ (nth 2 attr) 2) 20))
+           (height (- (nth 3 attr) 30))
+           (left (+ (nth 0 attr) width 20))
+           (top (nth 1 attr)))
+      (set-frame-parameter nil 'fullscreen nil)
+      (set-frame-position nil left top)
+      (set-frame-size nil width height t))))
+
+(defun centaur-frame-top-half ()
+  "Put the frame to the top-half."
+  (interactive)
+  (unless (centaur-frame--fullscreen-p)
+    (centaur-frame--save-geometry)
+    (let* ((attr (frame-monitor-workarea))
+           (width (- (nth 2 attr) 20))
+           (height (- (/ (nth 3 attr) 2) 30))
+           (left (nth 0 attr))
+           (top (nth 1 attr)))
+      (set-frame-parameter nil 'fullscreen nil)
+      (set-frame-position nil left top)
+      (set-frame-size nil width height t))))
+
+(defun centaur-frame-bottom-half ()
+  "Put the frame to the bottom-half."
+  (interactive)
+  (unless (centaur-frame--fullscreen-p)
+    (centaur-frame--save-geometry)
+    (let* ((attr (frame-monitor-workarea))
+           (width (- (nth 2 attr) 20))
+           (height (- (/ (nth 3 attr) 2) 30))
+           (left (nth 0 attr))
+           (top (+ (nth 1 attr) height 30)))
+      (set-frame-parameter nil 'fullscreen nil)
+      (set-frame-position nil left top)
+      (set-frame-size nil width height t))))
 
 
 
