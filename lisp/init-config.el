@@ -98,6 +98,7 @@
    t)
   ".*:\0? *"))
 
+(setq c-toggle-electric-state nil)
 ;;(progn
 ;;  (global-set-key [mouse-1] 'mouse-set-point)
 ;;  (global-unset-key [down-mouse-1])
