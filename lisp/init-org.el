@@ -264,7 +264,11 @@ prepended to the element after the #+HEADER: tag."
 
     ;; Preview
     (use-package org-preview-html
-      :diminish))
+      :diminish
+      :bind (:map org-mode-map
+             ("C-c C-h" . org-preview-html-mode))
+      :init (when (featurep 'xwidget-internal)
+              (setq org-preview-html-viewer 'xwidget))))
 
   ;; Presentation
   (use-package org-tree-slide
