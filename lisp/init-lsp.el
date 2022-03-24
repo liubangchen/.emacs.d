@@ -108,11 +108,14 @@
 
              lsp-enable-file-watchers nil
              lsp-enable-folding nil
-             lsp-enable-symbol-highlighting nil
+             lsp-enable-symbol-highlighting t
              lsp-enable-text-document-color nil
 
              lsp-enable-indentation nil
-             lsp-enable-on-type-formatting nil)
+             lsp-enable-on-type-formatting nil
+             lsp-lens-enable t
+             lsp-headerline-breadcrumb-enable t
+             lsp-modeline-code-actions-enable t)
 
        ;; For `lsp-clients'
        (setq lsp-clients-python-library-directories '("/usr/local/" "/usr/"))
@@ -222,6 +225,7 @@
        :init (setq lsp-ui-sideline-show-diagnostics nil
                    lsp-ui-sideline-ignore-duplicate t
                    lsp-ui-doc-delay 0.1
+                   lsp-ui-sideline-enable t
                    lsp-ui-doc-border (face-foreground 'font-lock-comment-face nil t)
                    lsp-ui-imenu-colors `(,(face-foreground 'font-lock-keyword-face)
                                          ,(face-foreground 'font-lock-string-face)
@@ -664,6 +668,7 @@
       (eval `(lsp-org-babel-enable ,lang)))))
 
 (provide 'init-lsp)
+;;https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-lsp.el ends here
