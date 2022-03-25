@@ -613,9 +613,13 @@
                lsp-java-format-comments-enabled nil
                lsp-java-import-gradle-enabled nil
                lsp-java-import-maven-enabled nil
+               lsp-java-references-code-lens-enabled t
+               lsp-java-implementations-code-lens-enabled t
+               lsp-java-save-actions-organize-imports t
                lsp-java-format-settings-profile "GoogleStyle"
                lsp-java-format-settings-url "~/.emacs.d/javalibs/eclipse-java-google-style.xml"
                lsp-java-configuration-maven-user-settings  "~/.emacs.d/javalibs/settings.xml"
+               lsp-java-java-path "/Users/chenlong/application/jdk/Contents/Home/bin/java"
                lsp-java-vmargs '("-noverify" "-Xmx4G" "-XX:+UseG1GC" "-server" "-XX:+DisableExplicitGC")
                lsp-java-server-install-dir "~/.emacs.d/javalibs/jdt")
          :bind
