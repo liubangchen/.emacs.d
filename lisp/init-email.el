@@ -1,4 +1,4 @@
-(add-to-list 'load-path "/usr/local/opt/mu/share/emacs/site-lisp/mu/mu4e")
+(add-to-list 'load-path "/opt/homebrew/Cellar/mu/1.6.10/share/emacs/site-lisp/mu/mu4e")
 
 (use-package org-mime)
 (require 'mu4e)
