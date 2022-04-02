@@ -108,7 +108,7 @@
   ;; Change default prefix key; needs to be set before loading org-journal
   (setq org-journal-prefix-key "C-c j ")
   :config
-  (setq org-journal-dir "~/GTD/journal"
+  (setq org-journal-dir "~/notes/org/gtd/journal"
         org-journal-file-format "%Y-%m-%d"
         org-journal-file-type 'monthly
         org-journal-file-header 'org-journal-file-header-func
@@ -117,29 +117,27 @@
 (setq org-ellipsis "⤵"
       ;; ➡, ⚡, ▼, ↴, , ∞, ⬎, ⤷, ⤵
       org-deadline-warning-days 7
-      org-default-notes-file "~/GTD/inbox.org"
-      org-directory "~/GTD/"
+      org-default-notes-file "~/notes/org/gtd/inbox.org"
+      org-directory "~/notes/org/gtd/"
       org-capture-templates
       '(
-        ("t" "待办任务" entry (file+olp "~/GTD/inbox.org" "Tasks" "待办任务")
+        ("t" "待办任务" entry (file+olp "~/notes/org/gtd/inbox.org" "Tasks" "待办任务")
          "* TODO %?  \n " :empty-lines 1)
-        ("a" "临时需求表" entry (file+olp "~/GTD/inbox.org" "Demand" "临时需求表")
+        ("x" "临时需求表" entry (file+olp "~/notes/org/gtd/inbox.org" "Demand" "临时需求表")
          "* TODO %?  \n " :empty-lines 1)
-        ("n" "笔记待办" entry (file+olp "~/GTD/inbox.org" "Notes" "笔记待办")
+        ("n" "笔记待办" entry (file+olp "~/notes/org/gtd/inbox.org" "Notes" "笔记待办")
          "*  %?  \n " :empty-lines 1)
-        ("n" "会议安排" entry (file+olp "~/GTD/inbox.org" "Meetings" "会议安排")
+        ("m" "会议安排" entry (file+olp "~/notes/org/gtd/inbox.org" "Meetings" "会议安排")
          "*  %?  \n " :empty-lines 1)
-        ("j" "Journal entry" entry (file+datetree "~/GTD/journal/journal.org")
+        ("j" "Journal entry" entry (file+datetree "~/notes/org/gtd/journal/journal.org")
          "* %U - %^{heading}\n  %?")
-        ("p" "个人待办" entry (file+olp "~/GTD/personal.org" "Tasks" "个人待办")
+        ("p" "个人待办" entry (file+olp "~/notes/org/gtd/personal.org" "Tasks" "个人待办")
          "*  %?  \n " :empty-lines 1)
         )
       ;;显示他们的内容
       org-agenda-files
-      (list "~/GTD/inbox.org"
-            "~/GTD/personal.org"
-            "~/GTD/doing.org"
-            "~/GTD/finished.org"))
+      (list "~/notes/org/gtd/inbox.org"
+            "~/notes/org/gtd/personal.org"))
 
 
 ;; 将项目转接在各文件之间，方便清理和回顾。
@@ -153,18 +151,18 @@
 ;; @ : 切换到该状态时要求输入文字说明
 ;; 如果同时设定@和!,使用@/!
 (setq org-todo-keywords
-      '((sequence "TODO(t)" "STARTED(s!/@)" "DOING(d@/!)" "PENDDING(p@/!)" "DONE(o@)" "CANCELED(c@/!)")))
+      '((sequence "待办(t)" "开始(s!/@)" "进行中(d@/!)" "阻塞(p@/!)" "完成(o@)" "取消(c@/!)")))
 (setq org-log-done 'note)
 ;;颜色设置
 (setq org-todo-keyword-faces
-      '(("TODO" . org-warning) ("STARTED" . "yellow") ("DOING" . "green4") ("PENDDING" . "OrangeRed") ("DONE" . "#32cd32")
+      '(("TODO" . org-warning) ("开始" . "yellow") ("进行中" . "green4") ("阻塞" . "OrangeRed") ("完成" . "#32cd32")
         ("CANCELED" . (:foreground "blue" :weight bold))))
 
 ;;日期设置
 (setq system-time-locale "zh_CN")
 (custom-set-variables
  '(org-display-custom-times t)
- '(org-time-stamp-custom-formats (quote ("<%Y-%m-%d %A>" . "<%Y %m %d  %A [%H:%M]>"))))
+ '(org-time-stamp-custom-formats (quote ("[%Y-%m-%d %A]" . "[%Y %m %d  %A [%H:%M]]"))))
 (format-time-string "%Y-%m-%d %A")
 
 ;;(use-package org-habit)
