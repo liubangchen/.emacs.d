@@ -138,6 +138,8 @@
               ("\\.\\(?:mp4\\|mkv\\|avi\\|flv\\|rm\\|rmvb\\|ogv\\)\\(?:\\.part\\)?\\'" ,cmd)
               ("\\.\\(?:mp3\\|flac\\)\\'" ,cmd)
               ("\\.html?\\'" ,cmd)
+              ("\\.pptx\\'" ,cmd)
+              ("\\.xlsx\\'" ,cmd)
               ("\\.md\\'" ,cmd))))
 
     (setq dired-omit-files
