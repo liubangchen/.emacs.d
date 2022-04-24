@@ -59,23 +59,6 @@
     ;; Show directory first
     (setq dired-listing-switches "-alh --group-directories-first")
 
-      ;; @see https://emacs-china.org/t/emacs-28-dired-kill-when-opening-new-dired-buffer/20655/4?u=seagle0128
-    (when emacs/>=28p
-      (setq dired-kill-when-opening-new-dired-buffer t)
-      (defun dired--find-possibly-alternative-file@dont-kill-split-buffer (&rest args)
-        "Advice around original function with ARGS to avoid killing the split buffer."
-        (let ((dired-kill-when-opening-new-dired-buffer
-               (and dired-kill-when-opening-new-dired-buffer
-                    (not (memq (current-buffer)
-                               (mapcar #'window-buffer
-                                       (remove
-                                        (get-buffer-window (current-buffer))
-                                        (window-list))))))))
-          (apply args)))
-
-      (advice-add 'dired--find-possibly-alternative-file
-                  :around 'dired--find-possibly-alternative-file@dont-kill-split-buffer))
-
     ;; Quick sort dired buffers via hydra
     (use-package dired-quick-sort
       :bind (:map dired-mode-map
@@ -98,8 +81,9 @@
   ;; Shows icons
   (use-package all-the-icons-dired
     :diminish
-    :if (icons-displayable-p)
-    :hook (dired-mode . all-the-icons-dired-mode)
+    :hook (dired-mode . (lambda ()
+                          (when (icons-displayable-p)
+                            (all-the-icons-dired-mode))))
     :init (setq all-the-icons-dired-monochrome nil)
     :config
     (with-no-warnings
@@ -138,7 +122,7 @@
   (use-package dired-aux :ensure nil)
   (use-package dired-x
     :ensure nil
-    :demand
+    :demand t
     :config
     (let ((cmd (cond (sys/mac-x-p "open")
                      (sys/linux-x-p "xdg-open")

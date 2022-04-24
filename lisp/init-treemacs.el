@@ -94,7 +94,7 @@
 
     (use-package treemacs-persp
       :after persp-mode
-      :demand
+      :demand t
       :functions treemacs-set-scope-type
       :config (treemacs-set-scope-type 'Perspectives))))
 

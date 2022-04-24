@@ -536,6 +536,14 @@ This is for use in `ivy-re-builders-alist'."
                    #'ivy--regex-pinyin))))
        ivy-re-builders-alist))))
 
+;; Ivy
+(use-package ivy-dired-history
+  :demand t
+  :after (savehist dired)
+  :bind (:map dired-mode-map
+         ("," . dired))
+  :init (add-to-list 'savehist-additional-variables 'ivy-dired-history-variable))
+
 ;; Better experience with icons
 ;; Enable it before`ivy-rich-mode' for better performance
 (use-package all-the-icons-ivy-rich
