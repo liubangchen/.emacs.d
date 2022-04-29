@@ -163,14 +163,14 @@
 (use-package aggressive-indent
   :diminish
   :hook ((after-init . global-aggressive-indent-mode)
-         ;; FIXME: Disable in big files due to the performance issues
+         ;; HACK: Disable in big files due to the performance issues
          ;; https://github.com/Malabarba/aggressive-indent-mode/issues/73
          (find-file . (lambda ()
                         (if (> (buffer-size) (* 3000 80))
                             (aggressive-indent-mode -1)))))
   :config
   ;; Disable in some modes
-  (dolist (mode '(asm-mode web-mode html-mode css-mode go-mode scala-mode prolog-inferior-mode))
+  (dolist (mode '(gitconfig-mode asm-mode web-mode html-mode css-mode go-mode scala-mode prolog-inferior-mode))
     (push mode aggressive-indent-excluded-modes))
 
   ;; Disable in some commands
