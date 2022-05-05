@@ -108,14 +108,11 @@
 
              lsp-enable-file-watchers nil
              lsp-enable-folding nil
-             lsp-enable-symbol-highlighting t
+             lsp-enable-symbol-highlighting nil
              lsp-enable-text-document-color nil
 
              lsp-enable-indentation nil
-             lsp-enable-on-type-formatting nil
-             lsp-lens-enable t
-             lsp-headerline-breadcrumb-enable t
-             lsp-modeline-code-actions-enable t)
+             lsp-enable-on-type-formatting nil)
 
        ;; For `lsp-clients'
        (setq lsp-clients-python-library-directories '("/usr/local/" "/usr/"))
@@ -222,15 +219,16 @@
               ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
               ([remap xref-find-references] . lsp-ui-peek-find-references))
        :hook (lsp-mode . lsp-ui-mode)
-       :init (setq lsp-ui-sideline-show-diagnostics nil
-                   lsp-ui-sideline-ignore-duplicate t
-                   lsp-ui-doc-delay 0.1
-                   lsp-ui-sideline-enable t
-                   lsp-ui-doc-border (face-background 'font-lock-comment-face nil t)
-                   lsp-ui-imenu-colors `(,(face-foreground 'font-lock-keyword-face)
-                                         ,(face-foreground 'font-lock-string-face)
-                                         ,(face-foreground 'font-lock-constant-face)
-                                         ,(face-foreground 'font-lock-variable-name-face)))
+       :init
+       (setq lsp-ui-sideline-show-diagnostics nil
+             lsp-ui-sideline-ignore-duplicate t
+             lsp-ui-doc-delay 0.1
+             lsp-ui-imenu-colors `(,(face-foreground 'font-lock-keyword-face)
+                                   ,(face-foreground 'font-lock-string-face)
+                                   ,(face-foreground 'font-lock-constant-face)
+                                   ,(face-foreground 'font-lock-variable-name-face)))
+       (when (facep 'posframe-border)
+         (setq lsp-ui-doc-border (face-background 'posframe-border nil t)))
        :config
        (with-no-warnings
          ;; Display peek in child frame if possible
@@ -578,7 +576,6 @@
        :defines projectile-project-root-files-top-down-recurring
        :hook ((c-mode c++-mode objc-mode cuda-mode) . (lambda () (require 'ccls)))
        :config
-       (setq ccls-initialization-options '(:index (:threads 6) :completion (:detailedLabel t)))
        (with-eval-after-load 'projectile
          (setq projectile-project-root-files-top-down-recurring
                (append '("compile_commands.json" ".ccls")
@@ -603,30 +600,6 @@
      ;; Java
      (when emacs/>=26p
        (use-package lsp-java
-         :config
-         (setq lsp-keep-workspace-alive nil
-               lsp-signature-auto-activate nil
-               lsp-enable-file-watchers nil
-               lsp-java-format-enabled nil
-               lsp-java-format-on-type-enabled nil
-               lsp-java-max-concurrent-builds 8
-               lsp-java-format-comments-enabled nil
-               lsp-java-import-gradle-enabled nil
-               lsp-java-import-maven-enabled nil
-               lsp-java-references-code-lens-enabled t
-               lsp-java-implementations-code-lens-enabled t
-               lsp-java-save-actions-organize-imports t
-               lsp-java-format-settings-profile "GoogleStyle"
-               lsp-java-format-settings-url "~/.emacs.d/javalibs/eclipse-java-google-style.xml"
-               lsp-java-configuration-maven-user-settings  "~/.emacs.d/javalibs/settings.xml"
-               lsp-java-java-path "java"
-               lsp-java-vmargs '("-noverify" "-Xmx4G" "-XX:+UseG1GC" "-server" "-XX:+DisableExplicitGC")
-               lsp-java-server-install-dir "~/.emacs.d/javalibs/jdt")
-         :bind
-         (("s-e" . 'lsp-find-implementation)
-          ("s-t" . 'lsp-ui-find-workspace-symbol)
-          ("s-r" . 'lsp-find-references)
-          ("s-i" . 'lsp-java-add-import))
          :hook (java-mode . (lambda () (require 'lsp-java)))))))
 
   (when (memq centaur-lsp '(lsp-mode eglot))
@@ -672,7 +645,6 @@
       (eval `(lsp-org-babel-enable ,lang)))))
 
 (provide 'init-lsp)
-;;https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-lsp.el ends here
