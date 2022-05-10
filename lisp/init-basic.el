@@ -30,6 +30,7 @@
 
 ;;; Code:
 
+(require 'subr-x)
 (require 'init-const)
 (require 'init-custom)
 (require 'init-funcs)
@@ -92,17 +93,6 @@
 ;; Explicitly set the prefered coding systems to avoid annoying prompt
 ;; from emacs (especially on Microsoft Windows)
 (prefer-coding-system 'utf-8)
-(setq locale-coding-system 'utf-8)
-
-(set-language-environment 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-buffer-file-coding-system 'utf-8)
-(set-clipboard-coding-system 'utf-8)
-(set-file-name-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-selection-coding-system 'utf-8)
-(modify-coding-system-alist 'process "*" 'utf-8)
 
 ;; Environment
 (when (or sys/mac-x-p sys/linux-x-p (daemonp))
@@ -176,7 +166,7 @@
 
     (defun my-list-processes--prettify ()
       "Prettify process list."
-      (let ((entries tabulated-list-entries))
+      (when-let ((entries tabulated-list-entries))
         (setq tabulated-list-entries nil)
         (dolist (p (process-list))
           (when-let* ((val (cadr (assoc p entries)))
@@ -196,8 +186,10 @@
                       (buf-label (aref val 3))
                       (tty (list (aref val 4) 'face 'font-lock-doc-face))
                       (thread (list (aref val 5) 'face 'font-lock-doc-face))
-                      (cmd (list (aref val 6) 'face 'completions-annotations)))
-            (push (list p (vector icon name pid status buf-label tty thread cmd))
+                      (cmd (list (aref val (if emacs/>=27p 6 5)) 'face 'completions-annotations)))
+            (push (list p (if emacs/>=27p
+                              (vector icon name pid status buf-label tty thread cmd)
+                            (vector icon name pid status buf-label tty cmd)))
 		          tabulated-list-entries)))))
     (advice-add #'list-processes--refresh :after #'my-list-processes--prettify)))
 
