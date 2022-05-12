@@ -33,16 +33,7 @@
 ;; Rust
 (require 'init-const)
 
-(defun rk/rustic-mode-hook ()
-  ;; so that run C-c C-c C-r works without having to confirm
-  (setq-local buffer-save-without-query t))
-
-(when emacs/>=26p
-  (use-package rustic
-    :config
-    (setq rustic-format-on-save t)
-    (add-hook 'rustic-mode-hook 'rk/rustic-mode-hook)))
-
+(use-package rustic)
 (use-package rust-playground)
 
 (provide 'init-rust)
