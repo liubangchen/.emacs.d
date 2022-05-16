@@ -210,10 +210,12 @@
               (company-box--maybe-move-number (or company-box--last-start 1))))
           (advice-add #'company-box--display :override #'my-company-box--display)
 
-          (setq company-box-doc-frame-parameters '((vertical-scroll-bars)
+          (setq company-box-doc-frame-parameters '((vertical-scroll-bars . nil)
+                                                   (horizontal-scroll-bars . nil)
                                                    (internal-border-width . 1)
                                                    (left-fringe . 8)
                                                    (right-fringe . 8)))
+
           (defun my-company-box-doc--make-buffer (object)
             (let* ((buffer-list-update-hook nil)
                    (inhibit-modification-hooks t)
@@ -336,7 +338,7 @@
               (set-frame-size frame text-width text-height t)))
           (advice-add #'company-box-doc--set-frame-position :override #'my-company-box-doc--set-frame-position)
 
-          (when (icons-displayable-p)
+          (when (icon-displayable-p)
             (setq company-box-icons-all-the-icons
                   `((Unknown . ,(all-the-icons-material "find_in_page" :height 1.0 :v-adjust -0.2))
                     (Text . ,(all-the-icons-faicon "text-width" :height 1.0 :v-adjust -0.02))
