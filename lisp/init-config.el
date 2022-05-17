@@ -42,7 +42,7 @@
 (define-key isearch-mode-map [escape] 'isearch-abort)   ;;;; isearch
 (global-set-key [escape] 'keyboard-escape-quit)         ;;;; everywhere else
 ;;设置选中区域的颜色
-(set-face-attribute 'region nil :background "#99CC00" :foreground "#ffffff")
+;;(set-face-attribute 'region nil :background "#99CC00" :foreground "#ffffff")
 ;;(setq helm-locate-command "locate %s  -d /Users/chenlong/locate.database -l 100  %s")
 ;;(setq yas-snippet-dirs '("~/.emacs.d/snippets/emacs-snippets"))
 (put 'downcase-region 'disabled nil)
