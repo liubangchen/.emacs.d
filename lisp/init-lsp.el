@@ -114,6 +114,7 @@
                  lsp-enable-indentation nil
                  lsp-enable-on-type-formatting nil
 
+                 lsp-lens-enable nil
                  ;; For `lsp-clients'
                  lsp-clients-python-library-directories '("/usr/local/" "/usr/"))
      :config
