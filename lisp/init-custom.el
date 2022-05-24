@@ -98,9 +98,6 @@
       ,(cons 'ustc
              `(,(cons "gnu"   (concat proto "://mirrors.ustc.edu.cn/elpa/gnu/"))
                ,(cons "melpa" (concat proto "://mirrors.ustc.edu.cn/elpa/melpa/"))))
-      ,(cons 'tencent
-             `(,(cons "gnu"   (concat proto "://mirrors.cloud.tencent.com/elpa/gnu/"))
-               ,(cons "melpa" (concat proto "://mirrors.cloud.tencent.com/elpa/melpa/"))))
       ,(cons 'tuna
              `(,(cons "gnu"   (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/"))
                ,(cons "melpa" (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/"))))))
@@ -221,8 +218,18 @@ nil means disabled."
   :group 'centaur
   :type '(repeat (symbol :tag "Major-Mode")))
 
+(defcustom centaur-tree-sitter t
+  "Enable `tree-sitter' or not."
+  :group 'centaur
+  :type 'boolean)
+
 (defcustom centaur-chinese-calendar nil
   "Enable Chinese calendar or not."
+  :group 'centaur
+  :type 'boolean)
+
+(defcustom centaur-player nil
+  "Enable players or not."
   :group 'centaur
   :type 'boolean)
 
