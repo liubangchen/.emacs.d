@@ -10,7 +10,7 @@
 ;; (setq centaur-proxy "127.0.0.1:1080")          ; Network proxy
 ;; (setq centaur-server nil)                      ; Enable `server-mode' or not: t or nil
 (setq centaur-icon t)                        ; Display icons or not: t or nil
-(setq centaur-package-archives 'tuna)         ; Package repo: melpa, emacs-china, netease, ustc, tencent or tuna
+(setq centaur-package-archives 'melpa)         ; Package repo: melpa, emacs-china, netease, ustc, tencent or tuna
 (setq centaur-theme 'dark)                     ; Color theme: auto, random, system, default, pro, dark, light, warm, cold, day or night doom-solarized-dark
 (setq centaur-completion-style 'minibuffer)    ; Completion display style: minibuffer or childframe
 (setq centaur-org-directory "~/notes/org")
