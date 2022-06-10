@@ -32,19 +32,17 @@
 ;;; Code:
 
 ;; Defer garbage collection further back in the startup process
-(setq gc-cons-threshold most-positive-fixnum
-      gc-cons-percentage 0.5)
+(setq gc-cons-threshold most-positive-fixnum)
 
 ;; Package initialize occurs automatically, before `user-init-file' is
 ;; loaded, but after `early-init-file'. We handle package
 ;; initialization, so we must prevent Emacs from doing it early!
 (setq package-enable-at-startup nil)
 
+(setq load-prefer-newer noninteractive)
+
 ;; Inhibit resizing frame
 (setq frame-inhibit-implied-resize t)
-
-;; Set default coding system
-(set-language-environment "UTF-8")
 
 ;; Faster to disable these here (before they've been initialized)
 (push '(menu-bar-lines . 0) default-frame-alist)
