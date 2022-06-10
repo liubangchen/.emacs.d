@@ -97,6 +97,7 @@
   :hook (after-init . doom-modeline-mode)
   :init
   (setq doom-modeline-icon centaur-icon
+        doom-modeline-height 1
         doom-modeline-minor-modes t)
   ;; Prevent flash of unstyled modeline at startup
   (unless after-init-time
@@ -323,24 +324,11 @@
       (dolist (icon mode-icon-alist)
         (add-to-list 'all-the-icons-mode-icon-alist icon)))))
 
-;; Show native line numbers if possible, otherwise use `linum'
-(if (fboundp 'display-line-numbers-mode)
-    (use-package display-line-numbers
-      :ensure nil
-      :hook ((prog-mode yaml-mode conf-mode) . display-line-numbers-mode)
-      :init (setq display-line-numbers-width-start t))
-  (use-package linum-off
-    :demand t
-    :defines linum-format
-    :hook (after-init . global-linum-mode)
-    :init (setq linum-format "%4d ")
-    :config
-    ;; Highlight current line number
-    (use-package hlinum
-      :defines linum-highlight-in-all-buffersp
-      :custom-face (linum-highlight-face ((t (:inherit default :background nil :foreground nil))))
-      :hook (global-linum-mode . hlinum-activate)
-      :init (setq linum-highlight-in-all-buffersp t))))
+;; Show line numbers
+(use-package display-line-numbers
+  :ensure nil
+  :hook ((prog-mode yaml-mode conf-mode) . display-line-numbers-mode)
+  :init (setq display-line-numbers-width-start t))
 
 ;; Suppress GUI features
 (setq use-file-dialog nil
@@ -451,15 +439,17 @@
   (setq x-gtk-use-system-tooltips nil))
 
 ;; When `centaur-prettify-symbols-alist' is `nil' use font supported ligatures
-(use-package composite
-  :ensure nil
-  :unless centaur-prettify-symbols-alist
-  :init (defvar composition-ligature-table (make-char-table nil))
-  :hook (((prog-mode conf-mode nxml-mode markdown-mode help-mode)
-          . (lambda () (setq-local composition-function-table composition-ligature-table))))
-  :config
-  ;; support ligatures, some toned down to prevent hang
-  (when emacs/>=27p
+(when emacs/>=27p
+  (use-package composite
+    :ensure nil
+    :unless centaur-prettify-symbols-alist
+    :init (defvar composition-ligature-table (make-char-table nil))
+    :hook (((prog-mode
+             conf-mode nxml-mode markdown-mode help-mode
+             shell-mode eshell-mode term-mode vterm-mode)
+            . (lambda () (setq-local composition-function-table composition-ligature-table))))
+    :config
+    ;; support ligatures, some toned down to prevent hang
     (let ((alist
            '((33 . ".\\(?:\\(==\\|[!=]\\)[!=]?\\)")
              (35 . ".\\(?:\\(###?\\|_(\\|[(:=?[_{]\\)[#(:=?[_{]?\\)")
