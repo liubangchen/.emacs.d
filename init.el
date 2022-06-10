@@ -157,5 +157,20 @@ Otherwise the startup will be very slow. "
 (require 'init-elixir)
 (require 'init-web)
 
+(require 'init-keybinds)
+(require 'init-config)
+(require 'init-devops)
+(require 'init-tabbar)
+(require 'org-publish-docs)
+(require 'init-orgtools)
+(require 'init-latex)
+(require 'init-taskjuggle)
+(require 'init-email)
+(require 'init-sql)
+(require 'init-plantuml)
+(require 'init-function)
+(require 'init-scala)
+(require 'init-dirtree)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here
