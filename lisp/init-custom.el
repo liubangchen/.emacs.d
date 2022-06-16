@@ -81,7 +81,7 @@
 ;; @see https://github.com/melpa/melpa and https://elpa.emacs-china.org/.
 (defcustom centaur-package-archives-alist
   '((melpa    . (("gnu"    . "http://elpa.gnu.org/packages/")
-                 ("nongnu" . "http://elpa.nongnu.org/packages/")
+                 ("nongnu" . "http://elpa.nongnu.org/nongnu/")
                  ("melpa"  . "http://melpa.org/packages/")))
     (emacs-cn . (("gnu"    . "http://elpa.emacs-china.org/gnu/")
                  ("nongnu" . "http://elpa.emacs-china.org/nongnu/")
@@ -150,13 +150,14 @@ For example:
   :type '(alist :key-type (string :tag "Time")
                 :value-type (symbol :tag "Theme")))
 
-(when (boundp 'ns-system-appearance)
-  (defcustom centaur-system-themes '((light . doom-one-light)
-				                     (dark  . doom-one))
-    "List of themes related the system appearance. It's only available on macOS."
-    :group 'centaur
-    :type '(alist :key-type (symbol :tag "Appearance")
-                  :value-type (symbol :tag "Theme"))))
+(defcustom centaur-system-themes '((light . doom-one-light)
+				                   (dark  . doom-one))
+  "List of themes related the system appearance.
+
+It's only available on macOS currently."
+  :group 'centaur
+  :type '(alist :key-type (symbol :tag "Appearance")
+                :value-type (symbol :tag "Theme")))
 
 (defcustom centaur-theme 'default
   "The color theme."
