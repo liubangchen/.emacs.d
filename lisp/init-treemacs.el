@@ -55,7 +55,7 @@
   (setq treemacs-collapse-dirs           (if treemacs-python-executable 3 0)
         treemacs-missing-project-action  'remove
         treemacs-sorting                 'alphabetic-asc
-        treemacs-follow-after-init       t
+        treemacs-follow-after-init       nil
         treemacs-width                   30
         treemacs-no-png-images           (not centaur-icon))
   :config
