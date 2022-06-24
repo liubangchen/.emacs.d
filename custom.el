@@ -17,7 +17,7 @@
 ;; (setq centaur-dashboard nil)                   ; Use dashboard at startup or not: t or nil
 (setq centaur-restore-frame-geometry t)      ; Restore the frame's geometry at startup: t or nil
 (setq centaur-lsp 'lsp-mode)                      ; Set LSP client: lsp-mode, eglot or nil
-;; (setq centaur-lsp-format-on-save-ignore-modes '(c-mode c++-mode)) ; Ignore format on save for some languages
+(setq centaur-lsp-format-on-save-ignore-modes '(c-mode c++-mode java-mode go-mode)) ; Ignore format on save for some languages
 (setq centaur-chinese-calendar t)              ; Use Chinese calendar or not: t or nil
 (setq package-check-signature nil)
 ;; (setq centaur-prettify-symbols-alist nil)      ; Alist of symbol prettifications. Nil to use font supports ligatures.
