@@ -100,7 +100,6 @@
   :init
   (setq doom-modeline-icon centaur-icon
         doom-modeline-height 1
-        doom-modeline-window-width-limit 90
         doom-modeline-minor-modes t)
   ;; Prevent flash of unstyled modeline at startup
   (unless after-init-time
@@ -194,7 +193,10 @@
       "relative to project"
       :toggle (eq doom-modeline-buffer-file-name-style 'relative-to-project)))
     "Project Detection"
-    (("p f" (setq doom-modeline-project-detection 'ffip)
+    (("p a" (setq doom-modeline-project-detection 'auto)
+      "auto"
+      :toggle (eq doom-modeline-project-detection 'auto))
+     ("p f" (setq doom-modeline-project-detection 'ffip)
       "ffip"
       :toggle (eq doom-modeline-project-detection 'ffip))
      ("p t" (setq doom-modeline-project-detection 'projectile)
