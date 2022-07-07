@@ -165,7 +165,7 @@ Otherwise the startup will be very slow. "
 (require 'init-orgtools)
 (require 'init-latex)
 (require 'init-taskjuggle)
-(require 'init-email)
+;;(require 'init-email)
 (require 'init-sql)
 (require 'init-plantuml)
 (require 'init-function)
