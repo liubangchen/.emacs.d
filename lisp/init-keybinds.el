@@ -23,6 +23,7 @@
 (global-set-key (kbd "M-<left>") 'back-button-global-backward)
 (global-set-key (kbd "M-<right>") 'back-button-global-forward)
 (global-set-key (kbd "M-h") 'hs-toggle-hiding)
+(global-set-key (kbd "s-u") 'ssh-deploy-upload-handler-forced)
 ;;(global-set-key (kbd "s-.") 'ggtags-find-definition)
 
 (add-hook 'term-mode-hook '(lambda()
