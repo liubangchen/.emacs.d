@@ -64,7 +64,10 @@
 
   ;; Support Perforce project
   (let ((val (or (getenv "P4CONFIG") ".p4config")))
-    (add-to-list 'projectile-project-root-files-bottom-up val)))
+    (add-to-list 'projectile-project-root-files-bottom-up val))
+  (mapc (lambda (item)
+          (add-to-list 'projectile-globally-ignored-directories item))
+        '(".ccls-cache" "build" "release" ".github" ".circleci" ".vscode" ".git" ".circleci")))
 
 (provide 'init-projectile)
 
