@@ -44,10 +44,7 @@
         projectile-sort-order 'recentf
         projectile-use-git-grep t)
   :config
-  (mapc (lambda (item)
-          (add-to-list 'projectile-globally-ignored-directories item))
-        '(".ccls-cache" "build" "release" ".github" ".circleci" ".vscode" ".git" ".circleci"))
-  ;; Use the faster searcher to handle project files: ripgrep `rg'.
+  ;; Use the faster searcher to handle project files
   (when (and (not (executable-find "fd"))
              (executable-find "rg"))
     (setq projectile-generic-command
