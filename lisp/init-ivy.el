@@ -488,14 +488,6 @@
         (hydra-set-posframe-show-params)
         (add-hook 'after-load-theme-hook #'hydra-set-posframe-show-params t))))
 
-  ;; Ivy integration for Projectile
-  (use-package counsel-projectile
-    :hook (counsel-mode . counsel-projectile-mode)
-    :init
-    (setq counsel-projectile-grep-initial-input '(ivy-thing-at-point))
-    (when (executable-find "ugrep")
-      (setq counsel-projectile-grep-base-command "ugrep --color=never -rnEI %s")))
-
   ;; Integrate yasnippet
   (use-package ivy-yasnippet
     :bind ("C-c C-y" . ivy-yasnippet))
@@ -559,13 +551,27 @@
       (advice-add #'ivy--regex-plus :around #'my-ivy--regex-pinyin)
       (advice-add #'ivy--regex-ignore-order :around #'my-ivy--regex-pinyin))))
 
-;; Ivy
+;; Use Ivy to open recent directories
 (use-package ivy-dired-history
   :demand t
-  :after (savehist dired)
+  :after dired
+  :defines (savehist-additional-variables desktop-globals-to-save)
   :bind (:map dired-mode-map
          ("," . dired))
-  :init (add-to-list 'savehist-additional-variables 'ivy-dired-history-variable))
+  :init
+  (with-eval-after-load 'savehist
+    (add-to-list 'savehist-additional-variables 'ivy-dired-history-variable))
+  (with-eval-after-load 'desktop
+    (add-to-list 'desktop-globals-to-save 'ivy-dired-history-variable)))
+
+
+;; `projectile' integration
+(use-package counsel-projectile
+  :hook (counsel-mode . counsel-projectile-mode)
+  :init
+  (setq counsel-projectile-grep-initial-input '(ivy-thing-at-point))
+  (when (executable-find "ugrep")
+    (setq counsel-projectile-grep-base-command "ugrep --color=never -rnEI %s")))
 
 ;; Better experience with icons
 ;; Enable it before`ivy-rich-mode' for better performance
