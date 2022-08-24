@@ -106,6 +106,9 @@
                  lsp-modeline-workspace-status-enable nil
                  lsp-headerline-breadcrumb-enable nil
 
+                 lsp-semantic-tokens-enable t
+                 lsp-progress-spinner-type 'horizontal-breathing
+
                  lsp-enable-file-watchers nil
                  lsp-enable-folding nil
                  lsp-enable-symbol-highlighting nil
@@ -364,10 +367,8 @@
             (elixir-mode            . (lambda () (require 'dap-elixir)))
             ((js-mode js2-mode)     . (lambda () (require 'dap-chrome)))
             (powershell-mode        . (lambda () (require 'dap-pwsh))))
-     :init
-     (setq dap-auto-configure-features '(sessions locals breakpoints expressions controls))
-     (when (executable-find "python3")
-       (setq dap-python-executable "python3")))
+     :init (when (executable-find "python3")
+             (setq dap-python-executable "python3")))
 
    ;; `lsp-mode' and `treemacs' integration
    (use-package lsp-treemacs
