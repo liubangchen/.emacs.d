@@ -58,7 +58,8 @@
     (set-fontset-font (frame-parameter nil 'font) charset
                       (font-spec :family chinese :size chinese-size))))
 
-(set-font   "Monaco" "Hiragino Sans GB" 14 16)
+(if (display-graphic-p)
+    (set-font   "Monaco" "Hiragino Sans GB" 14 16))
 ;;(if window-system
 ;;    (set-font   "Sarasa Mono SC" "Sarasa Mono SC" 15 15))
 ;;(set-font   "Sarasa Mono SC" "Sarasa Mono SC" 16 16)
