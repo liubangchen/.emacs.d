@@ -88,13 +88,16 @@
     (("F" set-frame-font "font")
      ("T" centaur-load-theme "theme"))))
   :custom-face
-  (aw-leading-char-face ((t (:inherit font-lock-keyword-face :bold t :height 2.0))))
+  (aw-leading-char-face ((t (:inherit font-lock-keyword-face :bold t :height 3.0))))
   (aw-minibuffer-leading-char-face ((t (:inherit font-lock-keyword-face :bold t :height 1.0))))
   (aw-mode-line-face ((t (:inherit mode-line-emphasis :bold t))))
   :bind (([remap other-window] . ace-window)
          ("C-c w" . ace-window-hydra/body))
   :hook (emacs-startup . ace-window-display-mode)
   :config
+  (when (childframe-workable-p)
+    (ace-window-posframe-mode 1))
+
   (defun toggle-window-split ()
     (interactive)
     (if (= (count-windows) 2)
@@ -208,7 +211,7 @@
           "\\*docker-.+\\*"
           "\\*prolog\\*" inferior-python-mode inf-ruby-mode swift-repl-mode
           "\\*rustfmt\\*$" rustic-compilation-mode rustic-cargo-clippy-mode
-          rustic-cargo-outdated-mode rustic-cargo-test-moed))
+          rustic-cargo-outdated-mode rustic-cargo-run-mode rustic-cargo-test-mode))
 
   (with-eval-after-load 'projectile
     (setq popper-group-function #'popper-group-by-projectile))
