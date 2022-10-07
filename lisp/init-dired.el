@@ -55,15 +55,13 @@
             (and (not sys/macp) (executable-find "ls")))
     ;; Using `insert-directory-program'
     (setq ls-lisp-use-insert-directory-program t)
-
     ;; Show directory first
-    (unless sys/win32p
-      (setq dired-listing-switches "-alh --group-directories-first"))
+    (setq dired-listing-switches "-alh --group-directories-first"))
 
-    ;; Quick sort dired buffers via hydra
-    (use-package dired-quick-sort
-      :bind (:map dired-mode-map
-             ("S" . hydra-dired-quick-sort/body))))
+  ;; Quick sort dired buffers via hydra
+  (use-package dired-quick-sort
+    :bind (:map dired-mode-map
+           ("S" . hydra-dired-quick-sort/body)))
 
   ;; Show git info in dired
   (use-package dired-git-info

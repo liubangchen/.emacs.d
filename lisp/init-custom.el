@@ -126,7 +126,7 @@
 (defcustom centaur-theme-alist
   '((default . doom-one)
     (pro     . doom-monokai-pro)
-    (dark    . doom-nord-aurora)
+    (dark    . doom-vibrant)
     (light   . doom-one-light)
     (warm    . doom-solarized-light)
     (cold    . doom-palenight)
