@@ -71,6 +71,9 @@
                      (t
                       (set-fontset-font t 'emoji (font-spec :family font) nil 'prepend))))
 
+    (dolist (charset '(kana han symbol cjk-misc bopomofo))
+      (set-fontset-font (frame-parameter nil 'font) charset
+                        (font-spec :family "WenQuanYi Micro Hei" :size 14)))
     ;; Specify font for Chinese characters
     (cl-loop for font in '("WenQuanYi Micro Hei" "PingFang SC" "Microsoft Yahei" "STFangsong")
              when (font-installed-p font)
