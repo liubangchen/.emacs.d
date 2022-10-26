@@ -4,6 +4,7 @@
 ;;;       Put your own configurations in custom-post.el to override default configurations.
 ;;; Code:
 
+(setq package-check-signature nil)
 ;;(setq centaur-logo nil)                        ; Logo file or nil (official logo)
 (setq centaur-full-name "liubangchen")           ; User full name
 (setq centaur-mail-address "liubangchen@tencent.com")   ; Email address
