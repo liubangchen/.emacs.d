@@ -249,10 +249,12 @@ FACE defaults to inheriting from default and highlight."
 
   (defun my-set-diff-hl-faces ()
     "Set `diff-hl' faces."
-    (custom-set-faces
-     `(diff-hl-change ((t (:foreground ,(face-foreground 'custom-changed) :background nil))))
-     '(diff-hl-insert ((t (:inherit diff-added :background nil))))
-     '(diff-hl-delete ((t (:inherit diff-removed :background nil))))))
+    (apply #'face-spec-set
+           `(diff-hl-change ((t (:foreground ,(face-foreground 'custom-changed) :background unspecified)))))
+    (apply #'face-spec-set
+           '(diff-hl-insert ((t (:inherit diff-added :background unspecified)))))
+    (apply #'face-spec-set
+           '(diff-hl-delete ((t (:inherit diff-removed :background unspecified))))))
 
   (with-no-warnings
     (defun my-diff-hl-fringe-bmp-function (_type _pos)
@@ -292,8 +294,8 @@ FACE defaults to inheriting from default and highlight."
 (use-package pulse
   :ensure nil
   :custom-face
-  (pulse-highlight-start-face ((t (:inherit region))))
-  (pulse-highlight-face ((t (:inherit region :extend t))))
+  (pulse-highlight-start-face ((t (:inherit region :background unspecified))))
+  (pulse-highlight-face ((t (:inherit region :background unspecified :extend t))))
   :hook (((dumb-jump-after-jump imenu-after-jump) . my-recenter-and-pulse)
          ((bookmark-after-jump magit-diff-visit-file next-error) . my-recenter-and-pulse-line))
   :init
