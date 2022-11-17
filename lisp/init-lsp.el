@@ -51,37 +51,9 @@
    ;; https://github.com/emacs-lsp/lsp-mode#supported-languages
    (use-package lsp-mode
      :diminish
-     :defines lsp-clients-python-library-directories
-     :commands (lsp-enable-which-key-integration
-                lsp-format-buffer
-                lsp-organize-imports
-                lsp-install-server)
-     :custom-face
-     (lsp-headerline-breadcrumb-path-error-face
-      ((t :underline (:style wave :color ,(face-foreground 'error))
-          :inherit lsp-headerline-breadcrumb-path-face)))
-     (lsp-headerline-breadcrumb-path-warning-face
-      ((t :underline (:style wave :color ,(face-foreground 'warning))
-          :inherit lsp-headerline-breadcrumb-path-face)))
-     (lsp-headerline-breadcrumb-path-info-face
-      ((t :underline (:style wave :color ,(face-foreground 'success))
-          :inherit lsp-headerline-breadcrumb-path-face)))
-     (lsp-headerline-breadcrumb-path-hint-face
-      ((t :underline (:style wave :color ,(face-foreground 'success))
-          :inherit lsp-headerline-breadcrumb-path-face)))
-
-     (lsp-headerline-breadcrumb-symbols-error-face
-      ((t :inherit lsp-headerline-breadcrumb-symbols-face
-          :underline (:style wave :color ,(face-foreground 'error)))))
-     (lsp-headerline-breadcrumb-symbols-warning-face
-      ((t :inherit lsp-headerline-breadcrumb-symbols-face
-          :underline (:style wave :color ,(face-foreground 'warning)))))
-     (lsp-headerline-breadcrumb-symbols-info-face
-      ((t :inherit lsp-headerline-breadcrumb-symbols-face
-          :underline (:style wave :color ,(face-foreground 'success)))))
-     (lsp-headerline-breadcrumb-symbols-hint-face
-      ((t :inherit lsp-headerline-breadcrumb-symbols-face
-          :underline (:style wave :color ,(face-foreground 'success)))))
+     :defines (lsp-diagnostics-disabled-modes lsp-clients-python-library-directories)
+     :autoload lsp-enable-which-key-integration
+     :commands (lsp-format-buffer lsp-organize-imports)
      :hook ((prog-mode . (lambda ()
                            (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode 'makefile-mode)
                              (lsp-deferred))))
@@ -117,8 +89,10 @@
                  lsp-enable-indentation nil
                  lsp-enable-on-type-formatting nil
 
-                 lsp-lens-enable nil
-                 ;; For `lsp-clients'
+                 ;; For diagnostics
+                 lsp-diagnostics-disabled-modes '(markdown-mode gfm-mode)
+
+                 ;; For clients
                  lsp-clients-python-library-directories '("/usr/local/" "/usr/"))
      :config
      (with-no-warnings
@@ -233,7 +207,7 @@
        (setq lsp-ui-doc-border
              (if (facep 'posframe-border)
                  (face-background 'posframe-border nil t)
-               (face-foreground 'shadow nil t))))
+               (face-background 'region nil t))))
      (my-lsp-ui-doc-set-border)
      (add-hook 'after-load-theme-hook #'my-lsp-ui-doc-set-border t)
      :config
