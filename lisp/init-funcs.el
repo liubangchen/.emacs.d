@@ -135,9 +135,9 @@ NEW-SESSION specifies whether to create a new xwidget-webkit session."
                  (browse-url-interactive-arg "xwidget-webkit URL: ")))
   (or (featurep 'xwidget-internal)
       (user-error "Your Emacs was not compiled with xwidgets support"))
+
   (xwidget-webkit-browse-url url new-session)
-  (let ((buf (xwidget-buffer (and (fboundp 'xwidget-webkit-current-session)
-                                  (xwidget-webkit-current-session)))))
+  (let ((buf (xwidget-buffer (xwidget-webkit-current-session))))
     (when (buffer-live-p buf)
       (and (eq buf (current-buffer)) (quit-window))
       (if pop-buffer
@@ -560,7 +560,7 @@ If SYNC is non-nil, the updating process is synchronous."
 
 (defun centaur--load-theme (theme)
   "Disable others and enable new one."
-  (when theme
+  (when-let ((theme (centaur--theme-name theme)))
     (message "Loading theme `%s'..." theme)
     (mapc #'disable-theme custom-enabled-themes)
     (load-theme theme t)
@@ -569,11 +569,7 @@ If SYNC is non-nil, the updating process is synchronous."
 (defun centaur--load-system-theme (appearance)
   "Load theme, taking current system APPEARANCE into consideration."
   (mapc #'disable-theme custom-enabled-themes)
-  (centaur--load-theme (centaur--theme-name
-                        (pcase appearance
-                          ('light (cdr (assoc 'light centaur-system-themes)))
-                          ('dark (cdr (assoc 'dark centaur-system-themes)))
-                          (_ centaur-theme)))))
+  (centaur--load-theme (alist-get appearance centaur-system-themes)))
 
 (defun centaur-load-random-theme ()
   "Load the random theme."
@@ -600,6 +596,7 @@ If SYNC is non-nil, the updating process is synchronous."
 
   ;; Disable system theme
   (when (bound-and-true-p auto-dark-mode)
+    (setq auto-dark--last-dark-mode-state 'unknown)
     (auto-dark-mode -1))
 
   (pcase centaur-theme
@@ -616,11 +613,13 @@ If SYNC is non-nil, the updating process is synchronous."
            :init
            (setq auto-dark-light-theme (alist-get 'light centaur-system-themes)
                  auto-dark-dark-theme (alist-get 'dark centaur-system-themes))
-           (auto-dark-mode 1))
+           (auto-dark-mode 1)
+           (when (bound-and-true-p ns-system-appearance)
+             (centaur--load-system-theme ns-system-appearance)))
        (message "The `system' theme is unavailable on this platform. Using `default' theme...")
-       (centaur--load-theme (centaur--theme-name 'default))))
+       (centaur--load-theme 'default)))
     ('random (centaur-load-random-theme))
-    (_ (centaur--load-theme (centaur--theme-name theme)))))
+    (_ (centaur--load-theme theme))))
 
 
 
@@ -628,12 +627,12 @@ If SYNC is non-nil, the updating process is synchronous."
 (defvar centaur-frame--geometry nil)
 (defun centaur-frame--save-geometry ()
   "Save current frame's geometry."
-  (setq-local centaur-frame--geometry
-              `((left . ,(frame-parameter nil 'left))
-                (top . ,(frame-parameter nil 'top))
-                (width . ,(frame-parameter nil 'width))
-                (height . ,(frame-parameter nil 'height))
-                (fullscreen))))
+  (setq centaur-frame--geometry
+        `((left   . ,(frame-parameter nil 'left))
+          (top    . ,(frame-parameter nil 'top))
+          (width  . ,(frame-parameter nil 'width))
+          (height . ,(frame-parameter nil 'height))
+          (fullscreen))))
 
 (defun centaur-frame--fullscreen-p ()
   "Returns Non-nil if the frame is fullscreen."
