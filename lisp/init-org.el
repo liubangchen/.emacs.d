@@ -38,6 +38,7 @@
   :ensure nil
   :custom-face (org-ellipsis ((t (:foreground unspecified))))
   :pretty-hydra
+  ;; See `org-structure-template-alist'
   ((:title (pretty-hydra-title "Org Template" 'fileicon "org" :face 'all-the-icons-green :height 1.1 :v-adjust 0.0)
     :color blue :quit-key ("q" "C-g"))
    ("Basic"
@@ -62,6 +63,7 @@
      ("m" (hot-expand "<s" "emacs-lisp") "emacs-lisp")
      ("y" (hot-expand "<s" "python :results output") "python")
      ("p" (hot-expand "<s" "perl") "perl")
+     ("w" (hot-expand "<s" "powershell") "powershell")
      ("r" (hot-expand "<s" "ruby") "ruby")
      ("S" (hot-expand "<s" "sh") "sh")
      ("g" (hot-expand "<s" "go :imports '\(\"fmt\"\)") "golang"))
@@ -228,6 +230,9 @@ prepended to the element after the #+HEADER: tag."
   (use-package ob-go
     :init (cl-pushnew '(go . t) load-language-alist))
 
+  (use-package ob-powershell
+    :init (cl-pushnew '(powershell . t) load-language-alist))
+
   (use-package ob-rust
     :init (cl-pushnew '(rust . t) load-language-alist))
 
@@ -335,6 +340,7 @@ prepended to the element after the #+HEADER: tag."
 
     (when emacs/>=27p
       (use-package org-roam-ui
+        :bind ("C-c n u" . org-roam-ui-mode)
         :init
         (when (featurep 'xwidget-internal)
           (setq org-roam-ui-browser-function #'xwidget-webkit-browse-url))))))
