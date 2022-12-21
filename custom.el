@@ -12,7 +12,7 @@
 ;; (setq centaur-socks-proxy "127.0.0.1:7890")    ; SOCKS proxy
 ;; (setq centaur-server nil)                      ; Enable `server-mode' or not: t or nil
 ;; (setq centaur-icon nil)                        ; Display icons or not: t or nil
-(setq centaur-package-archives 'melpa)         ; Package repo: melpa, emacs-cn, bfsu, netease, sjtu, tencent, tuna or ustc
+(setq centaur-package-archives 'sjtu)         ; Package repo: melpa, emacs-cn, bfsu, netease, sjtu, tencent, tuna or ustc
 (setq centaur-theme 'default)                     ; Color theme: auto, random, system, default, pro, dark, light, warm, cold, day or night
 (setq centaur-org-directory "~/notes/org")
 ;; (setq centaur-completion-style 'minibuffer)    ; Completion display style: minibuffer or childframe
@@ -20,7 +20,7 @@
 ;; (setq centaur-restore-frame-geometry nil)      ; Restore the frame's geometry at startup: t or nil
 (setq centaur-lsp 'lsp-mode)                      ; Set LSP client: lsp-mode, eglot or nil
 (setq centaur-lsp-format-on-save-ignore-modes '(c-mode c++-mode python-mode markdown-mode java-mode)) ; Ignore format on save for some languages
-(setq centaur-tree-sitter t)                   ; Enable `tree-sitter' or not: t or nil
+(setq centaur-tree-sitter nil)                   ; Enable `tree-sitter' or not: t or nil
 (setq centaur-chinese-calendar t)              ; Support Chinese calendar or not: t or nil
 (setq centaur-player t)                        ; Enable players or not: t or nil
 ;; (setq centaur-prettify-symbols-alist nil)      ; Alist of symbol prettifications. Nil to use font supports ligatures.
