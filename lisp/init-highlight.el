@@ -102,7 +102,7 @@ FACE defaults to inheriting from default and highlight."
   (symbol-overlay-face-3 ((t (:inherit all-the-icons-yellow :background unspecified :foreground unspecified :inverse-video t))))
   (symbol-overlay-face-4 ((t (:inherit all-the-icons-orange :background unspecified :foreground unspecified :inverse-video t))))
   (symbol-overlay-face-5 ((t (:inherit all-the-icons-red :background unspecified :foreground unspecified :inverse-video t))))
-  (symbol-overlay-face-6 ((t (:inherit all-the-icons-maroon :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-6 ((t (:inherit all-the-icons-purple :background unspecified :foreground unspecified :inverse-video t))))
   (symbol-overlay-face-7 ((t (:inherit all-the-icons-green :background unspecified :foreground unspecified :inverse-video t))))
   (symbol-overlay-face-8 ((t (:inherit all-the-icons-cyan :background unspecified :foreground unspecified :inverse-video t))))
   :bind (("M-i" . symbol-overlay-put)
@@ -118,24 +118,6 @@ FACE defaults to inheriting from default and highlight."
   :init (setq symbol-overlay-idle-time 0.1)
   :config
   (with-no-warnings
-    ;; FIXME: https://github.com/wolray/symbol-overlay/issues/88
-    (defun symbol-overlay-get-list (dir &optional symbol exclude)
-      "Get all highlighted overlays in the buffer.
-If SYMBOL is non-nil, get the overlays that belong to it.
-DIR is an integer.
-If EXCLUDE is non-nil, get all overlays excluding those belong to SYMBOL."
-      (let ((lists (progn (overlay-recenter (point)) (overlay-lists)))
-            (func (if (> dir 0) 'cdr (if (< dir 0) 'car nil))))
-        (seq-filter
-         (lambda (ov)
-           (let ((value (overlay-get ov 'symbol)))
-             (and value
-                  (or (not symbol)
-                      (if (string= value symbol) (not exclude)
-                        (and exclude (not (string= value ""))))))))
-         (if func (funcall func lists)
-           (append (car lists) (cdr lists))))))
-
     ;; Disable symbol highlighting while selecting
     (defun turn-off-symbol-overlay (&rest _)
       "Turn off symbol highlighting."
