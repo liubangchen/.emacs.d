@@ -49,7 +49,10 @@
   (setq citre-auto-enable-citre-mode-modes '(prog-mode)
         citre-default-create-tags-file-location 'global-cache
         citre-use-project-root-when-creating-tags t
-        citre-prompt-language-for-ctags-command t)
+        citre-prompt-language-for-ctags-command t
+        citre-ctags-program "/opt/homebrew/Cellar/universal-ctags/p6.0.20230108.0/bin/ctags"
+        citre-readtags-program "/opt/homebrew/Cellar/universal-ctags/p6.0.20230108.0/bin/readtags"
+        citre-gtags-args '("--compact"))
 
   (with-eval-after-load 'projectile
     (setq citre-project-root-function #'projectile-project-root))
