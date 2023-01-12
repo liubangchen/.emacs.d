@@ -567,6 +567,9 @@
 
    ;; Java
    (use-package lsp-java
+     :config
+     ;; current VSCode defaults
+     (setq lsp-java-vmargs '("-XX:+UseZGC" "-XX:GCTimeRatio=4" "-XX:AdaptiveSizePolicyWeight=90" "-Dsun.zip.disableMemoryMapping=true" "-Xmx2G" "-Xms100m"))
      :hook (java-mode . (lambda () (require 'lsp-java))))))
 
 (when (memq centaur-lsp '(lsp-mode eglot))
