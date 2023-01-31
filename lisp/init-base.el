@@ -1,4 +1,4 @@
-;; init-basic.el --- Better default configurations.	-*- lexical-binding: t -*-
+;; init-base.el --- Better default configurations.	-*- lexical-binding: t -*-
 
 ;; Copyright (C) 2006-2022 Vincent Zhang
 
@@ -207,14 +207,6 @@
 		          tabulated-list-entries)))))
     (advice-add #'list-processes--refresh :after #'my-list-processes--prettify)))
 
-(use-package time
-  :ensure nil
-  :init (setq display-time-24hr-format t
-              display-time-day-and-date t))
-
-(use-package so-long
-  :hook (after-init . global-so-long-mode))
-
 ;; Misc
 (if (boundp 'use-short-answers)
     (setq use-short-answers t)
@@ -258,12 +250,12 @@
            ("C-c C-l" . reload-init-file))
 
 ;; Sqlite
-(when emacs/>=29p
+(when (fboundp 'sqlite-open)
   (use-package emacsql-sqlite-builtin
     :defines emacsql-sqlite-c-compilers
     :init (setq emacsql-sqlite-c-compilers nil)))
 
-(provide 'init-basic)
+(provide 'init-base)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; init-basic.el ends here
+;;; init-base.el ends here

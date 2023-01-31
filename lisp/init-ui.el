@@ -120,9 +120,6 @@
         doom-modeline-height 1
         doom-modeline-window-width-limit 110
         doom-modeline-minor-modes t)
-  ;; Prevent flash of unstyled modeline at startup
-  (unless after-init-time
-    (setq-default mode-line-format nil))
   :bind (:map doom-modeline-mode-map
          ("C-<f6>" . doom-modeline-hydra/body))
   :pretty-hydra
@@ -374,6 +371,11 @@
          ("C-s-=" . default-text-scale-increase)
          ("C-s--" . default-text-scale-decrease)
          ("C-s-0" . default-text-scale-reset)))
+
+(use-package time
+  :ensure nil
+  :init (setq display-time-24hr-format t
+              display-time-day-and-date t))
 
 ;; Mouse & Smooth Scroll
 ;; Scroll one line at a time (less "jumpy" than defaults)
