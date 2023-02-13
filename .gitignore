@@ -6,6 +6,7 @@
 *.sqlite
 *.tmp
 *bak/
+*history
 .DS_Store
 .cache/
 .cask/
@@ -55,7 +56,6 @@ eclipse.jdt.ls/
 eln-cache/
 elpa*/
 emojis/
-eshell/
 flycheck_*.el*
 games/
 ido.*
