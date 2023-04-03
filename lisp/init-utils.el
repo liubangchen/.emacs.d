@@ -212,11 +212,7 @@ of the buffer text to be displayed in the popup"
 ;; Edit text for browsers with GhostText or AtomicChrome extension
 (use-package atomic-chrome
   :hook ((emacs-startup . atomic-chrome-start-server)
-         (atomic-chrome-edit-mode . (lambda ()
-                                      "Enter edit mode and delete other windows."
-                                      (and (fboundp 'olivetti-mode)
-                                           (olivetti-mode 1))
-                                      (delete-other-windows))))
+         (atomic-chrome-edit-mode . delete-other-windows))
   :init (setq atomic-chrome-buffer-open-style 'frame)
   :config
   (if (fboundp 'gfm-mode)
@@ -308,7 +304,7 @@ of the buffer text to be displayed in the popup"
               ztree-show-number-of-children t))
 
 ;; Misc
-(use-package focus)                     ; Focus on the current region
+(use-package disk-usage)
 (use-package memory-usage)
 
 (use-package list-environment
