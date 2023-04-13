@@ -108,5 +108,15 @@
   (kill-new (shell-command-to-string "osascript -e 'the clipboard as \"HTML\"' | perl -ne 'print chr foreach unpack(\"C*\",pack(\"H*\",substr($_,11,-3)))' | pandoc -f html -t json | pandoc -f json -t org | sed 's/ / /g'"))
   (yank))
 
+;;pip install -U yapf
+;;pip install futures
+(defun lsp-python-ms-format-buffer ()
+  (interactive)
+  (when (and (executable-find "yapf") buffer-file-name)
+    (call-process "yapf" nil nil nil "-i" buffer-file-name)))
+(add-hook 'python-mode-hook
+          (lambda ()
+            (add-hook 'after-save-hook #'lsp-python-ms-format-buffer t t)))
+;;(add-hook 'python-mode-hook 'yapf-mode)
 
 (provide 'init-function)
