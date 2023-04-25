@@ -569,7 +569,14 @@
 
    ;; Java
    (use-package lsp-java
-     :hook ((java-mode java-ts-mode jdee-mode) . (lambda () (require 'lsp-java))))))
+     :hook ((java-mode java-ts-mode jdee-mode) . (lambda () (require 'lsp-java)))
+     :config
+     (setq lsp-java-vmargs '("-XX:+UseZGC" "-Xmx4G" "-Xms1g")
+           lsp-java-save-actions-organize-imports t
+           lsp-java-content-provider-preferred "fernflower"
+           tab-width 2
+           lsp-java-format-settings-url "file:///Users/chenlong/.emacs.d/javalibs/eclipse-java-google-style.xml")
+     )))
 
 (unless centaur-lsp
   ;; Enable LSP in org babel
