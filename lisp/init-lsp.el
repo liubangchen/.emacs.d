@@ -575,6 +575,7 @@
            lsp-java-save-actions-organize-imports t
            lsp-java-content-provider-preferred "fernflower"
            tab-width 2
+           c-basic-offset 2
            lsp-java-format-settings-url "file:///Users/chenlong/.emacs.d/javalibs/arctic_format.xml") ;;apache_format.xml arctic_format.xml eclipse-java-google-style.xml iceberg_format.xml
      )))
 

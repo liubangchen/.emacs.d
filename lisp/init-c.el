@@ -37,12 +37,12 @@
   :ensure nil
   :bind (:map c-mode-base-map
          ("<f12>" . compile))
-  :init (setq-default c-basic-offset 4))
+  :init (setq-default c-basic-offset 2))
 
 (use-package c-ts-mode
   :ensure nil
   :when (centaur-treesit-available-p)
-  :init (setq c-ts-mode-indent-offset 4))
+  :init (setq c-ts-mode-indent-offset 2))
 
 (provide 'init-c)
 
