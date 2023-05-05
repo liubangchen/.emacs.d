@@ -38,7 +38,7 @@
 (use-package citre
   :diminish
   :commands citre-jump-back
-  :functions (projectile-project-root xref-go-back)
+  :functions xref-go-back
   :bind (:map prog-mode-map
          ("C-x c j" . citre-jump+)
          ("C-x c k" . citre-jump-back+)
@@ -53,9 +53,6 @@
         citre-ctags-program "/opt/homebrew/Cellar/universal-ctags/p6.0.20230108.0/bin/ctags"
         citre-readtags-program "/opt/homebrew/Cellar/universal-ctags/p6.0.20230108.0/bin/readtags"
         citre-gtags-args '("--compact"))
-
-  (with-eval-after-load 'projectile
-    (setq citre-project-root-function #'projectile-project-root))
 
   (defun citre-jump+ ()
     "Jump to the definition of the symbol at point.
