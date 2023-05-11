@@ -139,7 +139,7 @@ FACE defaults to inheriting from default and highlight."
                                    "Highlight indentations in small files for better performance."
                                    (unless (too-long-file-p)
                                      (highlight-indent-guides-mode 1))))
-  :init (setq highlight-indent-guides-method 'bitmap
+  :init (setq highlight-indent-guides-method 'character
               highlight-indent-guides-responsive 'top
               highlight-indent-guides-suppress-auto-error t)
   :config
@@ -161,6 +161,10 @@ FACE defaults to inheriting from default and highlight."
                   :after (lambda (&rest _)
                            (when (derived-mode-p 'prog-mode 'yaml-mode)
                              (highlight-indent-guides-mode 1)))))
+
+    (set-face-background 'highlight-indent-guides-odd-face "DarkCyan")
+    (set-face-background 'highlight-indent-guides-even-face "LightGreen")
+    (set-face-foreground 'highlight-indent-guides-character-face "LightGreen")
 
     ;; Don't display indentations in `swiper'
     ;; https://github.com/DarthFennec/highlight-indent-guides/issues/40
