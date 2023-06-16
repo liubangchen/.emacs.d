@@ -188,9 +188,12 @@ prepended to the element after the #+HEADER: tag."
   (if emacs/>=27p
       (use-package org-modern
         :config
-        (setq org-modern-table  nil
+        (setq org-modern-table  t
+              ;;org-modern-label-border 0
+              org-modern-label-border 1
               org-modern-table-vertical 1
-              org-modern-table-horizontal 0)
+              ;;org-modern-table-horizontal 0
+              )
         :hook ((org-mode . org-modern-mode)
                (org-agenda-finalize . org-modern-agenda)
                (org-modern-mode . (lambda ()
