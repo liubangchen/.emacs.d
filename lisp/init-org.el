@@ -187,6 +187,10 @@ prepended to the element after the #+HEADER: tag."
   ;; Prettify UI
   (if emacs/>=27p
       (use-package org-modern
+        :config
+        (setq org-modern-table  nil
+              org-modern-table-vertical 1
+              org-modern-table-horizontal 0)
         :hook ((org-mode . org-modern-mode)
                (org-agenda-finalize . org-modern-agenda)
                (org-modern-mode . (lambda ()
