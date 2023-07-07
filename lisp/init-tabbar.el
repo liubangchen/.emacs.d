@@ -77,8 +77,4 @@
      (and (string-prefix-p "magit" name)
           (not (file-name-extension name)))
      )))
-
-(use-package spaceline-all-the-icons
-  :after spaceline
-  :config (spaceline-all-the-icons-theme))
 (provide 'init-tabbar)
