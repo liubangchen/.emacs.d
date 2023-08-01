@@ -1,3 +1,14 @@
+(use-package ivy
+   :defer t
+   :config
+   (add-to-list 'ivy-format-functions-alist '(t . ivy-format-function-arrow)))
+
+(use-package swiper
+  :bind (("C-s" . swiper-isearch)))
+
+(use-package counsel
+  :bind (("M-x" . counsel-M-x)))
+
 (defun mark-region-lines (start end)
   "mark region by line region"
   (interactive "nStart Line: \nnEnd Line:")
