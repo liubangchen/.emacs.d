@@ -1,6 +1,6 @@
-;; init-docker.el --- Initialize docker configurations.	-*- lexical-binding: t -*-
+;;; init-workspace.el --- Initialize workspace configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2019-2023 Vincent Zhang
+;; Copyright (C) 2018-2023 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -25,25 +25,26 @@
 
 ;;; Commentary:
 ;;
-;; Docker configurations.
+;; Workspace configurations.
 ;;
 
 ;;; Code:
 
-;; Docker
-(use-package docker
-  :defines docker-image-run-arguments
-  :bind ("C-c D" . docker)
-  :init (setq docker-image-run-arguments '("-i" "-t" "--rm")
-              docker-container-shell-file-name "/bin/bash"))
+(use-package tabspaces
+  :hook (after-init . tabspaces-mode) ;; use this only if you want the minor-mode loaded at startup.
+  :commands (tabspaces-switch-or-create-workspace
+             tabspaces-open-or-create-project-and-workspace)
+  :custom
+  (tab-bar-show nil)
+  (tabspaces-use-filtered-buffers-as-default t)
+  (tabspaces-default-tab "Default")
+  (tabspaces-remove-to-default t)
+  (tabspaces-include-buffers '("*scratch*"))
+  ;; sessions
+  (tabspaces-session t)
+  (tabspaces-session-auto-restore t))
 
-;;`tramp-container' is builtin since 29
-(unless emacs/>=29p
-  (use-package docker-tramp))
-
-(use-package dockerfile-mode)
-
-(provide 'init-docker)
+(provide 'init-workspace)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; init-docker.el ends here
+;;; init-workspace.el ends here
