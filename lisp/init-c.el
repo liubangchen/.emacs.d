@@ -30,6 +30,7 @@
 
 ;;; Code:
 
+;; C/C++ Mode
 (use-package cc-mode
   :ensure nil
   :bind (:map c-mode-base-map
