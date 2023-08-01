@@ -1,7 +1,7 @@
-(use-package ivy
-   :defer t
-   :config
-   (add-to-list 'ivy-format-functions-alist '(t . ivy-format-function-arrow)))
+;;(use-package ivy
+;;   :defer t
+;;   :config
+;;   (add-to-list 'ivy-format-functions-alist '(t . ivy-format-function-arrow)))
 
 (use-package swiper
   :bind (("C-s" . swiper-isearch)))
