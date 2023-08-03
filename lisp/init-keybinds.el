@@ -1,4 +1,4 @@
-(global-set-key (kbd "C-l") 'goto-line)
+(global-set-key (kbd "C-l") 'consult-goto-line)
 (global-set-key (kbd "C-/") 'comment-or-uncomment-region)
 ;;(global-set-key (kbd "M-o") 'helm-find-files)
 ;;(global-set-key (kbd "C-c") 'kill-ring-save)
@@ -7,21 +7,21 @@
 (global-set-key (kbd "M-l") 'downcase-region)
 (global-set-key (kbd "C-.") 'revert-buffer)
 (global-set-key (kbd "C-k") 'kill-whole-line)
-(global-set-key (kbd "C-b") 'counsel-switch-buffer);;counsel-switch-buffer
-(global-set-key (kbd "C-s") 'swiper-isearch)
+(global-set-key (kbd "C-b") 'consult-buffer);;counsel-switch-buffer
+(global-set-key (kbd "C-s") 'consult-line)
 (global-set-key (kbd "C-S-f") 'lsp-format-buffer)
 (global-set-key (kbd "M-w") 'er/mark-word)
 ;;(global-set-key (kbd "C-S-r") 'helm-locate)
-(global-set-key (kbd "C-o") 'counsel-imenu);;ivy-imenu-anywhere
+(global-set-key (kbd "C-o") 'consult-imenu);;ivy-imenu-anywhere
 (global-set-key (kbd "M-k") 'kill-this-buffer)
 (global-set-key (kbd "RET") 'newline)
 (global-set-key (kbd "C-z") 'undo)
 (global-set-key (kbd "C-S-z") 'redo)
-(global-set-key (kbd "s-o") 'project-find-file)
+(global-set-key (kbd "s-o") 'consult-find)
 (global-set-key (kbd "s-p") 'counsel-find-file)
 ;;buffer跳转
-(global-set-key (kbd "M-<left>") 'back-button-global-backward)
-(global-set-key (kbd "M-<right>") 'back-button-global-forward)
+;;(global-set-key (kbd "M-<left>") 'back-button-global-backward)
+;;(global-set-key (kbd "M-<right>") 'back-button-global-forward)
 (global-set-key (kbd "M-h") 'hs-toggle-hiding)
 (global-set-key (kbd "s-u") 'ssh-deploy-upload-handler-forced)
 ;;(global-set-key (kbd "s-.") 'ggtags-find-definition)
@@ -29,7 +29,7 @@
 (add-hook 'term-mode-hook '(lambda()
                              (define-key term-raw-map (kbd "C-y") 'term-paste)
                              (define-key term-raw-map (kbd "M-x") 'counsel-M-x)
-                             (define-key term-raw-map (kbd "C-b") 'counsel-switch-buffer)
+                             (define-key term-raw-map (kbd "C-b") 'consult-buffer)
                              (define-key term-raw-map (kbd "s-p") 'counsel-find-file)
                              (define-key term-raw-map (kbd "C-k")  (define-key term-raw-map (kbd "C-k")
                                                                      (lambda ()

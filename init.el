@@ -160,7 +160,7 @@ Otherwise the startup will be very slow."
 (require 'init-keybinds)
 (require 'init-config)
 (require 'init-devops)
-;;(require 'init-tabbar)
+(require 'init-tabbar)
 (require 'org-publish-docs)
 (require 'init-orgtools)
 (require 'init-latex)
