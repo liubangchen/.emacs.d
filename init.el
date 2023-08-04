@@ -171,6 +171,6 @@ Otherwise the startup will be very slow."
 (require 'init-function)
 (require 'init-scala)
 (require 'init-dirtree)
-
+(require 'init-ivy)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here

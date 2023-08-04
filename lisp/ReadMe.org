@@ -16,6 +16,7 @@
   git fetch origin-pull
   #从origin-pull/master merge 到 本地master分支
   git merge origin-pull/master
+  git push origin rel-1.5.0
 #+END_SRC
 * checkout lib-lisp
 

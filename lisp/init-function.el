@@ -3,21 +3,6 @@
 ;;   :config
 ;;   (add-to-list 'ivy-format-functions-alist '(t . ivy-format-function-arrow)))
 
-(use-package swiper)
-;;  :bind (("C-s" . swiper-isearch)))
-
-(use-package counsel
-  :defer t
-  :config
-  (setq counsel-find-file-at-point t
-        counsel-find-file-ignore-regexp
-        (concat
-         ;; file names beginning with # or .
-         "\\(?:\\`[#.]\\)"
-         ;; file names ending with # or ~
-         "\\|\\(?:[#~]\\'\\)"))
-  :bind (("M-x" . counsel-M-x)))
-
 (defun mark-region-lines (start end)
   "mark region by line region"
   (interactive "nStart Line: \nnEnd Line:")
