@@ -61,8 +61,8 @@
     :init (setq vertico-posframe-poshandler
                 #'posframe-poshandler-frame-center-near-bottom
                 vertico-posframe-parameters
-                '((left-fringe . 4)
-                  (right-fringe . 4)))))
+                '((left-fringe  . 8)
+                  (right-fringe . 8)))))
 
 (use-package nerd-icons-completion
   :when (icons-displayable-p)
@@ -185,7 +185,7 @@
 
 (use-package embark
   :bind (("s-." . embark-act)
-         ("s-M-." . embark-dwim)
+         ("M-." . embark-dwim)
          ([remap describe-bindings] . embark-bindings))
   :init
   ;; Optionally replace the key help with a completing-read interface
