@@ -31,7 +31,6 @@
 ;;; Code:
 
 ;; A few more useful configurations...
-;; A few more useful configurations...
 (use-package emacs
   :init
   ;; TAB cycle if there are only few candidates
@@ -185,7 +184,7 @@
 
 (use-package embark
   :bind (("s-." . embark-act)
-         ("M-." . embark-dwim)
+         ("M-s-." . embark-dwim)
          ([remap describe-bindings] . embark-bindings))
   :init
   ;; Optionally replace the key help with a completing-read interface
