@@ -37,6 +37,8 @@
   (corfu-preview-current nil)
   (corfu-auto-delay 0.1)
   (corfu-popupinfo-delay '(0.2 . 0.1))
+  :custom-face
+  (corfu-border ((t (:inherit region :background unspecified))))
   :bind ("M-/" . completion-at-point)
   :hook ((after-init . global-corfu-mode)
          (global-corfu-mode . corfu-popupinfo-mode)))
@@ -124,10 +126,7 @@ function to the relevant margin-formatters list."
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-elisp-block)
   (add-to-list 'completion-at-point-functions #'cape-keyword)
-  (add-to-list 'completion-at-point-functions #'cape-abbrev)
-  :config
-  (require 'yasnippet-capf)
-  (add-to-list 'completion-at-point-functions #'yasnippet-capf))
+  (add-to-list 'completion-at-point-functions #'cape-abbrev))
 
 (provide 'init-corfu)
 
