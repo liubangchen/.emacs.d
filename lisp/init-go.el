@@ -112,6 +112,11 @@
   :diminish
   :commands go-playground-mode)
 
+(add-hook 'go-mode-hook
+          (lambda ()
+            (setq-default indent-tabs-mode 1)
+            (setq-default tab-width 4)))
+
 (provide 'init-go)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

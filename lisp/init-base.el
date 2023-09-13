@@ -200,7 +200,7 @@
   (fset 'yes-or-no-p 'y-or-n-p))
 (setq-default major-mode 'text-mode
               fill-column 80
-              tab-width 2
+              tab-width 4
               indent-tabs-mode nil)     ; Permanently indent with spaces, never with TABs
 
 (setq visible-bell t
