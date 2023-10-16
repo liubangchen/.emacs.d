@@ -144,15 +144,17 @@
 
 ;; Enforce rules for popups
 (use-package popper
-  :defines popper-echo-dispatch-actions
-  :autoload popper-group-by-directory
+  :diminish (popper-mode popper-echo-mode)
+  :custom
+  (popper-group-function #'popper-group-by-directory)
+  (popper-echo-dispatch-actions t)
   :bind (:map popper-mode-map
-         ("C-h z"     . popper-toggle-latest)
-         ("C-<tab>"   . popper-cycle)
-         ("C-M-<tab>" . popper-toggle-type))
-  :hook (emacs-startup . popper-mode)
+         ("C-h z"       . popper-toggle)
+         ("C-<tab>"     . popper-cycle)
+         ("C-M-<tab>"   . popper-toggle-type))
+  :hook ((emacs-startup . popper-mode)
+         (popper-mode   . popper-echo-mode))
   :init
-  (setq popper-group-function #'popper-group-by-directory)
   (setq popper-reference-buffers
         '("\\*Messages\\*"
           "Output\\*$" "\\*Pp Eval Output\\*$"
@@ -219,12 +221,8 @@
                              (bound-and-true-p doom-modeline-mode))
                         (format " %s "
                                 (nerd-icons-octicon "nf-oct-pin" :face face))
-                      (propertize " POP" 'face face))))))
-
-  (setq popper-echo-dispatch-actions t)
+                      (propertize " POP " 'face face))))))
   :config
-  (popper-echo-mode 1)
-
   (with-no-warnings
     (defun my-popper-fit-window-height (win)
       "Determine the height of popup window WIN by fitting it to the buffer's content."
