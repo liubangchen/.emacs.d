@@ -161,7 +161,7 @@ Otherwise the startup will be very slow."
 (require 'init-devops)
 (require 'init-tabbar)
 (require 'org-publish-docs)
-(require 'init-orgtools)
+;;(require 'init-orgtools)
 (require 'init-latex)
 (require 'init-taskjuggle)
 ;;(require 'init-email)
@@ -171,5 +171,8 @@ Otherwise the startup will be very slow."
 (require 'init-scala)
 (require 'init-dirtree)
 (require 'init-ivy)
+(require 'init-ollama)
+(require 'init-jupyter)
+(require 'init-orgtools)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here

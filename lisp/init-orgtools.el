@@ -217,6 +217,9 @@
    (plantuml . t)
    (ditaa . t)
    (gnuplot . t)
+   (julia . t)
+   (python . t)
+   (jupyter . t)
    (dot . t)))
 
 (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
