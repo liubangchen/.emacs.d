@@ -44,20 +44,20 @@
   )
 
 ;; Use the Tree View Protocol for viewing the project structure and triggering compilation
-(use-package lsp-treemacs
-  :config
+;(use-package lsp-treemacs
+;  :config
   ;;(lsp-metals-treeview-enable t)
   ;;(setq lsp-metals-treeview-show-when-views-received t)
-  )
+;;  )
 
-(use-package groovy-mode
-  :init
-  (setq groovy-indent-offset 2)
-  :mode (("\\.groovy$" . groovy-mode)
-         ("\\.gradle$" . groovy-mode)))
-
-(require 'lsp-groovy)
-(setq lsp-groovy-server-file "~/.emacs.d/lib-lisp/javalibs/groovy-language-server-all.jar")
+;;(use-package groovy-mode
+;;  :init
+;;  (setq groovy-indent-offset 2)
+;;  :mode (("\\.groovy$" . groovy-mode)
+;;         ("\\.gradle$" . groovy-mode)))
+;;
+;;(require 'lsp-groovy)
+;;(setq lsp-groovy-server-file "~/.emacs.d/lib-lisp/javalibs/groovy-language-server-all.jar")
 
 ;;(use-package lsp-groovy
 ;;  :config
