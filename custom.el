@@ -12,7 +12,7 @@
 ;; (setq centaur-socks-proxy "127.0.0.1:7890")    ; SOCKS proxy
 ;; (setq centaur-server nil)                      ; Enable `server-mode' or not: t or nil
 (setq centaur-icon t)                        ; Display icons or not: t or nil
-(setq centaur-package-archives 'ustc)         ; Package repo: melpa, emacs-cn, bfsu, netease, sjtu, tencent, tuna or ustc
+(setq centaur-package-archives 'melpa)         ; Package repo: melpa, emacs-cn, bfsu, netease, sjtu, tencent, tuna or ustc
 (setq centaur-theme 'default)                     ; Color theme: auto, random, system, default, pro, dark, light, warm, cold, day or night doom-acario-dark doom-dracula doom-dark+
 (setq centaur-org-directory "~/notes/org")
 ;; (setq centaur-completion-style 'minibuffer)    ; Completion display style: minibuffer or childframe
