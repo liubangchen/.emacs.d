@@ -303,32 +303,6 @@
                  (and (not (equal after ?\n)) (propertize " \n" 'face '(:height 0.5)))))))))
        (advice-add #'lsp-ui-doc--handle-hr-lines :override #'my-lsp-ui-doc--handle-hr-lines)))
 
-   ;; Debug
-   (use-package dap-mode
-     :disabled
-     :defines dap-python-executable
-     :functions dap-hydra/nil
-     :diminish
-     :bind (:map lsp-mode-map
-            ("<f5>" . dap-debug)
-            ("M-<f5>" . dap-hydra))
-     :hook ((after-init     . dap-auto-configure-mode)
-            (dap-stopped    . (lambda (_) (dap-hydra)))
-            (dap-terminated . (lambda (_) (dap-hydra/nil)))
-
-            ((python-mode python-ts-mode)            . (lambda () (require 'dap-python)))
-            ((ruby-mode ruby-ts-mode)                . (lambda () (require 'dap-ruby)))
-            ((go-mode go-ts-mode)                    . (lambda () (require 'dap-go)))
-            ((java-mode java-ts-mode jdee-mode)      . (lambda () (require 'dap-java)))
-            ((c-mode c-ts-mode c++-mode c++-ts-mode) . (lambda () (require 'dap-lldb)))
-            ((objc-mode swift-mode)                  . (lambda () (require 'dap-lldb)))
-            (php-mode                                . (lambda () (require 'dap-php)))
-            (elixir-mode                             . (lambda () (require 'dap-elixir)))
-            ((js-mode js2-mode js-ts-mode)           . (lambda () (require 'dap-chrome)))
-            (powershell-mode                         . (lambda () (require 'dap-pwsh))))
-     :init (when (executable-find "python3")
-             (setq dap-python-executable "python3")))
-
    ;; `lsp-mode' and `treemacs' integration
    (use-package lsp-treemacs
      :after lsp-mode
@@ -562,7 +536,7 @@
            lsp-java-format-settings-url "file:///Users/chenlong/.emacs.d/javalibs/arctic_format.xml") ;;apache_format.xml arctic_format.xml eclipse-java-google-style.xml iceberg_format.xml
      )))
 
-(unless centaur-lsp
+(when centaur-lsp
   ;; Enable LSP in org babel
   ;; https://github.com/emacs-lsp/lsp-mode/issues/377
   (cl-defmacro lsp-org-babel-enable (lang)
@@ -599,8 +573,8 @@
                           (upcase ,lang))))))))
 
   (defconst org-babel-lang-list
-    '("go" "python" "ipython" "ruby" "js" "css" "sass" "c" "rust" "java" "cpp" "c++"))
-  (add-to-list 'org-babel-lang-list "shell")
+    '("go" "python" "ipython" "ruby" "js" "css" "sass" "c" "rust" "java" "cpp" "c++" "shell")
+    "The supported programming languages for interactive Babel.")
   (dolist (lang org-babel-lang-list)
     (eval `(lsp-org-babel-enable ,lang))))
 
