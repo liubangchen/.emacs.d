@@ -1,13 +1,13 @@
 
-(use-package org-web-tools)
-(use-package htmlize :ensure t)
-(use-package ox-reveal
-  :init
-  (setq org-reveal-mathjax t
-        org-reveal-root "file:///Users/chenlong/.emacs.d/reveal.js"))
+;;(use-package org-web-tools)
+;;(use-package htmlize :ensure t)
+;;(use-package ox-reveal
+;;  :init
+;;  (setq org-reveal-mathjax t
+;;        org-reveal-root "file:///Users/chenlong/.emacs.d/reveal.js"))
 
-(require 'ox-reveal)
-(require 'htmlize)
+;;(require 'ox-reveal)
+;;(require 'htmlize)
 
 
 (defun cfw:sync-mac-calendar()
@@ -114,50 +114,50 @@
         org-journal-file-header 'org-journal-file-header-func
         org-journal-date-format "%Y-%m-%d %A"))
 
-(setq org-ellipsis "⤵"
-      ;; ➡, ⚡, ▼, ↴, , ∞, ⬎, ⤷, ⤵
-      org-deadline-warning-days 7
-      org-default-notes-file "~/notes/org/gtd/inbox.org"
-      org-directory "~/notes/org/gtd/"
-      org-capture-templates
-      '(
-        ("t" "待办任务" entry (file+olp "~/notes/org/gtd/inbox.org" "Tasks" "待办任务")
-         "* TODO %?  \n " :empty-lines 1)
-        ("x" "临时需求表" entry (file+olp "~/notes/org/gtd/inbox.org" "Demand" "临时需求表")
-         "* TODO %?  \n " :empty-lines 1)
-        ("n" "笔记待办" entry (file+olp "~/notes/org/gtd/inbox.org" "Notes" "笔记待办")
-         "*  %?  \n " :empty-lines 1)
-        ("m" "会议安排" entry (file+olp "~/notes/org/gtd/inbox.org" "Meetings" "会议安排")
-         "*  %?  \n " :empty-lines 1)
-        ("j" "Journal entry" entry (file+datetree "~/notes/org/gtd/journal/journal.org")
-         "* %U - %^{heading}\n  %?")
-        ("p" "个人待办" entry (file+olp "~/notes/org/gtd/personal.org" "Tasks" "个人待办")
-         "*  %?  \n " :empty-lines 1)
-        )
-      ;;显示他们的内容
-      org-agenda-files
-      (list "~/notes/org/gtd/inbox.org"
-            "~/notes/org/gtd/personal.org"))
+;;(setq org-ellipsis "⤵"
+;;      ;; ➡, ⚡, ▼, ↴, , ∞, ⬎, ⤷, ⤵
+;;      org-deadline-warning-days 7
+;;      org-default-notes-file "~/notes/org/gtd/inbox.org"
+;;      org-directory "~/notes/org/gtd/"
+;;      org-capture-templates
+;;      '(
+;;        ("t" "待办任务" entry (file+olp "~/notes/org/gtd/inbox.org" "Tasks" "待办任务")
+;;         "* TODO %?  \n " :empty-lines 1)
+;;        ("x" "临时需求表" entry (file+olp "~/notes/org/gtd/inbox.org" "Demand" "临时需求表")
+;;         "* TODO %?  \n " :empty-lines 1)
+;;        ("n" "笔记待办" entry (file+olp "~/notes/org/gtd/inbox.org" "Notes" "笔记待办")
+;;         "*  %?  \n " :empty-lines 1)
+;;        ("m" "会议安排" entry (file+olp "~/notes/org/gtd/inbox.org" "Meetings" "会议安排")
+;;         "*  %?  \n " :empty-lines 1)
+;;        ("j" "Journal entry" entry (file+datetree "~/notes/org/gtd/journal/journal.org")
+;;         "* %U - %^{heading}\n  %?")
+;;        ("p" "个人待办" entry (file+olp "~/notes/org/gtd/personal.org" "Tasks" "个人待办")
+;;         "*  %?  \n " :empty-lines 1)
+;;        )
+;;      ;;显示他们的内容
+;;      org-agenda-files
+;;      (list "~/notes/org/gtd/inbox.org"
+;;            "~/notes/org/gtd/personal.org"))
 
 
 ;; 将项目转接在各文件之间，方便清理和回顾。
-(custom-set-variables
- '(org-refile-targets
-   (quote
-    (("inbox.org" :level . 1) ("doing.org" :level . 1) ("personal.org" :level . 1) ("finished.org":level . 1))
-    )))
+;;(custom-set-variables
+;; '(org-refile-targets
+;;   (quote
+;;    (("inbox.org" :level . 1) ("doing.org" :level . 1) ("personal.org" :level . 1) ("finished.org":level . 1))
+;;    )))
 
 ;; ! : 切换到该状态时会自动添加时间戳
 ;; @ : 切换到该状态时要求输入文字说明
 ;; 如果同时设定@和!,使用@/!
-(setq org-todo-keywords
-      '((sequence "待办(t)" "开始(s!/@)" "进行中(d@/!)" "阻塞(p@/!)" "完成(o@)" "取消(c@/!)")))
-(setq org-log-done 'note)
+;;(setq org-todo-keywords
+;;     '((sequence "待办(t)" "开始(s!/@)" "进行中(d@/!)" "阻塞(p@/!)" "完成(o@)" "取消(c@/!)")))
+;;(setq org-log-done 'note)
 ;;颜色设置
-(setq org-todo-keyword-faces
-      '(("TODO" . org-warning) ("开始" . "yellow") ("进行中" . "green4") ("阻塞" . "OrangeRed") ("完成" . "#32cd32")
-        ("CANCELED" . (:foreground "blue" :weight bold))))
-
+;;(setq org-todo-keyword-faces
+;;      '(("TODO" . org-warning) ("开始" . "yellow") ("进行中" . "green4") ("阻塞" . "OrangeRed") ("完成" . "#32cd32")
+;;        ("CANCELED" . (:foreground "blue" :weight bold))))
+;;
 ;;日期设置
 (setq system-time-locale "zh_CN")
 (custom-set-variables
@@ -169,47 +169,47 @@
 
 ;;(use-package org-habit)
 ;;日历面板设置
-(use-package org-super-agenda
-  :after org-agenda
-  :hook (org-agenda-mode . org-super-agenda-mode)
-  :config
-  (setq org-super-agenda-groups
-        '((:name "Today"  ; Optionally specify section name
-           :time-grid t  ; Items that appear on the time grid
-           :todo "TODAY")  ; Items that have this TODO keyword
-          (:name "Important"
-           ;; Single arguments given alone
-           ;;:tag "bills"
-           :priority "A")
-          (:order-multi (2 (:name "Shopping in town"
-                            ;; Boolean AND group matches items that match all subgroups
-                            :and (:tag "shopping" :tag "@town"))
-                           (:name "Food-related"
-                            ;; Multiple args given in list with implicit OR
-                            :tag ("food" "dinner"))
-                           (:name "Personal"
-                            ;;:habit t
-                            :tag "personal")
-                           (:name "Space-related (non-moon-or-planet-related)"
-                            ;; Regexps match case-insensitively on the entire entry
-                            :and (:regexp ("space" "NASA")
-                                  ;; Boolean NOT also has implicit OR between selectors
-                                  :not (:regexp "moon" :tag "planet")))))
-          (:name "Scheduled earlier "
-           :scheduled past))))
+;;(use-package org-super-agenda
+;;  :after org-agenda
+;;  :hook (org-agenda-mode . org-super-agenda-mode)
+;;  :config
+;;  (setq org-super-agenda-groups
+;;        '((:name "Today"  ; Optionally specify section name
+;;           :time-grid t  ; Items that appear on the time grid
+;;           :todo "TODAY")  ; Items that have this TODO keyword
+;;          (:name "Important"
+;;           ;; Single arguments given alone
+;;           ;;:tag "bills"
+;;           :priority "A")
+;;          (:order-multi (2 (:name "Shopping in town"
+;;                            ;; Boolean AND group matches items that match all subgroups
+;;                            :and (:tag "shopping" :tag "@town"))
+;;                           (:name "Food-related"
+;;                            ;; Multiple args given in list with implicit OR
+;;                            :tag ("food" "dinner"))
+;;                           (:name "Personal"
+;;                            ;;:habit t
+;;                            :tag "personal")
+;;                           (:name "Space-related (non-moon-or-planet-related)"
+;;                            ;; Regexps match case-insensitively on the entire entry
+;;                            :and (:regexp ("space" "NASA")
+;;                                  ;; Boolean NOT also has implicit OR between selectors
+;;                                  :not (:regexp "moon" :tag "planet")))))
+;;          (:name "Scheduled earlier "
+;;           :scheduled past))))
 
-(setq org-agenda-time-grid '((daily today require-timed) "----------------------" nil)
-      org-agenda-skip-scheduled-if-done t
-      org-agenda-skip-deadline-if-done t
-      org-agenda-include-deadlines t
-      org-agenda-include-diary t
-      org-agenda-block-separator t
-      org-agenda-compact-blocks t
-      org-agenda-start-with-log-mode t)
+;;(setq org-agenda-time-grid '((daily today require-timed) "----------------------" nil)
+;;      org-agenda-skip-scheduled-if-done t
+;;      org-agenda-skip-deadline-if-done t
+;;      org-agenda-include-deadlines t
+;;      org-agenda-include-diary t
+;;      org-agenda-block-separator t
+;;      org-agenda-compact-blocks t
+;;      org-agenda-start-with-log-mode t)
 
 
 ;;(setq org-bullets-bullet-list '( "⦿" "○" "✸" "✿" "◆"))
-(setq org-agenda-skip-deadline-prewarning-if-scheduled t)
+;;(setq org-agenda-skip-deadline-prewarning-if-scheduled t)
 ;;画图
 (org-babel-do-load-languages
  'org-babel-load-languages
