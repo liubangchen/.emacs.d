@@ -80,7 +80,8 @@
     (progn
       ;; Make certain buffers grossly incandescent
       (use-package solaire-mode
-        :hook (after-load-theme . solaire-global-mode))
+        :hook (after-init . solaire-global-mode))
+
       ;; Excellent themes
       (use-package doom-themes
         :bind ("C-c T" . centaur-load-theme)
@@ -97,9 +98,11 @@
             (let ((buf (current-buffer))
                   (cookies (mapcar (lambda (face)
                                      (face-remap-add-relative face 'doom-themes-visual-bell))
-                                   '(mode-line mode-line-active))))
+                                   (if (facep 'mode-line-active)
+                                       '(mode-line-active solaire-mode-line-active-face)
+                                     '(mode-line solaire-mode-line-face)))))
               (force-mode-line-update)
-              (run-with-timer 0.2 nil
+              (run-with-timer 0.15 nil
                               (lambda ()
                                 (with-current-buffer buf
                                   (mapc #'face-remap-remove-relative cookies)
