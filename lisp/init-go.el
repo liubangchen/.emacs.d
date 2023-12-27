@@ -107,16 +107,6 @@
   (use-package go-ts-mode
     :init (setq go-ts-mode-indent-offset 4)))
 
-;; Local Golang playground for short snippets
-(use-package go-playground
-  :diminish
-  :commands go-playground-mode)
-
-(add-hook 'go-mode-hook
-          (lambda ()
-            (setq-default indent-tabs-mode 1)
-            (setq-default tab-width 4)))
-
 (provide 'init-go)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
