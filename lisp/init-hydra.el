@@ -1,6 +1,6 @@
 ;; init-hydra.el --- Initialize hydra configurations.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2019-2023 Vincent Zhang
+;; Copyright (C) 2019-2024 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -142,9 +142,9 @@
         ("t n" (centaur-load-theme 'night) "night"
          :toggle (centaur-theme-enable-p 'night) :exit t)
         ("t o" (centaur-load-theme
-                (let ((x (intern (completing-read "Load custom theme: "
-                                                  (all-completions "doom" (custom-available-themes))))))
-                  (or (car (rassoc x centaur-theme-alist)) x)))
+                (intern (completing-read "Load custom theme: "
+                                         (mapcar #'symbol-name
+				                                 (custom-available-themes)))))
          "others"
          :toggle (not (or (rassoc (car custom-enabled-themes) centaur-theme-alist)
                           (rassoc (cadr custom-enabled-themes) centaur-theme-alist)))
