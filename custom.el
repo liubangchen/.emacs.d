@@ -4,6 +4,13 @@
 ;;;       Put your own configurations in custom-post.el to override default configurations.
 ;;; Code:
 
+(setenv "LIBRARY_PATH"
+	(string-join
+	 '("/opt/homebrew/opt/gcc/lib/gcc/13"
+	   "/opt/homebrew/opt/libgccjit/lib/gcc/13"
+	   "/opt/homebrew/opt/gcc/lib/gcc/13/gcc/aarch64-apple-darwin23/13")
+	 ":"))
+
 (setq package-check-signature nil)
 ;;(setq centaur-logo nil)                        ; Logo file or nil (official logo)
 (setq centaur-full-name "liubangchen")           ; User full name
