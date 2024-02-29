@@ -207,6 +207,33 @@
 ;;      org-agenda-compact-blocks t
 ;;      org-agenda-start-with-log-mode t)
 
+(use-package org-bullets
+  :custom
+  (org-bullets-bullet-list '("◉" "☯" "○" "☯" "✸" "☯" "✿" "☯" "✜" "☯" "◆" "☯" "▶"))
+  (org-ellipsis "⤵")
+  :hook (org-mode . org-bullets-mode))
+
+(use-package org-pretty-tags
+  :demand t
+  :config
+   (setq org-pretty-tags-surrogate-strings
+         (quote
+          (("TOPIC" . "☆")
+           ("PROJEKT" . "💡")
+           ("SERVICE" . "✍")
+           ("Blog" . "✍")
+           ("music" . "♬")
+           ("security" . "🔥"))))
+   (org-pretty-tags-global-mode))
+
+(use-package org-fancy-priorities
+  :diminish
+  :demand t
+  :defines org-fancy-priorities-list
+  :hook (org-mode . org-fancy-priorities-mode)
+  :config
+  (unless (char-displayable-p ?❗)
+    (setq org-fancy-priorities-list '("HIGH" "MID" "LOW" "OPTIONAL"))))
 
 ;;(setq org-bullets-bullet-list '( "⦿" "○" "✸" "✿" "◆"))
 ;;(setq org-agenda-skip-deadline-prewarning-if-scheduled t)
