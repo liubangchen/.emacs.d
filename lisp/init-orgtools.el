@@ -207,33 +207,13 @@
 ;;      org-agenda-compact-blocks t
 ;;      org-agenda-start-with-log-mode t)
 
-(use-package org-bullets
+(use-package org-modern
+  :hook
+  (org-mode . global-org-modern-mode)
   :custom
-  (org-bullets-bullet-list '("◉" "☯" "○" "☯" "✸" "☯" "✿" "☯" "✜" "☯" "◆" "☯" "▶"))
-  (org-ellipsis "⤵")
-  :hook (org-mode . org-bullets-mode))
-
-(use-package org-pretty-tags
-  :demand t
-  :config
-   (setq org-pretty-tags-surrogate-strings
-         (quote
-          (("TOPIC" . "☆")
-           ("PROJEKT" . "💡")
-           ("SERVICE" . "✍")
-           ("Blog" . "✍")
-           ("music" . "♬")
-           ("security" . "🔥"))))
-   (org-pretty-tags-global-mode))
-
-(use-package org-fancy-priorities
-  :diminish
-  :demand t
-  :defines org-fancy-priorities-list
-  :hook (org-mode . org-fancy-priorities-mode)
-  :config
-  (unless (char-displayable-p ?❗)
-    (setq org-fancy-priorities-list '("HIGH" "MID" "LOW" "OPTIONAL"))))
+  (org-modern-keyword nil)
+  (org-modern-checkbox nil)
+  (org-modern-table nil))
 
 ;;(setq org-bullets-bullet-list '( "⦿" "○" "✸" "✿" "◆"))
 ;;(setq org-agenda-skip-deadline-prewarning-if-scheduled t)
