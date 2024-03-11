@@ -207,14 +207,6 @@
 ;;      org-agenda-compact-blocks t
 ;;      org-agenda-start-with-log-mode t)
 
-(use-package org-modern
-  :hook
-  (org-mode . global-org-modern-mode)
-  :custom
-  (org-modern-keyword nil)
-  (org-modern-checkbox nil)
-  (org-modern-table nil))
-
 ;;(setq org-bullets-bullet-list '( "⦿" "○" "✸" "✿" "◆"))
 ;;(setq org-agenda-skip-deadline-prewarning-if-scheduled t)
 ;;画图

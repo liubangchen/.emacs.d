@@ -181,14 +181,14 @@ prepended to the element after the #+HEADER: tag."
     :init (add-to-list 'org-export-backends 'gfm))
 
   ;; Prettify UI
-  ;;(use-package org-modern
-  ;;  :hook ((org-mode . org-modern-mode)
-  ;;         (org-agenda-finalize . org-modern-agenda)
-  ;;         (org-modern-mode . (lambda ()
-  ;;                              "Adapt `org-modern-mode'."
-  ;;                              ;; Disable Prettify Symbols mode
-  ;;                              (setq prettify-symbols-alist nil)
-  ;;                              (prettify-symbols-mode -1)))))
+  (use-package org-modern
+    :hook ((org-mode . org-modern-mode)
+           (org-agenda-finalize . org-modern-agenda)
+           (org-modern-mode . (lambda ()
+                                "Adapt `org-modern-mode'."
+                                ;; Disable Prettify Symbols mode
+                                (setq prettify-symbols-alist nil)
+                                (prettify-symbols-mode -1)))))
 
   ;; Babel
   (setq org-confirm-babel-evaluate nil
