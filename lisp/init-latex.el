@@ -33,10 +33,10 @@
 \\usepackage{xeCJK}
 \\usepackage{minted}
 \\usepackage{fontspec}
-\\setmainfont{PingFang SC}
-\\setCJKmainfont{PingFang SC}
-\\setCJKsansfont{PingFang SC}
-\\setCJKmonofont{PingFang SC}
+\\setmainfont{MesloLGS NF}
+\\setCJKmainfont{MesloLGS NF}
+\\setCJKsansfont{MesloLGS NF}
+\\setCJKmonofont{MesloLGS NF}
 %\\usepackage[dvipsnames]{xcolor}
 %\\usepackage[margin=1.6cm]{geometry}
 \\XeTeXlinebreaklocale ``zh''
@@ -64,10 +64,10 @@
                "\\documentclass[dvipdfmx,presentation]{beamer}
 \\usepackage{xeCJK}
 \\usepackage{fontspec}
-\\setmainfont{PingFang SC}
-\\setCJKmainfont{PingFang SC}
-\\setCJKsansfont{PingFang SC}
-\\setCJKmonofont{PingFang SC}
+\\setmainfont{MesloLGS NF}
+\\setCJKmainfont{MesloLGS NF}
+\\setCJKsansfont{MesloLGS NF}
+\\setCJKmonofont{MesloLGS NF}
                [NO-DEFAULT-PACKAGES] [PACKAGES] [EXTRA]"
                ("\\section\{%s\}" . "\\section*\{%s\}")
                ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
