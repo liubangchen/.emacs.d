@@ -33,10 +33,10 @@
 \\usepackage{xeCJK}
 \\usepackage{minted}
 \\usepackage{fontspec}
-\\setmainfont{微软雅黑}
-\\setCJKmainfont{微软雅黑}
-\\setCJKsansfont{微软雅黑}
-\\setCJKmonofont{微软雅黑}
+\\setmainfont{PingFang SC}
+\\setCJKmainfont{PingFang SC}
+\\setCJKsansfont{PingFang SC}
+\\setCJKmonofont{PingFang SC}
 %\\usepackage[dvipsnames]{xcolor}
 %\\usepackage[margin=1.6cm]{geometry}
 \\XeTeXlinebreaklocale ``zh''
@@ -64,10 +64,10 @@
                "\\documentclass[dvipdfmx,presentation]{beamer}
 \\usepackage{xeCJK}
 \\usepackage{fontspec}
-\\setmainfont{Microsoft YaHei}
-\\setCJKmainfont{Microsoft YaHei}
-\\setCJKsansfont{Microsoft YaHei}
-\\setCJKmonofont{Microsoft YaHei}
+\\setmainfont{PingFang SC}
+\\setCJKmainfont{PingFang SC}
+\\setCJKsansfont{PingFang SC}
+\\setCJKmonofont{PingFang SC}
                [NO-DEFAULT-PACKAGES] [PACKAGES] [EXTRA]"
                ("\\section\{%s\}" . "\\section*\{%s\}")
                ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
