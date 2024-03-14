@@ -33,10 +33,10 @@
 \\usepackage{xeCJK}
 \\usepackage{minted}
 \\usepackage{fontspec}
-\\setmainfont{MesloLGS NF}
-\\setCJKmainfont{MesloLGS NF}
-\\setCJKsansfont{MesloLGS NF}
-\\setCJKmonofont{MesloLGS NF}
+\\setmainfont{AppleGothic}
+\\setCJKmainfont{AppleGothic}
+\\setCJKsansfont{AppleGothic}
+\\setCJKmonofont{AppleGothic}
 %\\usepackage[dvipsnames]{xcolor}
 %\\usepackage[margin=1.6cm]{geometry}
 \\XeTeXlinebreaklocale ``zh''
@@ -64,10 +64,10 @@
                "\\documentclass[dvipdfmx,presentation]{beamer}
 \\usepackage{xeCJK}
 \\usepackage{fontspec}
-\\setmainfont{MesloLGS NF}
-\\setCJKmainfont{MesloLGS NF}
-\\setCJKsansfont{MesloLGS NF}
-\\setCJKmonofont{MesloLGS NF}
+\\setmainfont{AppleGothic}
+\\setCJKmainfont{AppleGothic}
+\\setCJKsansfont{AppleGothic}
+\\setCJKmonofont{AppleGothic}
                [NO-DEFAULT-PACKAGES] [PACKAGES] [EXTRA]"
                ("\\section\{%s\}" . "\\section*\{%s\}")
                ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
