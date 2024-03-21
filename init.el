@@ -173,5 +173,6 @@ Otherwise the startup will be very slow."
 (require 'init-ollama)
 (require 'init-jupyter)
 (require 'init-orgtools)
+(require 'org-transform-tree-table)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here
