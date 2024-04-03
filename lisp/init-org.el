@@ -183,7 +183,12 @@ prepended to the element after the #+HEADER: tag."
   ;; Prettify UI
   (use-package org-modern
     :config
-    (setq org-modern-table nil)
+    (setq org-modern-star ["◉" "○" "✸" "✿" "✤" "✜" "◆" "▶"]
+          org-modern-table-vertical 1
+          org-modern-table-horizontal 0.2
+          org-modern-list '((43 . "➤")
+                            (45 . "–")
+                            (42 . "•")))
     :hook ((org-mode . org-modern-mode)
            (org-agenda-finalize . org-modern-agenda)
            (org-modern-mode . (lambda ()
