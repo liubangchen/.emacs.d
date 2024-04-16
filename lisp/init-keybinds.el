@@ -7,7 +7,7 @@
 (global-set-key (kbd "M-l") 'downcase-region)
 (global-set-key (kbd "C-.") 'revert-buffer)
 (global-set-key (kbd "C-k") 'kill-whole-line)
-(global-set-key (kbd "C-b") 'counsel-switch-buffer);;counsel-switch-buffer
+(global-set-key (kbd "C-b") 'switch-to-buffer);;counsel-switch-buffer
 (global-set-key (kbd "C-s") 'consult-line)
 (global-set-key (kbd "C-S-f") 'lsp-format-buffer)
 (global-set-key (kbd "M-w") 'er/mark-word)
@@ -18,7 +18,7 @@
 (global-set-key (kbd "C-z") 'undo)
 (global-set-key (kbd "C-S-z") 'redo)
 (global-set-key (kbd "s-o") 'consult-find)
-(global-set-key (kbd "s-p") 'counsel-find-file)
+(global-set-key (kbd "s-p") 'ido-find-file)
 ;;buffer跳转
 ;;(global-set-key (kbd "M-<left>") 'back-button-global-backward)
 ;;(global-set-key (kbd "M-<right>") 'back-button-global-forward)
