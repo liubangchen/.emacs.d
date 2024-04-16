@@ -184,8 +184,7 @@ prepended to the element after the #+HEADER: tag."
   (use-package org-modern
     :config
     (setq org-modern-star ["◉" "○" "✸" "✿" "✤" "✜" "◆" "▶"]
-          org-modern-table-vertical 1
-          org-modern-table-horizontal 0.2
+          org-modern-table nil
           org-modern-list '((43 . "➤")
                             (45 . "–")
                             (42 . "•")))
