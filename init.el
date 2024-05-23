@@ -169,7 +169,7 @@ Otherwise the startup will be very slow."
 (require 'init-function)
 (require 'init-scala)
 (require 'init-dirtree)
-;;(require 'init-ivy)
+(require 'init-ivy)
 (require 'init-ollama)
 (require 'init-jupyter)
 (require 'init-orgtools)

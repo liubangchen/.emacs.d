@@ -537,18 +537,7 @@
       (advice-add #'ivy--regex-plus :around #'my-ivy--regex-pinyin)
       (advice-add #'ivy--regex-ignore-order :around #'my-ivy--regex-pinyin))))
 
-;; Use Ivy to open recent directories
-(use-package ivy-dired-history
-  :demand t
-  :after dired
-  :defines (savehist-additional-variables desktop-globals-to-save)
-  :bind (:map dired-mode-map
-         ("," . dired))
-  :init
-  (with-eval-after-load 'savehist
-    (add-to-list 'savehist-additional-variables 'ivy-dired-history-variable))
-  (with-eval-after-load 'desktop
-    (add-to-list 'desktop-globals-to-save 'ivy-dired-history-variable)))
+
 
 ;; More friendly display transformer for Ivy
 ;; Enable before`ivy-rich-mode' for better performance
