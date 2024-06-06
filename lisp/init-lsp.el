@@ -85,7 +85,7 @@
                  lsp-modeline-diagnostics-enable nil
                  lsp-modeline-workspace-status-enable nil
 
-                 lsp-semantic-tokens-enable t
+                 lsp-semantic-tokens-enable nil
                  lsp-progress-spinner-type 'progress-bar-filled
 
                  lsp-enable-file-watchers nil
