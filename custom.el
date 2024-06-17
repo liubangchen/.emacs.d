@@ -5,11 +5,11 @@
 ;;; Code:
 
 (setenv "LIBRARY_PATH"
-	(string-join
-	 '("/opt/homebrew/opt/gcc/lib/gcc/current/"
-	   "/opt/homebrew/opt/libgccjit/lib/gcc/current/"
-	   "/opt/homebrew/opt/gcc/lib/gcc/current/gcc/aarch64-apple-darwin23/14/")
-	 ":"))
+	    (string-join
+	     '("/opt/homebrew/opt/gcc/lib/gcc/13"
+	       "/opt/homebrew/opt/libgccjit/lib/gcc/13"
+	       "/opt/homebrew/opt/gcc/lib/gcc/13/gcc/aarch64-apple-darwin23/13")
+	     ":"))
 
 (setq package-check-signature nil)
 ;;(setq centaur-logo nil)                        ; Logo file or nil (official logo)
@@ -80,13 +80,15 @@
                      (t
                       (set-fontset-font t 'emoji (font-spec :family font) nil 'prepend))))
 
+    (dolist (charset '(kana han symbol cjk-misc bopomofo))
+      (set-fontset-font (frame-parameter nil 'font) charset
+                        (font-spec :family "WenQuanYi Micro Hei" :size 14)))
     ;; Specify font for Chinese characters
-    (cl-loop for font in '("LXGW Neo Xihei" "WenQuanYi Micro Hei Mono" "LXGW WenKai Screen"
-                           "LXGW WenKai Mono" "PingFang SC" "Microsoft Yahei UI" "Simhei")
+    (cl-loop for font in '("WenQuanYi Micro Hei" "PingFang SC" "Microsoft Yahei" "STFangsong")
              when (font-installed-p font)
              return (progn
-                      (setq face-font-rescale-alist `((,font . 1.0)))
-                      (set-fontset-font t 'han (font-spec :family font))))))
+                      (setq face-font-rescale-alist `((,font . 1.3)))
+                      (set-fontset-font t '(#x4e00 . #x9fff) (font-spec :family font))))))
 
 (centaur-setup-fonts)
 (add-hook 'window-setup-hook #'centaur-setup-fonts)
@@ -111,17 +113,13 @@
 ;; (setq confirm-kill-emacs 'y-or-n-p)
 
 ;; Enable proxy
-;; (enable-http-proxy)
-;; (enable-socks-proxy)
+;; (proxy-http-enable)
+;; (proxy-socks-enable)
 
 ;; Display on the specified monitor
 ;; (when (and (> (length (display-monitor-attributes-list)) 1)
 ;;            (> (display-pixel-width) 1920))
 ;;   (set-frame-parameter nil 'left 1920))
-
-;; (put 'cl-destructuring-bind 'lisp-indent-function 'defun)
-;; (put 'pdf-view-create-image 'lisp-indent-function 'defun)
-;; (put 'treemacs-create-theme 'lisp-indent-function 'defun)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
