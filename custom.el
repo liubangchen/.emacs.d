@@ -6,9 +6,9 @@
 
 (setenv "LIBRARY_PATH"
 	(string-join
-	 '("/opt/homebrew/opt/gcc/lib/gcc/13"
-	   "/opt/homebrew/opt/libgccjit/lib/gcc/13"
-	   "/opt/homebrew/opt/gcc/lib/gcc/13/gcc/aarch64-apple-darwin23/13")
+	 '("/opt/homebrew/opt/gcc/lib/gcc/current/"
+	   "/opt/homebrew/opt/libgccjit/lib/gcc/current/"
+	   "/opt/homebrew/opt/gcc/lib/gcc/current/gcc/aarch64-apple-darwin23/14/")
 	 ":"))
 
 (setq package-check-signature nil)
@@ -49,7 +49,7 @@
              when (font-installed-p font)
              return (set-face-attribute 'default nil
                                         :family font
-                                        :height (cond (sys/macp 160)
+                                        :height (cond (sys/macp 130)
                                                       (sys/win32p 110)
                                                       (t 100))))
 
@@ -80,15 +80,13 @@
                      (t
                       (set-fontset-font t 'emoji (font-spec :family font) nil 'prepend))))
 
-    (dolist (charset '(kana han symbol cjk-misc bopomofo))
-      (set-fontset-font (frame-parameter nil 'font) charset
-                        (font-spec :family "WenQuanYi Micro Hei" :size 14)))
     ;; Specify font for Chinese characters
-    (cl-loop for font in '("WenQuanYi Micro Hei" "PingFang SC" "Microsoft Yahei" "STFangsong")
+    (cl-loop for font in '("LXGW Neo Xihei" "WenQuanYi Micro Hei Mono" "LXGW WenKai Screen"
+                           "LXGW WenKai Mono" "PingFang SC" "Microsoft Yahei UI" "Simhei")
              when (font-installed-p font)
              return (progn
                       (setq face-font-rescale-alist `((,font . 1.3)))
-                      (set-fontset-font t '(#x4e00 . #x9fff) (font-spec :family font))))))
+                      (set-fontset-font t 'han (font-spec :family font))))))
 
 (centaur-setup-fonts)
 (add-hook 'window-setup-hook #'centaur-setup-fonts)
@@ -113,13 +111,17 @@
 ;; (setq confirm-kill-emacs 'y-or-n-p)
 
 ;; Enable proxy
-;; (proxy-http-enable)
-;; (proxy-socks-enable)
+;; (enable-http-proxy)
+;; (enable-socks-proxy)
 
 ;; Display on the specified monitor
 ;; (when (and (> (length (display-monitor-attributes-list)) 1)
 ;;            (> (display-pixel-width) 1920))
 ;;   (set-frame-parameter nil 'left 1920))
+
+;; (put 'cl-destructuring-bind 'lisp-indent-function 'defun)
+;; (put 'pdf-view-create-image 'lisp-indent-function 'defun)
+;; (put 'treemacs-create-theme 'lisp-indent-function 'defun)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
