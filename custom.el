@@ -49,7 +49,7 @@
              when (font-installed-p font)
              return (set-face-attribute 'default nil
                                         :family font
-                                        :height (cond (sys/macp 130)
+                                        :height (cond (sys/macp 160)
                                                       (sys/win32p 110)
                                                       (t 100))))
 
@@ -85,7 +85,7 @@
                            "LXGW WenKai Mono" "PingFang SC" "Microsoft Yahei UI" "Simhei")
              when (font-installed-p font)
              return (progn
-                      (setq face-font-rescale-alist `((,font . 1.3)))
+                      (setq face-font-rescale-alist `((,font . 1.0)))
                       (set-fontset-font t 'han (font-spec :family font))))))
 
 (centaur-setup-fonts)

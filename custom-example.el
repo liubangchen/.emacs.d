@@ -40,7 +40,7 @@
              when (font-installed-p font)
              return (set-face-attribute 'default nil
                                         :family font
-                                        :height (cond (sys/macp 130)
+                                        :height (cond (sys/macp 160)
                                                       (sys/win32p 110)
                                                       (t 100))))
 
