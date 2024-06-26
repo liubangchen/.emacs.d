@@ -90,6 +90,11 @@
         :init (centaur-load-theme centaur-theme t)
         :config
         ;; Enable flashing mode-line on errors
+        (setq doom-themes-enable-bold t
+              doom-themes-enable-italic t)
+        (doom-themes-neotree-config)
+        (doom-themes-treemacs-config)
+        (doom-themes-org-config)
         (doom-themes-visual-bell-config)
 
         ;; WORKAROUND: Visual bell on 29+

@@ -1,6 +1,3 @@
-;;(defalias 'yes-or-no-p 'y-or-no-p)
-;;(setq confirm-kill-emacs 'y-or-no-p)
-
 ;;不产生临时文件
 (setq-default make-backup-files nil)
 (setq backup-directory-alist (quote (("." . "~/backups"))))
@@ -32,10 +29,10 @@
   :hook ((after-save . ssh-deploy-after-save)
          (find-file . ssh-deploy-find-file))
   :config
-  (ssh-deploy-line-mode) ;; If you want mode-line feature
-  (ssh-deploy-add-menu) ;; If you want menu-bar feature
-  (ssh-deploy-hydra "C-c C-z") ;; If you want the hydra feature
-  )
+  (setq ssh-deploy-line-mode t
+        ssh-deploy-add-menu t
+        ssh-deploy-hydra "C-c C-z"))
+
 (setenv "TZ" "Asia/Beijing")
 (customize-set-variable 'tramp-encoding-shell "/bin/zsh")
 ;;(setq tramp-shell-prompt-pattern       "\\(?:^\\|\r\\)[^]#$%>\n]*#?[]#$%>].* *\\(^[\\[[0-9;]*[a-zA-Z] *\\)*")
