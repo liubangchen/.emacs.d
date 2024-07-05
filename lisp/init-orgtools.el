@@ -248,4 +248,8 @@ same directory as the org-buffer and insert a link to this file."
   (insert (concat "[[./" filename "]]")))
 
 (setq org-babel-python-command "python3")
+
+(use-package all-the-icons
+  :if (display-graphic-p))
+
 (provide 'init-orgtools)
