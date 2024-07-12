@@ -226,10 +226,11 @@
 (setq org-ditaa-jar-path
       (expand-file-name "~/.emacs.d/javalibs/ditaa0_9.jar"))
 
-;;(setq org-plantuml-jar-path
-;;      (expand-file-name "~/.emacs.d/javalibs/plantumllib/plantuml.jar"))
-(setq org-plantuml-exec-mode 'plantuml)
-(setq org-plantuml-executable-path "~/.emacs.d/javalibs/plantuml")
+(setq org-plantuml-jar-path
+      (expand-file-name "~/.emacs.d/javalibs/plantumllib/plantuml.jar"))
+(setq org-plantuml-exec-mode 'jar)
+;;(setq org-plantuml-exec-mode 'plantuml)
+;;(setq org-plantuml-executable-path "~/.emacs.d/javalibs/plantuml")
 (setq org-plantuml-executable-args '("-headless" "-charset UTF-8"))
 (setq org-confirm-babel-evaluate nil)
 

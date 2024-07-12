@@ -1,5 +1,5 @@
 #!/bin/bash
 curdir=`pwd`
-echo "$curdir"
+#echo "$curdir"
 #java -cp "$(printf %s: *.jar)"  org.apache.fop.fonts.apps.TTFReader -ttcname "Microsoft YaHei" /Users/chenlong/Library/Fonts/WeiRuanYaHei-1.ttf yahei.xml
 java  -Duser.dir=/Users/chenlong/.emacs.d/javalibs -Xmx1024m -cp :/Users/chenlong/.emacs.d/javalibs/plantumllib/* net.sourceforge.plantuml.Run "${@}"
