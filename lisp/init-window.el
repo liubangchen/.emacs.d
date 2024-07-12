@@ -244,7 +244,7 @@
         (when-let ((window (caar popper-open-popup-alist))
                    (buffer (cdar popper-open-popup-alist)))
           (when (and (with-current-buffer buffer
-                       (not (derived-mode-p 'ehell-mode
+                       (not (derived-mode-p 'eshell-mode
                                             'shell-mode
                                             'term-mode
                                             'vterm-mode)))
