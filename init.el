@@ -167,7 +167,7 @@ Otherwise the startup will be very slow."
 (require 'init-sql)
 (require 'init-plantuml)
 (require 'init-function)
-;;(require 'init-scala)
+(require 'init-scala)
 (require 'init-dirtree)
 (require 'init-ivy)
 (require 'init-ollama)

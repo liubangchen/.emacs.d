@@ -16,10 +16,10 @@
 (setq centaur-org-directory "~/notes/org")
 (setq centaur-completion-style 'childframe)    ; Completion display style: minibuffer or childframe
 ;; (setq centaur-dashboard nil)                   ; Display dashboard at startup or not: t or nil
-(setq centaur-lsp 'eglot)                   ; Set LSP client: lsp-mode, eglot or nil
+(setq centaur-lsp 'lsp-mode)                   ; Set LSP client: lsp-mode, eglot or nil
 (setq centaur-lsp-format-on-save t)            ; Auto format buffers on save: t or nil
 (setq centaur-lsp-format-on-save-ignore-modes '(c-mode c++-mode python-mode markdown-mode)) ; Ignore format on save for some languages
-;; (setq centaur-tree-sitter nil)                 ; Enable tree-sitter or not: t or nil. Only available in 29+.
+(setq centaur-tree-sitter t)                 ; Enable tree-sitter or not: t or nil. Only available in 29+.
 (setq centaur-chinese-calendar t)              ; Support Chinese calendar or not: t or nil
 (setq centaur-player t)                        ; Enable players or not: t or nil
 ;; (setq centaur-prettify-symbols-alist nil)      ; Alist of symbol prettifications. Nil to use font supports ligatures.
