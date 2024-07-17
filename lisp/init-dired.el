@@ -144,7 +144,6 @@
   :bind (:map dired-mode-map
          ("s" . hydra-dired-quick-sort/body)))
 
-(dired-quick-sort-setup)
 (provide 'init-dired)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
