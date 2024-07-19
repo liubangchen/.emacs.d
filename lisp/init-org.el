@@ -183,8 +183,7 @@ prepended to the element after the #+HEADER: tag."
   ;; Prettify UI
   (use-package org-modern
     :config
-    (setq org-modern-star ["◉" "○" "✸" "✿" "✤" "✜" "◆" "▶"]
-          org-modern-table nil
+    (setq org-modern-table nil
           org-modern-list '((43 . "➤")
                             (45 . "–")
                             (42 . "•")))
