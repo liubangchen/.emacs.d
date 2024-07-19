@@ -50,6 +50,7 @@
            ("C-c u"   . gt-do-text-utility)
            ("C-c d g" . gt-do-translate)
            ("C-c d G" . gt-do-translate-prompt)
+           ("C-c d p" . gt-do-speak)
            ("C-c d s" . gt-do-setup)
            ("C-c d u" . gt-do-text-utility))
     :init
@@ -69,7 +70,7 @@
       (setq gt-preset-translators
             `((default . ,(gt-translator
                            :taker   (list (gt-taker :pick nil :if 'selection)
-                                          (gt-taker :text 'paragraph :if '(Info-mode help-mode helpful-mode))
+                                          (gt-taker :text 'paragraph :if '(Info-mode help-mode helpful-mode devdocs-mode))
                                           (gt-taker :text 'buffer :pick 'fresh-word :if 'read-only)
                                           (gt-taker :text 'word))
                            :engines (if (display-graphic-p)
@@ -81,7 +82,7 @@
                                             (gt-google-engine :if 'word)))
                            :render  (list (gt-posframe-pop-render :if (lambda (translator)
                                                                         (and (display-graphic-p)
-                                                                             (not (derived-mode-p 'Info-mode 'help-mode 'helpful-mode))
+                                                                             (not (derived-mode-p 'Info-mode 'help-mode 'helpful-mode 'devdocs-mode))
                                                                              (not (member (buffer-name) '("COMMIT_EDITMSG")))))
                                                                   :frame-params (list :accept-focus nil
                                                                                       :width 70
