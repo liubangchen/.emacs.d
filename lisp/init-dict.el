@@ -94,7 +94,7 @@
                                           (gt-overlay-render :if 'read-only)
                                           (gt-insert-render :if (lambda (translator) (member (buffer-name) '("COMMIT_EDITMSG"))))
                                           (gt-buffer-render))))
-              (multi-dict . ,(gt-translator :taker (gt-taker :langs '(en zh) :prompt t)
+              (multi-dict . ,(gt-translator :taker (gt-taker :prompt t)
                                             :engines (list (gt-bing-engine)
                                                            (gt-youdao-dict-engine)
                                                            (gt-youdao-suggest-engine :if 'word)
