@@ -130,4 +130,6 @@ same directory as the org-buffer and insert a link to this file."
 (use-package all-the-icons
   :if (display-graphic-p))
 
+(require 'org-pretty-table)
+(add-hook 'org-mode-hook (lambda () (org-pretty-table-mode)))
 (provide 'init-orgtools)
