@@ -184,9 +184,9 @@ prepended to the element after the #+HEADER: tag."
   (use-package org-modern
     :config
     (setq org-modern-table nil
-          org-modern-list '((?+ . "❖")
-                            (?- . "■")
-                            (?* . "➽")))
+          org-modern-list '((?+ . "✏")
+                            (?- . "☞")
+                            (?* . "✪")))
     :hook ((org-mode . org-modern-mode)
            (org-agenda-finalize . org-modern-agenda)
            (org-modern-mode . (lambda ()
