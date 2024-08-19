@@ -124,17 +124,17 @@ prepended to the element after the #+HEADER: tag."
   (setq org-modules nil                 ; Faster loading
         org-directory centaur-org-directory
         org-capture-templates
-        `(("i" "Idea" entry (file ,(concat org-directory "/idea.org"))
+        `(("i" "Idea" entry (file ,(concat org-directory "/gtd/idea.org"))
            "*  %^{Title} %?\n%U\n%a\n")
-          ("t" "Todo" entry (file ,(concat org-directory "/gtd.org"))
+          ("t" "Todo" entry (file ,(concat org-directory "/gtd/gtd.org"))
            "* TODO %?\n%U\n%a\n" :clock-in t :clock-resume t)
-          ("n" "Note" entry (file ,(concat org-directory "/note.org"))
+          ("n" "Note" entry (file ,(concat org-directory "/gtd/note.org"))
            "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
           ("j" "Journal" entry (file+olp+datetree
-                                ,(concat org-directory "/journal.org"))
+                                ,(concat org-directory "/gtd/journal.org"))
            "*  %^{Title} %?\n%U\n%a\n" :clock-in t :clock-resume t)
 	      ("b" "Book" entry (file+olp+datetree
-                             ,(concat org-directory "/book.org"))
+                             ,(concat org-directory "/gtd/book.org"))
 	       "* Topic: %^{Description}  %^g %? Added: %U"))
 
         org-todo-keywords
@@ -183,10 +183,10 @@ prepended to the element after the #+HEADER: tag."
   ;; Prettify UI
   (use-package org-modern
     :config
-    (setq org-modern-table nil
-          org-modern-list '((?+ . "✏")
-                            (?- . "☞")
-                            (?* . "✪")))
+    (setq org-modern-table nil)
+;;          org-modern-list '((?+ . "✏")
+;;                            (?- . "☞")
+;;                            (?* . "✪")))
     :hook ((org-mode . org-modern-mode)
            (org-agenda-finalize . org-modern-agenda)
            (org-modern-mode . (lambda ()

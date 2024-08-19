@@ -124,7 +124,7 @@
  '(org-timestamp-custom-formats '("[%Y-%m-%d %A]" . "[%Y %m %d  %A [%H:%M]]"))
  '(package-vc-selected-packages
    '((eglot-booster :vc-backend Git :url
-                    "https://github.com/jdtsmith/eglot-booster"))))
+       "https://github.com/jdtsmith/eglot-booster"))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
