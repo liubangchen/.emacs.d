@@ -47,7 +47,7 @@
         dired-recursive-copies 'always)
 
   ;; Show directory first
-  (setq dired-listing-switches "-alh --group-directories-first")
+  (setq dired-listing-switches "-alh --group-directories-first --time-style \"+%Y-%m-%d %H:%M:%S\"")
 
   (when sys/macp
     (if (executable-find "gls")
