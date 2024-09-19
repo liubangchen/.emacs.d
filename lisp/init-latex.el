@@ -64,10 +64,10 @@
                "\\documentclass[dvipdfmx,presentation]{beamer}
 \\usepackage{xeCJK}
 \\usepackage{fontspec}
-\\setmainfont{AppleGothic}
-\\setCJKmainfont{AppleGothic}
-\\setCJKsansfont{AppleGothic}
-\\setCJKmonofont{AppleGothic}
+\\setmainfont{PingFang SC}
+\\setCJKmainfont{PingFang SC}
+\\setCJKsansfont{PingFang SC}
+\\setCJKmonofont{PingFang SC}
                [NO-DEFAULT-PACKAGES] [PACKAGES] [EXTRA]"
                ("\\section\{%s\}" . "\\section*\{%s\}")
                ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
