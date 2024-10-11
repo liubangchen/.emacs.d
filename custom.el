@@ -123,8 +123,9 @@
  '(org-display-custom-times t)
  '(org-timestamp-custom-formats '("[%Y-%m-%d %A]" . "[%Y %m %d  %A [%H:%M]]"))
  '(package-vc-selected-packages
-   '((eglot-booster :vc-backend Git :url
-       "https://github.com/jdtsmith/eglot-booster"))))
+   '((copilot :url "https://github.com/copilot-emacs/copilot.el" :branch "main")
+     (eglot-booster :vc-backend Git :url
+                    "https://github.com/jdtsmith/eglot-booster"))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
