@@ -12,7 +12,7 @@
 ;; (setq centaur-server nil)                      ; Enable `server-mode' or not: t or nil
 (setq centaur-icon t)                        ; Display icons or not: t or nil
 (setq centaur-package-archives 'melpa)         ; Package repo: melpa, emacs-cn, bfsu, netease, sjtu, tencent, tuna or ustc
-(setq centaur-theme 'dark)                     ; Color theme: auto, random, system, default, pro, dark, light, warm, cold, day or night doom-acario-dark doom-bluloco-dark
+(setq centaur-theme 'default)                     ; Color theme: auto, random, system, default, pro, dark, light, warm, cold, day or night doom-acario-dark doom-bluloco-dark
 (setq centaur-org-directory "~/notes/org")
 (setq centaur-completion-style 'childframe)    ; Completion display style: minibuffer or childframe
 ;; (setq centaur-dashboard nil)                   ; Display dashboard at startup or not: t or nil
@@ -123,9 +123,9 @@
  '(org-display-custom-times t)
  '(org-timestamp-custom-formats '("[%Y-%m-%d %A]" . "[%Y %m %d  %A [%H:%M]]"))
  '(package-vc-selected-packages
-   '((copilot :url "https://github.com/copilot-emacs/copilot.el" :branch "main")
-     (eglot-booster :vc-backend Git :url
-                    "https://github.com/jdtsmith/eglot-booster"))))
+   '((eglot-booster :vc-backend Git :url
+       "https://github.com/jdtsmith/eglot-booster")
+     (copilot :url "https://github.com/copilot-emacs/copilot.el" :branch "main"))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
