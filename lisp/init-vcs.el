@@ -62,6 +62,7 @@
 (when (childframe-completion-workable-p)
   (use-package transient-posframe
     :diminish
+    :after posframe transient
     :defines posframe-border-width
     :custom-face
     (transient-posframe ((t (:inherit tooltip))))
