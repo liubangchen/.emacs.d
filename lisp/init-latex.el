@@ -33,10 +33,10 @@
 \\usepackage{xeCJK}
 \\usepackage{minted}
 \\usepackage{fontspec}
-\\setmainfont{AppleGothic}
-\\setCJKmainfont{AppleGothic}
-\\setCJKsansfont{AppleGothic}
-\\setCJKmonofont{AppleGothic}
+\\setmainfont{PingFang SC}
+\\setCJKmainfont{PingFang SC}
+\\setCJKsansfont{PingFang SC}
+\\setCJKmonofont{PingFang SC}
 %\\usepackage[dvipsnames]{xcolor}
 %\\usepackage[margin=1.6cm]{geometry}
 \\XeTeXlinebreaklocale ``zh''
