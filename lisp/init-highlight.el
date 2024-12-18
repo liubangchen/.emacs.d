@@ -43,13 +43,18 @@
 ;; Highlight matching parens
 (use-package paren
   :ensure nil
-  :custom-face (show-paren-match ((t (:underline t))))
+  :custom-face
+  (show-paren-match ((((class color) (background light))
+                      (:box (:line-width (-1 . -1) :color "gray70")))
+                     (((class color) (background dark))
+                      (:box (:line-width (-1 . -1) :color "gray50")))))
   :hook (after-init . show-paren-mode)
   :init (setq show-paren-when-point-inside-paren t
               show-paren-when-point-in-periphery t)
   :config
   (if emacs/>=29p
-      (setq show-paren-context-when-offscreen
+      (setq blink-matching-paren-highlight-offscreen t
+            show-paren-context-when-offscreen
             (if (childframe-workable-p) 'child-frame 'overlay))
     (with-no-warnings
       ;; Display matching line for off-screen paren.
