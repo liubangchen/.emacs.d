@@ -153,6 +153,7 @@ FACE defaults to inheriting from default and highlight."
 ;; Highlight indentions
 (use-package indent-bars
   :custom
+  (indent-bars-color '(highlight :face-bg t :blend 0.225))
   (indent-bars-treesit-support centaur-tree-sitter)
   (indent-bars-no-descend-string t)
   (indent-bars-treesit-ignore-blank-lines-types '("module"))
@@ -167,8 +168,7 @@ FACE defaults to inheriting from default and highlight."
     (use-package colorful-mode
       :diminish
       :hook (after-init . global-colorful-mode)
-      :init (setq colorful-use-prefix t
-                  colorful-prefix-string "⬤")
+      :init (setq colorful-use-prefix t)
       :config (dolist (mode '(html-mode php-mode help-mode helpful-mode))
                 (add-to-list 'global-colorful-modes mode)))
   (use-package rainbow-mode
