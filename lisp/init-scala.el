@@ -69,9 +69,9 @@
 (use-package posframe)
 
 ;; Use the Debug Adapter Protocol for running tests and debugging
-(use-package dap-mode
-  :hook
-  (lsp-mode . dap-mode)
-  (lsp-mode . dap-ui-mode))
+;;(use-package dap-mode
+;;  :hook
+;;  (lsp-mode . dap-mode)
+;;  (lsp-mode . dap-ui-mode))
 
 (provide 'init-scala)
