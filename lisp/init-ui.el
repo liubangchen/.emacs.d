@@ -1,6 +1,6 @@
 ;; init-ui.el --- Better lookings and appearances.	-*- lexical-binding: t -*-
 
-;; Copyright (C) 2006-2024 Vincent Zhang
+;; Copyright (C) 2006-2025 Vincent Zhang
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; URL: https://github.com/seagle0128/.emacs.d
@@ -369,8 +369,8 @@
   :config (dolist (mode '(dashboard-mode emacs-news-mode))
             (add-to-list 'page-break-lines-modes mode)))
 
-;; Child frame
 (when (childframe-workable-p)
+  ;; Child frame
   (use-package posframe
     :hook (after-load-theme . posframe-delete-all)
     :init
@@ -392,7 +392,20 @@
                  2)
               (/ (+ (plist-get info :parent-frame-height)
                     (* 2 (plist-get info :font-height)))
-                 2))))))
+                 2)))))
+
+  ;; Display transient in child frame
+  (use-package transient-posframe
+    :diminish
+    :custom-face
+    (transient-posframe ((t (:inherit tooltip))))
+    (transient-posframe-border ((t (:inherit posframe-border :background unspecified))))
+    :hook (after-init . transient-posframe-mode)
+    :init (setq transient-mode-line-format nil
+                transient-posframe-border-width posframe-border-width
+                transient-posframe-poshandler 'posframe-poshandler-frame-center
+                transient-posframe-parameters '((left-fringe . 8)
+                                                (right-fringe . 8)))))
 
 (with-no-warnings
   (when sys/macp
