@@ -22,6 +22,7 @@
 (setq centaur-tree-sitter t)                 ; Enable tree-sitter or not: t or nil. Only available in 29+.
 (setq centaur-chinese-calendar t)              ; Support Chinese calendar or not: t or nil
 (setq centaur-player t)                        ; Enable players or not: t or nil
+(setq debug-on-error t)
 ;; (setq centaur-prettify-symbols-alist nil)      ; Alist of symbol prettifications. Nil to use font supports ligatures.
 ;; (setq centaur-prettify-org-symbols-alist nil)  ; Alist of symbol prettifications for `org-mode'
 
@@ -123,8 +124,9 @@
  '(org-display-custom-times t)
  '(org-timestamp-custom-formats '("[%Y-%m-%d %A]" . "[%Y %m %d  %A [%H:%M]]"))
  '(package-vc-selected-packages
-   '((eglot-booster :vc-backend Git :url
-       "https://github.com/jdtsmith/eglot-booster")
+   '((aider :url "https://github.com/tninja/aider.el")
+     (eglot-booster :vc-backend Git :url
+                    "https://github.com/jdtsmith/eglot-booster")
      (copilot :url "https://github.com/copilot-emacs/copilot.el" :branch "main"))))
 
 (custom-set-faces
