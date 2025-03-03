@@ -343,10 +343,12 @@
       scroll-preserve-screen-position t)
 
 ;; Smooth scrolling
-(when emacs/>=29p
-  (use-package ultra-scroll
-    :vc (:url "https://github.com/jdtsmith/ultra-scroll")
-    :hook (after-init . ultra-scroll-mode)))
+(use-package ultra-scroll
+  :when emacs/>=29p
+  :ensure nil
+  :init (unless (package-installed-p 'ultra-scroll)
+          (package-vc-install "https://github.com/jdtsmith/ultra-scroll"))
+  :hook (after-init . ultra-scroll-mode))
 
 ;; Smooth scrolling over images
 (unless emacs/>=30p
@@ -411,7 +413,7 @@
     (setq ns-pop-up-frames nil)))
 
 ;; Ligatures support
-(when (and emacs/>=28p (not centaur-prettify-symbols-alist))
+(unless centaur-prettify-symbols-alist
   (use-package composite
     :ensure nil
     :init (defvar composition-ligature-table (make-char-table nil))
