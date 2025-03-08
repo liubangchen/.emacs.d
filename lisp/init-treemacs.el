@@ -33,6 +33,9 @@
 (eval-when-compile
   (require 'init-custom))
 
+(use-package all-the-icons
+  :if (display-graphic-p))
+
 ;; A tree layout file explorer
 (use-package treemacs
   :commands (treemacs-follow-mode

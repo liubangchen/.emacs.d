@@ -127,9 +127,6 @@ same directory as the org-buffer and insert a link to this file."
 
 (setq org-babel-python-command "python3")
 
-(use-package all-the-icons
-  :if (display-graphic-p))
-
 (require 'org-modern-indent)
 (add-hook 'org-mode-hook #'org-modern-indent-mode 90)
 
