@@ -60,10 +60,10 @@
 ;; To Company-lsp users:
 ;;   Company-lsp is no longer maintained and has been removed from MELPA.
 ;;   Please migrate to company-capf.
-(use-package company
-  :hook (scala-mode . company-mode)
-  :config
-  (setq lsp-completion-provider :capf))
+;;(use-package company
+;;  :hook (scala-mode . company-mode)
+;;  :config
+;;  (setq lsp-completion-provider :capf))
 
 ;; Posframe is a pop-up tool that must be manually installed for dap-mode
 (use-package posframe)
