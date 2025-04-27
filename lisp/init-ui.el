@@ -50,8 +50,8 @@
 ;; Initial frame
 (setq initial-frame-alist '((top . 0.5)
                             (left . 0.5)
-                            (width . 0.63)
-                            (height . 0.8)
+                            (width . 0.7)
+                            (height . 0.85)
                             (fullscreen)))
 
 ;; Logo
@@ -270,7 +270,7 @@
 (use-package hide-mode-line
   :hook (((treemacs-mode
            eshell-mode shell-mode
-           term-mode vterm-mode
+           term-mode vterm-mode eat-mode
            embark-collect-mode
            lsp-ui-imenu-mode
            pdf-annot-list-mode) . turn-on-hide-mode-line-mode)
