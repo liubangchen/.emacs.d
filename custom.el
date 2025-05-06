@@ -22,7 +22,8 @@
 (setq centaur-tree-sitter t)                 ; Enable tree-sitter or not: t or nil. Only available in 29+.
 (setq centaur-chinese-calendar t)              ; Support Chinese calendar or not: t or nil
 (setq centaur-player t)                        ; Enable players or not: t or nil
-(setq debug-on-error t)
+;;(setq debug-on-error t)
+
 ;; (setq centaur-prettify-symbols-alist nil)      ; Alist of symbol prettifications. Nil to use font supports ligatures.
 ;; (setq centaur-prettify-org-symbols-alist nil)  ; Alist of symbol prettifications for `org-mode'
 
