@@ -184,7 +184,7 @@ prepended to the element after the #+HEADER: tag."
   ;; Prettify UI
   (use-package org-modern
     :config
-    (setq org-modern-table nil)
+    (setq org-modern-table t)
     ;;          org-modern-list '((?+ . "✏")
     ;;                            (?- . "☞")
     ;;                            (?* . "✪")))
