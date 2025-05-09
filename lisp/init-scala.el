@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;; doc https://scalameta.org/metals/docs/editors/emacs.html
 ;;
 ;; Enable scala-mode and sbt-mode

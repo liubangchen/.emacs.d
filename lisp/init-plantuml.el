@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 (use-package plantuml-mode
   :ensure t
   :mode ("\\.plu\\'" "\\.plantuml\\'" "\\.puml\\'")

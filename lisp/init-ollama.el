@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;; ollama.el --- ollama client for Emacs
 
 ;; Copyright (C) 2023 ZHOU Feng

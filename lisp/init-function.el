@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;(use-package ivy
 ;;   :defer t
 ;;   :config

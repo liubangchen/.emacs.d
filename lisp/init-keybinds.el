@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 (global-set-key (kbd "C-l") 'consult-goto-line)
 (global-set-key (kbd "C-/") 'comment-or-uncomment-region)
 ;;(global-set-key (kbd "M-o") 'helm-find-files)

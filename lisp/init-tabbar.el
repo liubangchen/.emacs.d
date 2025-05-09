@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 (use-package centaur-tabs
   :demand
   :config

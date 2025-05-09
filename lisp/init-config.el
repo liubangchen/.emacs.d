@@ -1,5 +1,5 @@
-;;不产生临时文件
-(setq-default make-backup-files nil)
+;;; -*- lexical-binding: t; -*-
+(setq make-backup-files nil)
 (setq backup-directory-alist (quote (("." . "~/backups"))))
 (global-set-key [escape] 'keyboard-escape-quit)         ;;;; everywhere else
 

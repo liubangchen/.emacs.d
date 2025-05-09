@@ -1,4 +1,4 @@
-
+;;; -*- lexical-binding: t; -*-
 
 (use-package neotree
   :init

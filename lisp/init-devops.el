@@ -1,4 +1,4 @@
-
+;;; -*- lexical-binding: t; -*-
 (use-package ag
   :ensure t
   :commands (ag ag-regexp ag-project))

@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 (use-package sql-indent)
 (add-hook 'sql-mode-hook (lambda() (sqlind-minor-mode t)))
 

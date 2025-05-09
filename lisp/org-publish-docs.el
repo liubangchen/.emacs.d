@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 (require 'ox-publish)
 (setq org-html-coding-system 'utf-8-unix)
 
