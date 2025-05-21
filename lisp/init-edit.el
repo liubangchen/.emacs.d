@@ -162,7 +162,7 @@
   (dolist (mode '(gitconfig-mode
                   asm-mode web-mode html-mode
                   css-mode css-ts-mode
-                  go-mode go-ts-mode
+                  go-mode go-ts-mode c-mode c++-mode java-mode
                   python-ts-mode yaml-ts-mode
                   scala-mode
                   shell-mode term-mode vterm-mode
