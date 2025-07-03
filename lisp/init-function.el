@@ -19,6 +19,13 @@
     )
   )
 
+(defun delete-lines (start end)
+  "删除从 START 行到 END 行之间的内容"
+  (interactive "nStart line: \nnEnd line: ")
+  (let ((start-pos (save-excursion (goto-line start) (point)))
+        (end-pos (save-excursion (goto-line end) (point))))
+    (delete-region start-pos end-pos)))
+
 (defun md2pdf ()
   "Generate pdf from currently open markdown."
   (interactive)

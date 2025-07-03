@@ -48,7 +48,13 @@
      (setq read-process-output-max (* 1024 1024)) ; 1MB
      (setq eglot-autoshutdown t
            eglot-events-buffer-size 0
-           eglot-send-changes-idle-time 0.5))
+           eglot-send-changes-idle-time 0.5)
+     :config
+     (add-to-list 'eglot-server-programs '((c++ mode c-mode) "ccls"))
+
+     ;; 开启 clang-format 支持（使用项目中的配置文件）
+     (setq-default eglot-workspace-configuration
+                   '((:ccls (:format (:enable . t))))))
 
    (use-package consult-eglot
      :after consult eglot
