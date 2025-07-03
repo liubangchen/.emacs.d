@@ -46,6 +46,13 @@
   (use-package c-ts-mode
     :init (setq c-ts-mode-indent-offset 4)))
 
+(use-package eglot-inactive-regions
+  :custom
+  (eglot-inactive-regions-style 'shade-background)
+  (eglot-inactive-regions-opacity 0.4)
+  :config
+  (eglot-inactive-regions-mode 1))
+
 (provide 'init-c)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
