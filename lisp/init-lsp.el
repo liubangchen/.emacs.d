@@ -48,13 +48,7 @@
      (setq read-process-output-max (* 1024 1024)) ; 1MB
      (setq eglot-autoshutdown t
            eglot-events-buffer-size 0
-           eglot-send-changes-idle-time 0.5)
-     :config
-     (add-to-list 'eglot-server-programs '((c++ mode c-mode) "ccls"))
-
-     ;; 开启 clang-format 支持（使用项目中的配置文件）
-     (setq-default eglot-workspace-configuration
-                   '((:ccls (:format (:enable . t))))))
+           eglot-send-changes-idle-time 0.5))
 
    (use-package consult-eglot
      :after consult eglot
@@ -110,7 +104,7 @@
                  lsp-modeline-diagnostics-enable nil
                  lsp-modeline-workspace-status-enable nil
 
-                 lsp-semantic-tokens-enable nil
+                 lsp-semantic-tokens-enable t
                  lsp-progress-spinner-type 'progress-bar-filled
 
                  lsp-enable-file-watchers nil
@@ -584,17 +578,7 @@
 
    ;; Java
    (use-package lsp-java
-     :hook ((java-mode java-ts-mode jdee-mode) . (lambda () (require 'lsp-java)))
-     :config
-     (setq lsp-java-vmargs '("-XX:+UseZGC" "-Xmx4G" "-Xms1g")
-           lsp-java-save-actions-organize-imports t
-           lsp-java-content-provider-preferred "fernflower"
-           lsp-java-import-gradle-enabled t
-           lsp-java-import-gradle-version t
-           tab-width 2
-           c-basic-offset 2
-           lsp-java-format-settings-url "file:///Users/chenlong/.emacs.d/javalibs/arctic_format.xml") ;;apache_format.xml arctic_format.xml eclipse-java-google-style.xml iceberg_format.xml
-     )))
+     :hook ((java-mode java-ts-mode jdee-mode) . (lambda () (require 'lsp-java))))))
 
 (when centaur-lsp
   ;; Enable LSP in org babel

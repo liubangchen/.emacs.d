@@ -46,30 +46,30 @@
   (use-package c-ts-mode
     :init (setq c-ts-mode-indent-offset 4)))
 
-(use-package eglot-inactive-regions
-  :custom
-  (eglot-inactive-regions-style 'shade-background)
-  (eglot-inactive-regions-opacity 0.4)
-  :config
-  (eglot-inactive-regions-mode 1))
-
-(use-package format-all
-  :ensure t
-  :hook
-  (prog-mode . format-all-ensure-formatter)
-  :config
-  ;; Enable format-all-mode for programming modes (optional)
-  (add-hook 'prog-mode-hook 'format-all-mode)
-
-  ;; Bind key for formatting the current buffer
-  (define-key prog-mode-map (kbd "C-c f") 'format-all-buffer)
-
-  ;; Optionally, format on save
-  (add-hook 'prog-mode-hook
-            (lambda ()
-              (add-hook 'before-save-hook 'format-all-buffer nil 'local))))
-
-(setq clang-format-style "file")
+;;(use-package eglot-inactive-regions
+;;  :custom
+;;  (eglot-inactive-regions-style 'shade-background)
+;;  (eglot-inactive-regions-opacity 0.4)
+;;  :config
+;;  (eglot-inactive-regions-mode 1))
+;;
+;;(use-package format-all
+;;  :ensure t
+;;  :hook
+;;  (prog-mode . format-all-ensure-formatter)
+;;  :config
+;;  ;; Enable format-all-mode for programming modes (optional)
+;;  (add-hook 'prog-mode-hook 'format-all-mode)
+;;
+;;  ;; Bind key for formatting the current buffer
+;;  (define-key prog-mode-map (kbd "C-c f") 'format-all-buffer)
+;;
+;;  ;; Optionally, format on save
+;;  (add-hook 'prog-mode-hook
+;;            (lambda ()
+;;              (add-hook 'before-save-hook 'format-all-buffer nil 'local))))
+                                        ;
+;;(setq clang-format-style "file")
 
 (provide 'init-c)
 
