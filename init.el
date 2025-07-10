@@ -176,5 +176,6 @@ Avoid placing large files like EAF in `site-lisp` to prevent slow startup."
 (require 'init-ollama)
 (require 'init-jupyter)
 (require 'init-orgtools)
+(require 'init-ai)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init.el ends here
