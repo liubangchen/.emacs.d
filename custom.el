@@ -117,26 +117,3 @@
 ;; (put 'cl-destructuring-bind 'lisp-indent-function 'defun)
 ;; (put 'pdf-view-create-image 'lisp-indent-function 'defun)
 ;; (put 'treemacs-create-theme 'lisp-indent-function 'defun)
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(org-display-custom-times t)
- '(org-timestamp-custom-formats '("[%Y-%m-%d %A]" . "[%Y %m %d  %A [%H:%M]]"))
- '(package-vc-selected-packages
-   '((ultra-scroll :vc-backend Git :url "https://github.com/jdtsmith/ultra-scroll")
-     (eglot-booster :vc-backend Git :url
-                    "https://github.com/jdtsmith/eglot-booster")
-     (aider :url "https://github.com/tninja/aider.el")
-     (copilot :url "https://github.com/copilot-emacs/copilot.el" :branch "main"))))
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-
-;;; custom.el ends here

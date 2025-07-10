@@ -26,4 +26,16 @@
   (plist-put minuet-openai-fim-compatible-options :model "qwen2.5-coder:32b")
   )
 
+(use-package vterm
+  :ensure t)
+
+(use-package aidermacs
+  :bind (("C-c a" . aidermacs-transient-menu))
+  :config
+  (setq aidermacs-backend 'vterm)
+  (setenv "OLLAMA_API_BASE" "http://127.0.0.1:11434")
+  :custom
+  (aidermacs-default-chat-mode 'architect)
+  (aidermacs-default-model "ollama_chat/qwen2.5-coder:7b"))
+
 (provide 'init-ai)
