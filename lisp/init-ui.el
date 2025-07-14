@@ -100,11 +100,6 @@
         :init (centaur-load-theme centaur-theme t)
         :config
         ;; Enable flashing mode-line on errors
-        (setq doom-themes-enable-bold t
-              doom-themes-enable-italic t)
-        (doom-themes-neotree-config)
-        (doom-themes-treemacs-config)
-        (doom-themes-org-config)
         (doom-themes-visual-bell-config)
 
         ;; WORKAROUND: Visual bell on 29+
@@ -286,15 +281,14 @@
 
 ;; A minor-mode menu for mode-line
 (use-package minions
-  :hook (doom-modeline-mode . minions-mode))
+  :hook (after-init . minions-mode))
 
 ;; Icons
 (use-package nerd-icons
   :commands nerd-icons-install-fonts
   :functions font-installed-p
   :config
-  (when (and (display-graphic-p)
-             (not (font-installed-p nerd-icons-font-family)))
+  (unless (font-installed-p nerd-icons-font-family)
     (nerd-icons-install-fonts t)))
 
 ;; Show line numbers
