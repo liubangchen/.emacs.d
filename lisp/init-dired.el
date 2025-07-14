@@ -47,7 +47,7 @@
         dired-recursive-copies 'always)
 
   ;; Show directory first
-  (setq dired-listing-switches "-alh --group-directories-first --time-style \"+%Y-%m-%d %H:%M:%S\"")
+  (setq dired-listing-switches "-alh --group-directories-first")
 
   (when sys/macp
     (if (executable-find "gls")
@@ -97,7 +97,7 @@
         (let ((ov (make-overlay (1- pos) pos)))
           (overlay-put ov 'nerd-icons-dired-overlay t)
           (overlay-put ov 'after-string
-                           (propertize "_" 'display string))))
+                       (propertize "_" 'display string))))
       (advice-add #'nerd-icons-dired--add-overlay :override #'my-nerd-icons-dired--add-overlay)))
 
   ;; Extra Dired functionality
@@ -121,40 +121,11 @@
               ("\\.\\(?:mp4\\|mkv\\|avi\\|flv\\|rm\\|rmvb\\|ogv\\)\\(?:\\.part\\)?\\'" ,cmd)
               ("\\.\\(?:mp3\\|flac\\)\\'" ,cmd)
               ("\\.html?\\'" ,cmd)
-              ("\\.pptx\\'" ,cmd)
-              ("\\.xlsx\\'" ,cmd)
               ("\\.md\\'" ,cmd))))
 
     (setq dired-omit-files
           (concat dired-omit-files
                   "\\|^.DS_Store$\\|^.projectile$\\|^.git*\\|^.svn$\\|^.vscode$\\|\\.js\\.meta$\\|\\.meta$\\|\\.elc$\\|^.emacs.*"))))
-
-;; `find-dired' alternative using `fd'
-(when (executable-find "fd")
-  (use-package fd-dired))
-
-(use-package dired-subtree
-  :ensure t
-  :config
-  (bind-keys :map dired-mode-map
-    ("i" . dired-subtree-insert)
-    (";" . dired-subtree-remove)))
-
-(use-package fd-dired)
-;;  :init
-;;  (setq fd-dired-program "/Users/chenlong/application/coreutils/bin/ls"))
-
-;; wget http://ftp.gnu.org/gnu/coreutils/coreutils-8.32.tar.gz
-;; ./configure --prefix=/Users/chenlong/application/coreutils
-;; (setq insert-directory-program "/Users/chenlong/application/coreutils/bin/ls")
-;; (setq dired-listing-switches "-aBhl --group-directories-first")
-;;(setq insert-directory-program "/Users/chenlong/application/coreutils/bin/ls")
-;;(setq dired-listing-switches "-aBhl --group-directories-first")
-
-(use-package dired-quick-sort
-  :ensure t
-  :bind (:map dired-mode-map
-         ("s" . hydra-dired-quick-sort/body)))
 
 (provide 'init-dired)
 
