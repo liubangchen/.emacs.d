@@ -26,6 +26,10 @@
   (plist-put minuet-openai-fim-compatible-options :model "qwen2.5-coder:32b")
   )
 
+
+(setq python-interpreter "~/.pyenv/shims/python3")
+(setq python-shell-interpreter "~/.pyenv/shims/python3")
+
 (use-package vterm
   :ensure t)
 
@@ -36,6 +40,6 @@
   (setenv "OLLAMA_API_BASE" "http://127.0.0.1:11434")
   :custom
   (aidermacs-default-chat-mode 'architect)
-  (aidermacs-default-model "ollama_chat/qwen2.5-coder:7b"))
+  (aidermacs-default-model "ollama_chat/qwen2.5-coder:14b"))
 
 (provide 'init-ai)
