@@ -184,17 +184,17 @@ prepended to the element after the #+HEADER: tag."
   ;; Prettify UI
   (use-package org-modern
     :config
-    (setq org-modern-table t)
-    ;;          org-modern-list '((?+ . "✏")
-    ;;                            (?- . "☞")
-    ;;                            (?* . "✪")))
+    (setq org-modern-table nil)
+    ;;org-modern-list '((?+ . "✏")
+    ;;                  (?- . "☞")
+    ;;                  (?* . "✪"))
     :hook ((org-mode . org-modern-mode)
            (org-agenda-finalize . org-modern-agenda)
            (org-modern-mode . (lambda ()
-                                "Adapt `org-modern-mode'."
-                                ;; Disable Prettify Symbols mode
-                                (setq prettify-symbols-alist nil)
-                                (prettify-symbols-mode -1)))))
+                              "Adapt `org-modern-mode'."
+                              ;; Disable Prettify Symbols mode
+                              (setq prettify-symbols-alist nil)
+                              (prettify-symbols-mode -1)))))
 
   ;; Babel
   (setq org-confirm-babel-evaluate nil

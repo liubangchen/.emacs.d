@@ -52,6 +52,11 @@
 (setq org-plantuml-executable-args '("-headless" "-charset UTF-8"))
 (setq org-confirm-babel-evaluate nil)
 
+(use-package valign
+  :hook (org-mode . valign-mode)
+  :config
+  (setq valign-fancy-bar t))
+
 ;;(defun org-screenshot ()
 ;;  "Take a screenshot into a time stamped unique-named file in the
 ;;same directory as the org-buffer and insert a link to this file."
