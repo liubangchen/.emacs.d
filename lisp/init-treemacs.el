@@ -55,6 +55,7 @@
   :config
   (setq treemacs-collapse-dirs           (if treemacs-python-executable 3 0)
         treemacs-missing-project-action  'remove
+        treemacs-user-mode-line-format   'none
         treemacs-sorting                 'alphabetic-asc
         treemacs-follow-after-init       nil
         treemacs-width                   30
