@@ -5,17 +5,17 @@ navigator navbar {
 textreport report "Plan" {
   formats html
   #formats csv
-  header '== %title =='
+  header '== 全局任务视图 =='
   center -8<-
   [#Plan 任务甘特图] | [#Dashboard 任务面板] | [#Resource 资源视图]
   ----
-  === Plan ===
+  === 计划列表 ===
   <[report id="plan"]>
   ----
-  === Dashboard ===
+  === 进度面板 ===
   <[report id="dashboard"]>
   ----
-  === Resource ===
+  === 投入资源 ===
   <[report id="resourceGraph"]>
   ->8-
 }
@@ -47,21 +47,24 @@ macro AlertColor [
 
 # A traditional Gantt chart with a project overview.
 taskreport plan "" {
-  headline "Project Plan"
+#  headline "Project Plan"
   scenarios plan
   timeformat "%Y-%m-%d"
   timezone "Asia/Shanghai"
   columns bsi{title '序号'},
-	name{title '需求'} ,
+    name{title '需求'} ,
 	start{title '开始时间'} ,
 	end{title '结束时间'} ,
-	duration{title '工作量(day)'} ,
-	effortdone{title '已关闭(day)'} ,
-	effortleft{title '开放窗口(day)'} ,
+	effort{title '工作量(天)'} ,
+    duration{title '开发时间(天)'},
+    note{title '类别'} ,
+    responsible{title '负责人'} ,
+	effortdone{title '已关闭(天)'} ,
+	effortleft{title '开放窗口(天)'} ,
 	complete{title '进度'} ,
-	status{title '任务状态' width 150} ,
-	resources{title '资源'},
-	chart {${TaskTip}  width 1200 }
+	status{title '任务状态'} ,
+	resources{title '研发'}
+#	chart {${TaskTip} }
   loadunit days
   hideresource @all
   caption '工作量以每人每天计算'
@@ -86,16 +89,16 @@ taskreport dashboard "" {
 
     # A graph showing resource allocation. It identifies whether each
     # resource is under- or over-allocated for.
-    resourcereport resourceGraph "" {
-      headline "开发资源试图"
+resourcereport resourceGraph "" {
+      headline "开发资源视图"
       timeformat "%Y-%m-%d"
-      timezone "Asia/Shanghai"	
+      timezone "Asia/Shanghai"
       columns no{title '序号'},
       name{title '企业微信'},
       email{title '方向'},
-	    effort{title '工作量'},
-	    weekly { width 900 }
+	  effort{title '工作量'},
+	  weekly { width 900 }
       loadunit days
       hidetask ~(isleaf() & isleaf_())
       sorttasks plan.start.up
-    }
+  }
