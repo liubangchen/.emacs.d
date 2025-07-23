@@ -32,16 +32,15 @@
 ;; (setq package-user-dir (locate-user-emacs-file (format "elpa-%s" emacs-major-version)))
 ;; (setq desktop-base-file-name (format ".emacs-%s.desktop" emacs-major-version))
 ;; (setq desktop-base-lock-name (format ".emacs-%s.desktop.lock" emacs-major-version))
-
 ;; Fonts
 (defun centaur-setup-fonts ()
   "Setup fonts."
   (when (display-graphic-p)
     ;; Set default font
     (cl-loop for font in '("Cascadia Code" "Fira Code" "Jetbrains Mono"
-                           "SF Mono" "Hack" "Source Code Pro" "Menlo"
+                           "SF Mono" "Menlo" "Hack" "Source Code Pro"
                            "Monaco" "DejaVu Sans Mono" "Consolas")
-             when (font-installed-p font)
+             when (font-available-p font)
              return (set-face-attribute 'default nil
                                         :family font
                                         :height (cond (sys/macp 160)
@@ -49,8 +48,8 @@
                                                       (t 100))))
 
     ;; Set mode-line font
-    ;; (cl-loop for font in '("Menlo" "SF Pro Display" "Helvetica")
-    ;;          when (font-installed-p font)
+    ;; (cl-loop for font in '("SF Mono" "Menlo" "SF Pro Display" "Helvetica")
+    ;;          when (font-available-p font)
     ;;          return (progn
     ;;                   (set-face-attribute 'mode-line nil :family font :height 120)
     ;;                   (when (facep 'mode-line-active)
@@ -59,26 +58,20 @@
 
     ;; Specify font for all unicode characters
     (cl-loop for font in '("Apple Symbols" "Segoe UI Symbol" "Symbola" "Symbol")
-             when (font-installed-p font)
-             return (if (< emacs-major-version 27)
-                        (set-fontset-font "fontset-default" 'unicode font nil 'prepend)
-                      (set-fontset-font t 'symbol (font-spec :family font) nil 'prepend)))
+             when (font-available-p font)
+             return (set-fontset-font t 'symbol (font-spec :family font) nil 'prepend))
 
     ;; Emoji
     (cl-loop for font in '("Noto Color Emoji" "Apple Color Emoji" "Segoe UI Emoji")
-             when (font-installed-p font)
-             return (cond
-                     ((< emacs-major-version 27)
-                      (set-fontset-font "fontset-default" 'unicode font nil 'prepend))
-                     ((< emacs-major-version 28)
-                      (set-fontset-font t 'symbol (font-spec :family font) nil 'prepend))
-                     (t
-                      (set-fontset-font t 'emoji (font-spec :family font) nil 'prepend))))
+             when (font-available-p font)
+             return (set-fontset-font t
+                                      (if (< emacs-major-version 28)'symbol 'emoji)
+                                      (font-spec :family font) nil 'prepend))
 
     ;; Specify font for Chinese characters
     (cl-loop for font in '("LXGW Neo Xihei" "WenQuanYi Micro Hei Mono" "LXGW WenKai Screen"
                            "LXGW WenKai Mono" "PingFang SC" "Microsoft Yahei UI" "Simhei")
-             when (font-installed-p font)
+             when (font-available-p font)
              return (progn
                       (setq face-font-rescale-alist `((,font . 1.15)))
                       (set-fontset-font t 'han (font-spec :family font))))))
@@ -104,6 +97,7 @@
 
 ;; Misc.
 ;; (setq confirm-kill-emacs 'y-or-n-p)
+;; (setq package-check-signature nil)
 
 ;; Enable proxy
 ;; (enable-http-proxy)
@@ -117,16 +111,19 @@
 ;; (put 'cl-destructuring-bind 'lisp-indent-function 'defun)
 ;; (put 'pdf-view-create-image 'lisp-indent-function 'defun)
 ;; (put 'treemacs-create-theme 'lisp-indent-function 'defun)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-vc-selected-packages
-   '((ultra-scroll :vc-backend Git :url "https://github.com/jdtsmith/ultra-scroll"))))
+ )
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+;;; custom.el ends here

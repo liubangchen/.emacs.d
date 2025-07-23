@@ -7,11 +7,11 @@
 (setq org-taskjuggler-account-tag "account")
 (setq org-taskjuggler-report-tag "report")
 (setq org-taskjuggler-target-version 3.8)
-;;(setq org-taskjuggler-valid-task-attributes
-;;      '(account start note duration endbuffer endcredit end
-;;                flags journalentry length limits maxend maxstart minend
-;;                minstart period reference responsible scheduling
-;;                startbuffer startcredit statusnote chargeset charge priority))
+(setq org-taskjuggler-valid-task-attributes
+      '(account start note duration endbuffer endcredit end
+                flags journalentry length limits maxend maxstart minend
+                minstart period reference responsible scheduling
+                startbuffer startcredit statusnote chargeset charge priority))
 
 (add-hook 'org-mode-hook (lambda()
                            (require 'ox-taskjuggler)
