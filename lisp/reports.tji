@@ -2,6 +2,14 @@ navigator navbar {
   hidereport 0
 }
 
+account cost "Project Cost" {
+   account dev "Development"
+   account doc "Documentation"
+}
+account rev "Payments"
+ # The Profit&Loss analysis should be rev - cost accounts.
+balance cost rev
+
 textreport report "Plan" {
   formats html
   #formats csv

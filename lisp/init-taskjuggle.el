@@ -2,7 +2,11 @@
 (require 'taskjuggler-mode)
 (require 'ox-taskjuggler)
 (setq org-taskjuggler-default-reports '("include \"/Users/chenlong/.emacs.d/lisp/reports.tji\""))
-
+(setq org-taskjuggler-project-tag "project")
+(setq org-taskjuggler-resource-tag "resource")
+(setq org-taskjuggler-account-tag "account")
+(setq org-taskjuggler-report-tag "report")
+(setq org-taskjuggler-target-version 3.8)
 ;;(setq org-taskjuggler-valid-task-attributes
 ;;      '(account start note duration endbuffer endcredit end
 ;;                flags journalentry length limits maxend maxstart minend
