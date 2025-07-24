@@ -71,9 +71,9 @@ taskreport plan "" {
     columns
     bsi{title '序号'},
     name{title '任务项'} ,
-    priority {title '优先级' ${PriorityCn}},
-	start{title '开始时间'} ,
-	end{title '结束时间'} ,
+    priority {title '优先级'  ${PriorityCn} width 60},
+	start{title '开始时间' width 90 } ,
+	end{title '结束时间' width 90} ,
 	effort{title '工作量(天)'} ,
     duration{title '开发时间(天)'},
     note{title '类别'} ,
