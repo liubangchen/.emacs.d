@@ -48,21 +48,30 @@ tooltip istask() -8<-
 ]
 
 macro AlertColor [
-    cellcolor plan.alert = 0 "#00D000" # green
-    cellcolor plan.alert = 1 "#D0D000" # yellow
-    cellcolor plan.alert = 2 "#D00000" # red
+cellcolor plan.alert = 0 "#00D000" # green
+cellcolor plan.alert = 1 "#D0D000" # yellow
+cellcolor plan.alert = 2 "#D00000" # red
 ]
 
+#macro PriorityCn [
+#]
+
+macro PriorityCn [
+celltext plan.priority = 1 "🔴P0"
+celltext plan.priority = 2 "🟡P1"
+celltext plan.priority = 3 "🟢P2"
+]
 
 # A traditional Gantt chart with a project overview.
 taskreport plan "" {
-#  headline "Project Plan"
-  scenarios plan
-  timeformat "%Y-%m-%d"
-  timezone "Asia/Shanghai"
-  columns bsi{title '序号'},
+    #  headline "Project Plan"
+    scenarios plan
+    timeformat "%Y-%m-%d"
+    timezone "Asia/Shanghai"
+    columns
+    bsi{title '序号'},
     name{title '任务项'} ,
-    priority{title '优先级'},
+    priority {title '优先级' ${PriorityCn}},
 	start{title '开始时间'} ,
 	end{title '结束时间'} ,
 	effort{title '工作量(天)'} ,
@@ -75,10 +84,10 @@ taskreport plan "" {
 	status{title '任务状态'} ,
 	resources{title '研发'}
     #	chart {${TaskTip} }
-  loadunit days
-  sorttasks tree
-  hideresource @all
-  caption '工作量以每人每天计算'
+   loadunit days
+   sorttasks tree
+   hideresource @all
+   caption '工作量以每人每天计算'
 }
 
 taskreport dashboard "" {
