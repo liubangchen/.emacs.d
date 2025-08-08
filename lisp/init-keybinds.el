@@ -12,13 +12,13 @@
 (global-set-key (kbd "C-s") 'consult-line)
 (global-set-key (kbd "C-S-f") 'lsp-format-buffer)
 (global-set-key (kbd "M-w") 'er/mark-word)
-;;(global-set-key (kbd "C-S-r") 'helm-locate)
+(global-set-key (kbd "C-S-r") 'counsel-fzf)
 (global-set-key (kbd "C-o") 'consult-imenu);;ivy-imenu-anywhere
 (global-set-key (kbd "M-k") 'centaur-tabs--kill-this-buffer-dont-ask)
 (global-set-key (kbd "RET") 'newline)
 (global-set-key (kbd "C-z") 'undo)
 (global-set-key (kbd "C-S-z") 'redo)
-(global-set-key (kbd "s-o") 'consult-find)
+(global-set-key (kbd "s-o") 'consult-fd)
 (global-set-key (kbd "s-p") 'ido-find-file)
 (global-set-key (kbd "M-x") 'counsel-M-x)
 ;;buffer跳转
