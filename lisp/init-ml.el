@@ -36,7 +36,10 @@
 (use-package aidermacs
   :bind (("C-c a" . aidermacs-transient-menu))
   :config
-  (setq aidermacs-backend 'vterm))
+  (setq aidermacs-auto-commits nil
+        aidermacs-exit-kills-buffer t
+        aidermacs-extra-args '("--thinking-tokens" "128k")
+        aidermacs-backend 'vterm))
 ;;(setenv "OLLAMA_API_BASE" "http://127.0.0.1:11434")
 ;;:custom
 ;;(aidermacs-default-chat-mode 'architect)
