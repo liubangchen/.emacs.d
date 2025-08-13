@@ -20,7 +20,7 @@
 (global-set-key (kbd "C-S-z") 'redo)
 (global-set-key (kbd "s-o") 'consult-fd)
 (global-set-key (kbd "s-p") 'ido-find-file)
-(global-set-key (kbd "M-x") 'counsel-M-x)
+;;(global-set-key (kbd "M-x") 'counsel-M-x)
 ;;buffer跳转
 ;;(global-set-key (kbd "M-<left>") 'back-button-global-backward)
 ;;(global-set-key (kbd "M-<right>") 'back-button-global-forward)

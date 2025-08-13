@@ -37,8 +37,8 @@
   "Setup fonts."
   (when (display-graphic-p)
     ;; Set default font
-    (cl-loop for font in '("Cascadia Code" "GoogleSansCode" "FiraCode Nerd Font" "CaskaydiaCove Nerd Font"
-                           "Fira Code" "Cascadia Code" "Jetbrains Mono"
+    (cl-loop for font in '("FiraCode Nerd Font" "CaskaydiaCove Nerd Font"
+                           "Fira Code" "Cascadia Code" "Jetbrains Mono" "GoogleSansCode"
                            "SF Mono" "Menlo" "Hack" "Source Code Pro"
                            "Monaco" "DejaVu Sans Mono" "Consolas")
              when (font-available-p font)
