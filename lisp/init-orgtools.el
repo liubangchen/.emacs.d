@@ -72,5 +72,6 @@
 
 ;;(setq org-babel-python-command "python3")
 
-
+(setq org-log-into-drawer t)
+(setq org-log-done 'time)
 (provide 'init-orgtools)
