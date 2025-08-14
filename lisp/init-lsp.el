@@ -310,6 +310,7 @@
    ;; `lsp-mode' and `treemacs' integration
    (use-package lsp-treemacs
      :after lsp-mode
+     :functions lsp-treemacs-sync-mode
      :bind (:map lsp-mode-map
             ("C-<f8>" . lsp-treemacs-errors-list)
             ("M-<f8>" . lsp-treemacs-symbols)
@@ -493,7 +494,7 @@
 
    ;; Python
    (use-package lsp-pyright
-     :preface
+     :functions lsp-pyright-format-buffer
      :hook (((python-mode python-ts-mode) . (lambda ()
                                               (require 'lsp-pyright)
                                               (add-hook 'after-save-hook #'lsp-pyright-format-buffer t t))))
