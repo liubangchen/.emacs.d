@@ -1,4 +1,4 @@
-;;; ox-taskjuggler.el --- TaskJuggler Back-End for Org Export Engine
+;;; ox-taskjuggler.el --- TaskJuggler Back-End for Org Export Engine 	-*- lexical-binding: t -*-
 ;;
 ;; Copyright (C) 2007-2021 Free Software Foundation, Inc.
 ;;
