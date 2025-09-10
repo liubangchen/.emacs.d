@@ -213,6 +213,8 @@ prepended to the element after the #+HEADER: tag."
 (use-package org-modern
   :after org
   :autoload global-org-modern-mode
+  :config
+  (setq org-modern-table nil)
   :init (global-org-modern-mode 1))
 
 (use-package org-rich-yank
