@@ -66,8 +66,6 @@
       icon-title-format frame-title-format)
 
 (when (or sys/mac-ns-p sys/mac-port-p)
-  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-  (add-to-list 'default-frame-alist '(ns-appearance . dark))
   (add-hook 'server-after-make-frame-hook
             (lambda ()
               (if (display-graphic-p)
@@ -75,14 +73,18 @@
                 (menu-bar-mode -1))))
 
   (defun refresh-ns-appearance ()
-    "Refresh frame parameter ns-appearance."
+    "Safely refresh frame parameter `ns-appearance' to match background mode."
+    (interactive)
     (let ((bg (frame-parameter nil 'background-mode)))
       (set-frame-parameter nil 'ns-appearance bg)
-      (setcdr (assq 'ns-appearance default-frame-alist) bg)))
+      (setf (alist-get 'ns-appearance default-frame-alist) bg)))
+
+  ;; Hook up appearance refresh to theme changes
   (add-hook 'after-load-theme-hook #'refresh-ns-appearance)
-  (with-eval-after-load'auto-dark
-   (add-hook 'auto-dark-dark-mode-hook #'refresh-ns-appearance)
-   (add-hook 'auto-dark-light-mode-hook #'refresh-ns-appearance)))
+
+  (with-eval-after-load 'auto-dark
+    (dolist (hook '(auto-dark-dark-mode-hook auto-dark-light-mode-hook))
+      (add-hook hook #'refresh-ns-appearance))))
 
 ;; Theme
 (if (centaur-compatible-theme-p centaur-theme)
@@ -107,12 +109,13 @@
         (with-no-warnings
           (defun my-doom-themes-visual-bell-fn ()
             "Blink the mode-line red briefly. Set `ring-bell-function' to this to use it."
-            (let ((buf (current-buffer))
-                  (cookies (mapcar (lambda (face)
-                                     (face-remap-add-relative face 'doom-themes-visual-bell))
-                                   (if (facep 'mode-line-active)
-                                       '(mode-line-active solaire-mode-line-active-face)
-                                     '(mode-line solaire-mode-line-face)))))
+            (let* ((faces (if (facep 'mode-line-active)
+                              '(mode-line-active solaire-mode-line-active-face)
+                            '(mode-line solaire-mode-line-face)))
+                   (buf (current-buffer))
+                   (cookies (mapcar (lambda (face)
+                                      (face-remap-add-relative face 'doom-themes-visual-bell))
+                                    faces)))
               (force-mode-line-update)
               (run-with-timer 0.15 nil
                               (lambda ()
@@ -331,26 +334,31 @@
   :init (setq display-time-default-load-average nil
               display-time-format "%H:%M"))
 
-;; Mouse & Smooth Scroll
+;; Scrolling
 ;; Scroll one line at a time (less "jumpy" than defaults)
-(when (display-graphic-p)
-  (setq mouse-wheel-scroll-amount '(1 ((shift) . hscroll))
-        mouse-wheel-scroll-amount-horizontal 1
-        mouse-wheel-progressive-speed nil))
-(setq scroll-step 1
+(setq hscroll-step 1
+      hscroll-margin 2
+      scroll-step 1
       scroll-margin 0
       scroll-conservatively 100000
+      scroll-preserve-screen-position t
       auto-window-vscroll nil
-      scroll-preserve-screen-position t)
+      ;; mouse
+      mouse-wheel-scroll-amount-horizontal 1
+      mouse-wheel-progressive-speed nil)
 
 ;; Smooth scrolling
-(when emacs/>=29p
+(when (fboundp 'pixel-scroll-precision-mode) ;; 29+
   (use-package ultra-scroll
-    :hook (after-init . ultra-scroll-mode)))
+    :functions (hl-todo-mode diff-hl-flydiff-mode)
+    :hook (after-init . ultra-scroll-mode)
+    :config
+    (add-hook 'ultra-scroll-hide-functions #'diff-hl-flydiff-mode)
+    (add-hook 'ultra-scroll-hide-functions #'hl-todo-mode)
+    (add-hook 'ultra-scroll-hide-functions #'jit-lock-mode)))
 
 ;; Use fixed pitch where it's sensible
-(use-package mixed-pitch
-  :diminish)
+(use-package mixed-pitch :diminish)
 
 ;; Display ugly ^L page breaks as tidy horizontal lines
 (use-package page-break-lines
