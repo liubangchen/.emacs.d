@@ -71,6 +71,60 @@
 ;;  (insert (concat "[[./" filename "]]")))
 
 ;;(setq org-babel-python-command "python3")
+;; brew install pngpaste imagemagick
+(defvar org-screenshot-dir "~/notes/org/notes/images/"
+  "保存截图的目录，会自动创建")
+
+(defun org-screenshot ()
+  "截图→保存→插入 org 链接"
+  (interactive)
+  (unless (file-directory-p org-screenshot-dir)
+    (make-directory org-screenshot-dir t))
+  (let* ((basename (format-time-string "%Y-%m-%d_%H-%M-%S.png"))
+         (path (expand-file-name basename org-screenshot-dir)))
+    (cond
+     ((eq system-type 'gnu/linux)
+      (call-process "import" nil nil nil path)) ; ImageMagick
+     ((eq system-type 'darwin)
+      (call-process "screencapture" nil nil nil "-i" path)))
+    (insert (format "[[file:%s]]" path))
+    (org-display-inline-images)))
+
+(defun org-clip-image ()
+  "剪贴板有图片时保存并插入链接"
+  (interactive)
+  (let* ((basename (format-time-string "%Y-%m-%d_%H-%M-%S.png"))
+         (path (expand-file-name basename org-screenshot-dir)))
+    (unless (file-directory-p org-screenshot-dir) (make-directory org-screenshot-dir t))
+    (cond
+     ((eq system-type 'gnu/linux)
+      (call-process "xclip" nil nil nil "-selection" "clipboard" "-t" "image/png" "-o" path))
+     ((eq system-type 'darwin)
+      (call-process "pngpaste" nil nil nil path))
+     ((eq system-type 'windows-nt)
+      (w32-read-png-from-clipboard path)))
+    (insert (format "[[file:%s]]" path))
+    (org-display-inline-images)))
+
+(defun org-clip-image-current ()
+  "剪贴板有图片时保存并插入链接"
+  (interactive)
+  (let* ((basename (format-time-string "%Y-%m-%d_%H-%M-%S.png"))
+         (basedir (when buffer-file-name
+                    (file-name-directory buffer-file-name)))
+         (imagedir (expand-file-name "images" basedir))
+         (path (expand-file-name basename imagedir)))
+    (unless (file-directory-p imagedir) (make-directory imagedir t))
+    (cond
+     ((eq system-type 'gnu/linux)
+      (call-process "xclip" nil nil nil "-selection" "clipboard" "-t" "image/png" "-o" path))
+     ((eq system-type 'darwin)
+      (call-process "pngpaste" nil nil nil path))
+     ((eq system-type 'windows-nt)
+      (w32-read-png-from-clipboard path)))
+    (insert (format "[[file:%s]]" path))
+    (org-display-inline-images)))
+
 
 (setq org-log-into-drawer t)
 (setq org-log-done 'time)
