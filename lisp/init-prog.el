@@ -76,7 +76,7 @@
       :custom-face
       (eldoc-box-border ((t (:inherit posframe-border :background unspecified))))
       (eldoc-box-body ((t (:inherit tooltip))))
-      :hook ((eglot-managed-mode . eldoc-box-hover-at-point-mode))
+      :hook ((eglot-managed-mode . eldoc-box-mouse-mode))
       :config
       ;; Prettify `eldoc-box' frame
       (setf (alist-get 'left-fringe eldoc-box-frame-parameters) 8
@@ -117,13 +117,12 @@
   (defconst devdocs-major-mode-docs-alist
     '((c-mode          . ("c"))
       (c++-mode        . ("cpp"))
-      (python-mode     . ("python~3.10" "python~2.7"))
-      (ruby-mode       . ("ruby~3.1"))
+      (python-mode     . ("python~3.14" "python~2.7"))
+      (ruby-mode       . ("ruby~3"))
 
       (rustic-mode     . ("rust"))
       (css-mode        . ("css"))
       (html-mode       . ("html"))
-      (julia-mode      . ("julia~1.8"))
       (js-mode         . ("javascript" "jquery"))
       (emacs-lisp-mode . ("elisp")))
     "Alist of major-mode and docs.")

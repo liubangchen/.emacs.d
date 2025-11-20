@@ -31,6 +31,7 @@
 ;;; Code:
 
 (eval-when-compile
+  (require 'init-const)
   (require 'init-custom))
 
 (use-package org
@@ -211,18 +212,35 @@ prepended to the element after the #+HEADER: tag."
 ;; Prettify UI
 (use-package org-modern
   :after org
+  :diminish
   :autoload global-org-modern-mode
   :config
   (setq org-modern-table nil)
   :init (global-org-modern-mode 1))
 
+;; Paste with org-mode markup and link
 (use-package org-rich-yank
   :after org
+  :diminish
   :bind (:map org-mode-map
          ("C-M-y" . org-rich-yank)))
 
+;; Auto-toggle Org elements
+(use-package org-appear
+  :diminish
+  :hook (org-mode . org-appear-mode)
+  :custom
+  (org-appear-autoentities t)
+  (org-appear-autokeywords t)
+  (org-appear-autolinks t)
+  (org-appear-autosubmarkers t)
+  (org-appear-inside-latex t)
+  (org-appear-manual-linger t)
+  (org-appear-delay 0.5))
+
 ;; Table of contents
 (use-package toc-org
+  :diminish
   :hook (org-mode . toc-org-mode))
 
 ;; Preview
@@ -236,38 +254,28 @@ prepended to the element after the #+HEADER: tag."
           (setq org-preview-html-viewer 'xwidget)))
 
 ;; Presentation
-(use-package org-tree-slide
-  :after org
-  :diminish
-  :functions (org-display-inline-images
-              org-remove-inline-images)
-  :bind (:map org-mode-map
-         ("s-<f7>" . org-tree-slide-mode)
-         :map org-tree-slide-mode-map
-         ("<left>" . org-tree-slide-move-previous-tree)
-         ("<right>" . org-tree-slide-move-next-tree)
-         ("S-SPC" . org-tree-slide-move-previous-tree)
-         ("SPC" . org-tree-slide-move-next-tree))
-  :hook ((org-tree-slide-play . (lambda ()
-                                  (text-scale-increase 4)
-                                  (org-display-inline-images)
-                                  (read-only-mode 1)))
-         (org-tree-slide-stop . (lambda ()
-                                  (text-scale-increase 0)
-                                  (org-remove-inline-images)
-                                  (read-only-mode -1))))
-  :init (setq org-tree-slide-header nil
-              org-tree-slide-slide-in-effect t
-              org-tree-slide-heading-emphasis nil
-              org-tree-slide-cursor-init t
-              org-tree-slide-modeline-display 'outside
-              org-tree-slide-skip-done nil
-              org-tree-slide-skip-comments t
-              org-tree-slide-skip-outline-level 3))
+(if emacs/>=29.2p
+    (use-package dslide
+      :after org
+      :diminish
+      :bind (:map org-mode-map
+             ("s-<f7>" . dslide-deck-start)))
+  (use-package org-tree-slide
+    :after org
+    :diminish
+    :bind (:map org-mode-map
+           ("s-<f7>" . org-tree-slide-mode)
+           :map org-tree-slide-mode-map
+           ("<left>" . org-tree-slide-move-previous-tree)
+           ("<right>" . org-tree-slide-move-next-tree)
+           ("S-SPC" . org-tree-slide-move-previous-tree)
+           ("SPC" . org-tree-slide-move-next-tree))
+    :init (setq org-tree-slide-skip-outline-level 3)))
 
 ;; Pomodoro
 (use-package org-pomodoro
   :after org
+  :diminish
   :custom-face
   (org-pomodoro-mode-line ((t (:inherit warning))))
   (org-pomodoro-mode-line-overtime ((t (:inherit error))))
@@ -276,8 +284,8 @@ prepended to the element after the #+HEADER: tag."
          ("C-c C-x m" . org-pomodoro))
   :init (with-eval-after-load 'org-agenda
           (bind-keys :map org-agenda-mode-map
-           ("K" . org-pomodoro)
-           ("C-c C-x m" . org-pomodoro))))
+            ("K" . org-pomodoro)
+            ("C-c C-x m" . org-pomodoro))))
 
 ;; Roam
 (when (and (fboundp 'sqlite-available-p) (sqlite-available-p))
