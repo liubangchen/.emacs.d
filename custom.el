@@ -12,7 +12,7 @@
 ;; (setq centaur-socks-proxy "127.0.0.1:7890")    ; SOCKS proxy
 ;; (setq centaur-server nil)                      ; Enable `server-mode' or not: t or nil
 (setq centaur-icon t)                        ; Display icons or not: t or nil
-(setq centaur-package-archives 'ustc)         ; Package repo: melpa, emacs-cn, bfsu, netease, sjtu, tencent, tuna or ustc
+(setq centaur-package-archives 'melpa)         ; Package repo: melpa, emacs-cn, bfsu, netease, sjtu, tencent, tuna or ustc
 (setq centaur-theme 'default)                     ; Color theme: auto, random, system, default, pro, dark, light, warm, cold, day or night doom-acario-dark doom-bluloco-dark
 (setq centaur-org-directory "~/notes/org")
 (setq centaur-completion-style 'childframe)    ; Completion display style: minibuffer or childframe
@@ -39,14 +39,14 @@
   "Setup fonts."
   (when (display-graphic-p)
     ;; Set default font
-    (cl-loop for font in '("FiraCode Nerd Font" "CaskaydiaCove Nerd Font"
+    (cl-loop for font in '("Cascadia Code" "FiraCode Nerd Font" "CaskaydiaCove Nerd Font"
                            "Fira Code" "Cascadia Code" "Jetbrains Mono" "GoogleSansCode"
                            "SF Mono" "Menlo" "Hack" "Source Code Pro"
                            "Monaco" "DejaVu Sans Mono" "Consolas")
              when (font-available-p font)
              return (set-face-attribute 'default nil
                                         :family font
-                                        :height (cond (sys/macp 160)
+                                        :height (cond (sys/macp 140)
                                                       (sys/win32p 110)
                                                       (t 100))))
 
@@ -70,12 +70,12 @@
              return (set-fontset-font t 'emoji (font-spec :family font) nil 'prepend))
 
     ;; Specify font for Chinese characters
-    ;; (cl-loop for font in '("LXGW Neo Xihei" "WenQuanYi Micro Hei Mono" "LXGW WenKai Screen"
-    ;;                        "LXGW WenKai Mono" "PingFang SC" "Microsoft Yahei UI" "Simhei")
-    ;;          when (font-available-p font)
-    ;;          return (progn
-    ;;                   (setq face-font-rescale-alist `((,font . 1.3)))
-    ;;                   (set-fontset-font t 'han (font-spec :family font))))
+    (cl-loop for font in '("LXGW Neo Xihei" "WenQuanYi Micro Hei Mono" "LXGW WenKai Screen"
+                           "LXGW WenKai Mono" "PingFang SC" "Microsoft Yahei UI" "Simhei")
+             when (font-available-p font)
+             return (progn
+                      (setq face-font-rescale-alist `((,font . 1.2)))
+                      (set-fontset-font t 'han (font-spec :family font))))
     ))
 
 (centaur-setup-fonts)
