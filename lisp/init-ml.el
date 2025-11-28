@@ -45,4 +45,14 @@
 ;;(aidermacs-default-chat-mode 'architect)
 ;;(aidermacs-default-model "ollama_chat/qwen2.5-coder:14b"))
 
+(use-package ellama
+  :ensure t
+  :init
+  ;; 设定默认使用的本地模型 (确保你已经在终端运行过 `ollama pull zephyr`)
+  (setopt ellama-language "Chinese") ;; 让它尽量用中文回答
+  (require 'llm-ollama)
+  (setopt ellama-provider
+		  (make-llm-ollama
+		   :chat-model "qwen3-coder:30b" :embedding-model "pull granite-embedding:latest")))
+
 (provide 'init-ml)
