@@ -1,4 +1,3 @@
-;;; -*- lexical-binding: t; -*-
 ;;; custom.el --- user customization file    -*- lexical-binding: t no-byte-compile: t -*-
 ;;; Commentary:
 ;;;       Add or change the configurations in custom.el, then restart Emacs.
@@ -8,45 +7,42 @@
 (setq centaur-logo nil)                        ; Logo file or nil (official logo)
 (setq centaur-full-name "liubangchen")           ; User full name
 (setq centaur-mail-address "liubangchen@tencent.com")   ; Email address
-;; (setq centaur-proxy "127.0.0.1:7890")          ; HTTP/HTTPS proxy
-;; (setq centaur-socks-proxy "127.0.0.1:7890")    ; SOCKS proxy
+;; (setq centaur-proxy "127.0.0.1:7897")          ; HTTP/HTTPS proxy
+;; (setq centaur-socks-proxy "127.0.0.1:7897")    ; SOCKS proxy
 ;; (setq centaur-server nil)                      ; Enable `server-mode' or not: t or nil
+;; (setq centaur-use-exec-path-from-shell nil)    ; Use `exec-path-from-shell' or not. If using emacs-plus with path ejection, set to nil
 (setq centaur-icon t)                        ; Display icons or not: t or nil
-(setq centaur-package-archives 'melpa)         ; Package repo: melpa, emacs-cn, bfsu, netease, sjtu, tencent, tuna or ustc
-(setq centaur-theme 'default)                     ; Color theme: auto, random, system, default, pro, dark, light, warm, cold, day or night doom-acario-dark doom-bluloco-dark
-(setq centaur-org-directory "~/notes/org")
-(setq centaur-completion-style 'childframe)    ; Completion display style: minibuffer or childframe
+(setq centaur-package-archives 'melpa)         ; Package repo: melpa, bfsu, iscas, netease, sjtu, tencent, tuna or ustc
+(setq centaur-theme 'default)                     ; Color theme: auto, random, system, default, pro, dark, light, warm, cold, day or night
+(setq centaur-completion-style 'minibuffer)    ; Completion display style: minibuffer or childframe
+(setq centaur-frame-maximized-on-startup t)    ; Maximize frame on startup or not: t or nil
 ;; (setq centaur-dashboard nil)                   ; Display dashboard at startup or not: t or nil
 (setq centaur-lsp 'lsp-mode)                   ; Set LSP client: lsp-mode, eglot or nil
-(setq centaur-lsp-format-on-save t)            ; Auto format buffers on save: t or nil
-(setq centaur-lsp-format-on-save-ignore-modes '(c-mode c++-mode python-mode markdown-mode)) ; Ignore format on save for some languages
-(setq centaur-tree-sitter t)                 ; Enable tree-sitter or not: t or nil. Only available in 29+.
+;; (setq centaur-lsp-format-on-save t)            ; Auto format buffers on save: t or nil
+;; (setq centaur-lsp-format-on-save-ignore-modes '(c-mode c++-mode python-mode markdown-mode)) ; Ignore format on save for some languages
+;; (setq centaur-tree-sitter nil)                 ; Enable tree-sitter or not: t or nil. Only available in 29+.
 (setq centaur-chinese-calendar t)              ; Support Chinese calendar or not: t or nil
 (setq centaur-player t)                        ; Enable players or not: t or nil
-(setq debug-on-error nil)
 (setq centaur-prettify-symbols-alist nil)      ; Alist of symbol prettifications. Nil to use font supports ligatures.
-(setq centaur-prettify-org-symbols-alist nil)  ; Alist of symbol prettifications for `org-mode'
-
-;; (setq centaur-prettify-symbols-alist nil)      ; Alist of symbol prettifications. Nil to use font supports ligatures.
-;; (setq centaur-prettify-org-symbols-alist nil)  ; Alist of symbol prettifications for `org-mode'
 
 ;; For Emacs devel
 ;; (setq package-user-dir (locate-user-emacs-file (format "elpa-%s" emacs-major-version)))
 ;; (setq desktop-base-file-name (format ".emacs-%s.desktop" emacs-major-version))
 ;; (setq desktop-base-lock-name (format ".emacs-%s.desktop.lock" emacs-major-version))
+
 ;; Fonts
 (defun centaur-setup-fonts ()
   "Setup fonts."
   (when (display-graphic-p)
     ;; Set default font
-    (cl-loop for font in '("Cascadia Code" "FiraCode Nerd Font" "CaskaydiaCove Nerd Font"
-                           "Fira Code" "Cascadia Code" "Jetbrains Mono" "GoogleSansCode"
+    (cl-loop for font in '("Monaco" "FiraCode Nerd Font" "CaskaydiaCove Nerd Font"
+                           "Fira Code" "Cascadia Code" "Jetbrains Mono"
                            "SF Mono" "Menlo" "Hack" "Source Code Pro"
                            "Monaco" "DejaVu Sans Mono" "Consolas")
              when (font-available-p font)
              return (set-face-attribute 'default nil
                                         :family font
-                                        :height (cond (sys/macp 140)
+                                        :height (cond (sys/macp 160)
                                                       (sys/win32p 110)
                                                       (t 100))))
 
@@ -70,11 +66,11 @@
              return (set-fontset-font t 'emoji (font-spec :family font) nil 'prepend))
 
     ;; Specify font for Chinese characters
-    (cl-loop for font in '("LXGW Neo Xihei" "WenQuanYi Micro Hei Mono" "LXGW WenKai Screen"
-                           "LXGW WenKai Mono" "PingFang SC" "Microsoft Yahei UI" "Simhei")
+    (cl-loop for font in '("LXGW Neo Xihei" "LXGW WenKai Mono" "WenQuanYi Micro Hei Mono"
+                           "PingFang SC" "Microsoft Yahei UI" "Simhei")
              when (font-available-p font)
              return (progn
-                      (setq face-font-rescale-alist `((,font . 1.2)))
+                      (setq face-font-rescale-alist `((,font . 1.3)))
                       (set-fontset-font t 'han (font-spec :family font))))
     ))
 
@@ -111,7 +107,6 @@
 ;;   (set-frame-parameter nil 'left 1920))
 
 ;; (put 'cl-destructuring-bind 'lisp-indent-function 'defun)
-;; (put 'pdf-view-create-image 'lisp-indent-function 'defun)
 ;; (put 'treemacs-create-theme 'lisp-indent-function 'defun)
 
 (custom-set-variables
