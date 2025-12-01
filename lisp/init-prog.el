@@ -74,8 +74,10 @@
              ("C-h ." . eldoc-mouse-pop-doc-at-cursor))
       :hook (eglot-managed-mode emacs-lisp-mode)
       :init (setq eldoc-mouse-posframe-border-color (face-background 'posframe-border nil t))
-      :config (add-to-list 'eldoc-mouse-posframe-override-parameters
-                           `(background-color . ,(face-background 'tooltip nil t))))))
+      :config
+      (tooltip-mode -1)                 ; Conflict with `track-mouse'
+      (add-to-list 'eldoc-mouse-posframe-override-parameters
+                   `(background-color . ,(face-background 'tooltip nil t))))))
 
 ;; Cross-referencing commands
 (use-package xref
@@ -169,10 +171,13 @@ Install the doc if it's not installed."
 (if (centaur-treesit-available-p)
     (progn
       (use-package julia-ts-mode)
-      (use-package mermaid-ts-mode)
+      (use-package mermaid-ts-mode
+        :mode ("\\.mmd\\'" . mermaid-ts-mode))
       (use-package scala-ts-mode)
-      (use-package swift-ts-mode)
-      (use-package yaml-ts-mode))
+      (use-package swift-ts-mode
+        :mode ("\\.swift\\'" . swift-ts-mode))
+      (use-package yaml-ts-mode
+        :mode ("\\.ya?ml\\'" . yaml-ts-mode)))
   (progn
     (use-package julia-mode)
     (use-package mermaid-mode)
