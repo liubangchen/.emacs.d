@@ -6,6 +6,12 @@
   (setq plantuml-jar-path (expand-file-name "~/.emacs.d/javalibs/plantumllib/plantuml.jar")
         plantuml-default-exec-mode 'jar))
 
+
+(add-hook 'plantuml-mode-hook
+          (lambda ()
+            ;; 或禁用 corfu-mode
+            (corfu-mode -1)
+           ))
 (use-package flycheck-plantuml
   :ensure t
   :commands (flycheck-plantuml-setup)
