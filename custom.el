@@ -35,7 +35,7 @@
   "Setup fonts."
   (when (display-graphic-p)
     ;; Set default font
-    (cl-loop for font in '("Monaco" "FiraCode Nerd Font" "CaskaydiaCove Nerd Font"
+    (cl-loop for font in '("LXGW WenKai Mono" "FiraCode Nerd Font" "CaskaydiaCove Nerd Font"
                            "Fira Code" "Cascadia Code" "Jetbrains Mono"
                            "SF Mono" "Menlo" "Hack" "Source Code Pro"
                            "Monaco" "DejaVu Sans Mono" "Consolas")
@@ -66,12 +66,12 @@
              return (set-fontset-font t 'emoji (font-spec :family font) nil 'prepend))
 
     ;; Specify font for Chinese characters
-    (cl-loop for font in '("LXGW Neo Xihei" "LXGW WenKai Mono" "WenQuanYi Micro Hei Mono"
-                           "PingFang SC" "Microsoft Yahei UI" "Simhei")
-             when (font-available-p font)
-             return (progn
-                      (setq face-font-rescale-alist `((,font . 1.3)))
-                      (set-fontset-font t 'han (font-spec :family font))))
+    ;;(cl-loop for font in '("LXGW Neo Xihei" "LXGW WenKai Mono" "WenQuanYi Micro Hei Mono"
+    ;;                       "PingFang SC" "Microsoft Yahei UI" "Simhei")
+    ;;         when (font-available-p font)
+    ;;         return (progn
+    ;;                  (setq face-font-rescale-alist `((,font . 1.3)))
+    ;;                  (set-fontset-font t 'han (font-spec :family font))))
     ))
 
 (centaur-setup-fonts)
