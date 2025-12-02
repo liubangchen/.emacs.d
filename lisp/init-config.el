@@ -33,7 +33,8 @@
         ssh-deploy-add-menu t
         ssh-deploy-hydra "C-c C-z"))
 
-(setenv "TZ" "Asia/Beijing")
+(setenv "TZ" "Asia/Shanghai")
+(setq system-time-locale "C")
 (customize-set-variable 'tramp-encoding-shell "/bin/zsh")
 ;;(setq tramp-shell-prompt-pattern       "\\(?:^\\|\r\\)[^]#$%>\n]*#?[]#$%>].* *\\(^[\\[[0-9;]*[a-zA-Z] *\\)*")
 (customize-set-variable
@@ -74,6 +75,8 @@
   :config
   (setq ls-lisp-use-insert-directory-program nil)
   (setq ls-lisp-dirs-first t) ;; 目录置顶
+  (setq ls-lisp-use-localized-time-format t)
+  (setq dired-listing-switches "-alh --time-style=long-iso")
   (setq ls-lisp-format-time-list '("%Y-%m-%d %H:%M" "%Y-%m-%d %H:%M")))
 ;;(progn
 ;;  (global-set-key [mouse-1] 'mouse-set-point)
