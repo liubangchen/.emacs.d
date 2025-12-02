@@ -77,7 +77,9 @@
   (setq ls-lisp-dirs-first t) ;; 目录置顶
   (setq ls-lisp-use-localized-time-format t)
   (setq dired-listing-switches "-alh --time-style=long-iso")
-  (setq ls-lisp-format-time-list '("%Y-%m-%d %H:%M" "%Y-%m-%d %H:%M")))
+  (setq ls-lisp-format-time-list
+        '("%Y年%m月%d日 %H:%M"   ;; 格式示例: 2023年05月20日 14:30
+          "%Y年%m月%d日 %H:%M")))
 ;;(progn
 ;;  (global-set-key [mouse-1] 'mouse-set-point)
 ;;  (global-unset-key [down-mouse-1])
