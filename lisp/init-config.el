@@ -67,6 +67,14 @@
         ;; If nil, the fzf buffer will appear at the top of the window
         fzf/position-bottom t
         fzf/window-height 15))
+
+(use-package ls-lisp
+  :ensure nil
+  :hook (dired-mode . (lambda () (setq dired-use-ls-dired nil)))
+  :config
+  (setq ls-lisp-use-insert-directory-program nil)
+  (setq ls-lisp-dirs-first t) ;; 目录置顶
+  (setq ls-lisp-format-time-list '("%Y-%m-%d %H:%M" "%Y-%m-%d %H:%M")))
 ;;(progn
 ;;  (global-set-key [mouse-1] 'mouse-set-point)
 ;;  (global-unset-key [down-mouse-1])
