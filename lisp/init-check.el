@@ -34,10 +34,11 @@
   :diminish
   :functions my-elisp-flymake-byte-compile
   :bind ("C-c f" . flymake-show-buffer-diagnostics)
-  :hook (prog-mode . flymake-mode)
-  :init (setq flymake-no-changes-timeout nil
-              flymake-fringe-indicator-position 'right-fringe
-              flymake-margin-indicator-position 'right-margin)
+  :hook prog-mode
+  :custom
+  (flymake-no-changes-timeout nil)
+  (flymake-fringe-indicator-position 'right-fringe)
+  (flymake-margin-indicator-position 'right-margin)
   :config
   ;; Check elisp with `load-path'
   (defun my-elisp-flymake-byte-compile (fn &rest args)
@@ -47,13 +48,15 @@
       (apply fn args)))
   (advice-add 'elisp-flymake-byte-compile :around #'my-elisp-flymake-byte-compile))
 
-(use-package flymake-popon
+(use-package flyover
   :diminish
-  :custom-face
-  (flymake-popon ((t :inherit default :height 0.85)))
-  (flymake-popon-posframe-border ((t :foreground ,(face-background 'posframe-border nil t))))
-  :hook (flymake-mode . flymake-popon-mode)
-  :init (setq flymake-popon-width 80))
+  :hook flymake-mode
+  :config
+  ;; FIXME: `flymake-handle-report' doesn't exist
+  ;; @see https://github.com/konrad1977/flyover/issues/30
+  (advice-add 'flymake--handle-report :after
+              (lambda (&rest _)
+                (flyover--maybe-display-errors-debounced))))
 
 (provide 'init-check)
 

@@ -48,7 +48,12 @@
   (unbind-key "M-3" magit-mode-map)
   (unbind-key "M-4" magit-mode-map))
 
-;; Show TODOs in magit
+;; Prime cache before Magit refresh
+(use-package magit-prime
+  :diminish
+  :hook after-init)
+
+;; Show TODOs in Magit
 (use-package magit-todos
   :after magit-status
   :commands magit-todos-mode
