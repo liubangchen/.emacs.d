@@ -125,7 +125,9 @@
                         (goto-char (point-min))
                         (when (re-search-forward ":files '\\((.*)\\)" nil t)
                           (dolist (file (read (match-string 1)))
-                            (delete-file file))))
+                            (if (file-directory-p file)
+                                (delete-directory file 'recursive)
+                              (delete-file file)))))
                       (delete-file pkg-file))))
           (funcall ofun pkg-desc force nosave))
       (funcall ofun pkg-desc force nosave))))
@@ -134,9 +136,6 @@
 (unless (bound-and-true-p package--initialized) ; To avoid warnings in 27
   (setq package-enable-at-startup nil)          ; To prevent initializing twice
   (package-initialize))
-
-;; More options
-(setq package-install-upgrade-built-in t)
 
 ;; Setup `use-package'
 (unless (package-installed-p 'use-package)
