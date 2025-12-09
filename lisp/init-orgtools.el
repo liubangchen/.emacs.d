@@ -41,15 +41,16 @@
 
 (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
 
-(setq org-ditaa-jar-path
-      (expand-file-name "~/.emacs.d/javalibs/ditaa0_9.jar"))
+;;(setq org-ditaa-jar-path
+;;      (expand-file-name "~/.emacs.d/javalibs/ditaa0_9.jar"))
 
-(setq org-plantuml-jar-path
-      (expand-file-name "~/.emacs.d/javalibs/plantumllib/plantuml.jar"))
-(setq org-plantuml-exec-mode 'jar)
+;;(setq org-plantuml-jar-path
+;;      (expand-file-name "~/.emacs.d/javalibs/plantumllib/plantuml.jar"))
+;;(setq org-plantuml-exec-mode 'jar)
 ;;(setq org-plantuml-exec-mode 'plantuml)
 ;;(setq org-plantuml-executable-path "~/.emacs.d/javalibs/plantuml")
-(setq org-plantuml-executable-args '("-headless" "-charset UTF-8"))
+;;(setq org-plantuml-executable-args '("-headless" "-charset UTF-8"))
+
 (setq org-confirm-babel-evaluate nil)
 
 ;;(use-package valign
@@ -125,6 +126,16 @@
     (insert (format "[[file:%s]]" path))
     (org-display-inline-images)))
 
+
+;; 这是 GTD 的核心：把 inbox 的条目移动到 gtd.org 的具体项目下
+(setq org-refile-targets '(("idea.org" :maxlevel . 3)
+                           ("gtd.org" :level . 1)
+                           ("book.org" :level . 1)
+                           ("note.org" :level . 1)
+                           ("journal.org" :maxlevel . 2)))
+;;以此种方式显示路径： gtd.org/Project A/Subtask
+(setq org-refile-use-outline-path 'file)
+(setq org-outline-path-complete-in-steps nil) ; 可以在一个 prompt 里完成路径补全
 
 (setq org-log-into-drawer t)
 (setq org-log-done 'time)
