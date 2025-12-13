@@ -34,10 +34,6 @@
   (require 'init-const)
   (require 'init-custom))
 
-(declare-function childframe-completion-workable-p "init-funcs")
-(declare-function centaur-compatible-theme-p "init-funcs")
-(declare-function refresh-ns-appearance "init-ui")
-
 ;; Optimization
 (setq idle-update-delay 1.0)
 
@@ -91,25 +87,21 @@
     (progn
       ;; Make certain buffers grossly incandescent
       (use-package solaire-mode
+        :functions (centaur-compatible-theme-p refresh-ns-appearance)
         :hook (after-init . solaire-global-mode))
 
       ;; Excellent themes
       (use-package doom-themes
         :functions centaur-load-theme doom-themes-visual-bell-config
-        :custom
-        (doom-themes-enable-bold t)
-        (doom-themes-enable-italic t)
         :init (centaur-load-theme centaur-theme t)
-        :config
-        ;; Enable flashing mode-line on errors
-        (doom-themes-visual-bell-config)))
+        :config (doom-themes-visual-bell-config)))
   (progn
     (warn "The current theme may be incompatible!")
     (centaur-load-theme centaur-theme t)))
 
 ;; Mode-line
 (use-package doom-modeline
-  :hook (after-init . doom-modeline-mode)
+  :hook after-init
   :init
   (setq doom-modeline-icon centaur-icon
         doom-modeline-minor-modes t)
@@ -256,7 +248,7 @@
 
 ;; A minor-mode menu for mode-line
 (use-package minions
-  :hook (after-init . minions-mode))
+  :hook after-init)
 
 ;; Icons
 (use-package nerd-icons
@@ -339,9 +331,10 @@
   (use-package transient-posframe
     :diminish
     :defines posframe-border-width
+    :functions childframe-completion-workable-p
     :custom-face
     (transient-posframe-border ((t (:inherit posframe-border :background unspecified))))
-    :hook (after-init . transient-posframe-mode)
+    :hook after-init
     :init (setq transient-mode-line-format nil
                 transient-posframe-border-width posframe-border-width
                 transient-posframe-poshandler 'posframe-poshandler-frame-center

@@ -30,17 +30,16 @@
 
 ;;; Code:
 
-(declare-function centaur-treesit-available-p "init-funcs")
-
 (defun elixir-auto-config ()
   "Configure elixir automatically."
   (use-package alchemist
     :diminish (alchemist-mode alchemist-phoenix-mode)
-    :hook (((elixir-mode elixir-ts-mode) . alchemist-mode)
+    :hook ((elixir-mode elixir-ts-mode)
            (alchemist-mode . alchemist-phoenix-mode))))
 
 (if (centaur-treesit-available-p)
     (use-package elixir-ts-mode
+      :functions centaur-treesit-available-p
       :mode (("\\.elixir\\'" . elixir-ts-mode)
              ("\\.ex\\'"     . elixir-ts-mode)
              ("\\.exs\\'"    . elixir-ts-mode)

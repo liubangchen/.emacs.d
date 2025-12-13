@@ -34,16 +34,12 @@
   (require 'init-const)
   (require 'init-custom))
 
-(declare-function centaur-treesit-available-p "init-funcs")
-(declare-function childframe-workable-p "init-funcs")
-
 ;; ---------------------------------------------------------------------------
 ;; Code Display & Utilities
 ;; ---------------------------------------------------------------------------
 
 ;; Prettify Symbols (e.g., display “lambda” as “λ”)
 (use-package prog-mode
-  :ensure nil
   :hook (prog-mode . prettify-symbols-mode)
   :init
   (setq-default prettify-symbols-alist centaur-prettify-symbols-alist)
@@ -53,6 +49,7 @@
 (when (centaur-treesit-available-p)
   ;; Automatic Tree-sitter grammar management
   (use-package treesit-auto
+    :functions centaur-treesit-available-p
     :hook (after-init . global-treesit-auto-mode)
     :init (setq treesit-auto-install 'prompt))
 
@@ -64,7 +61,7 @@
 
 ;; Show function arglist or variable docstring
 (use-package eldoc
-  :ensure nil
+  :functions childframe-workable-p
   :diminish
   :config
   (when (childframe-workable-p)
@@ -72,12 +69,19 @@
       :diminish
       :bind (:map eldoc-mouse-mode-map
              ("C-h ." . eldoc-mouse-pop-doc-at-cursor))
-      :hook (eglot-managed-mode emacs-lisp-mode)
-      :init (setq eldoc-mouse-posframe-border-color (face-background 'posframe-border nil t))
-      :config
-      (tooltip-mode -1)                 ; Conflict with `track-mouse'
-      (add-to-list 'eldoc-mouse-posframe-override-parameters
-                   `(background-color . ,(face-background 'tooltip nil t))))))
+      :hook ((eglot-managed-mode emacs-lisp-mode)
+             (after-load-theme . set-eldoc-mouse-appearance))
+      :init
+      (defun set-eldoc-mouse-appearance ()
+        "Set appearance of eldoc-mouse."
+        (setq eldoc-mouse-posframe-override-parameters
+              `((drag-internal-border . t)
+                (foreground-color . ,(face-foreground 'tooltip nil t))
+                (background-color . ,(face-background 'tooltip nil t)))
+              eldoc-mouse-posframe-border-color
+              (face-background 'posframe-border nil t)))
+      (set-eldoc-mouse-appearance)
+      :config (tooltip-mode -1))))      ; conflict with `track-mouse'
 
 ;; Cross-referencing commands
 (use-package xref
@@ -96,7 +100,7 @@
 ;; Code styles
 (use-package editorconfig
   :diminish
-  :hook (after-init . editorconfig-mode))
+  :hook after-init)
 
 ;; Run commands quickly
 (use-package quickrun

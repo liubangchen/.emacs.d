@@ -105,16 +105,7 @@ FACE defaults to inheriting from default and highlight."
 ;; Highlight symbols
 (use-package symbol-overlay
   :diminish
-  :custom-face
-  (symbol-overlay-default-face ((t (:inherit region :background unspecified :foreground unspecified))))
-  (symbol-overlay-face-1 ((t (:inherit nerd-icons-blue :background unspecified :foreground unspecified :inverse-video t))))
-  (symbol-overlay-face-2 ((t (:inherit nerd-icons-pink :background unspecified :foreground unspecified :inverse-video t))))
-  (symbol-overlay-face-3 ((t (:inherit nerd-icons-yellow :background unspecified :foreground unspecified :inverse-video t))))
-  (symbol-overlay-face-4 ((t (:inherit nerd-icons-purple :background unspecified :foreground unspecified :inverse-video t))))
-  (symbol-overlay-face-5 ((t (:inherit nerd-icons-red :background unspecified :foreground unspecified :inverse-video t))))
-  (symbol-overlay-face-6 ((t (:inherit nerd-icons-orange :background unspecified :foreground unspecified :inverse-video t))))
-  (symbol-overlay-face-7 ((t (:inherit nerd-icons-green :background unspecified :foreground unspecified :inverse-video t))))
-  (symbol-overlay-face-8 ((t (:inherit nerd-icons-cyan :background unspecified :foreground unspecified :inverse-video t))))
+  :functions (easy-kill easy-kill-destroy-candidate)
   :bind (("M-i"  . symbol-overlay-put)
          ("M-n"  . symbol-overlay-jump-next)
          ("M-p"  . symbol-overlay-jump-prev)
@@ -125,28 +116,27 @@ FACE defaults to inheriting from default and highlight."
          ([M-f3] . symbol-overlay-put)
          ([M-f4] . symbol-overlay-remove-all))
   :bind-keymap ("M-s s"  . symbol-overlay-map)
-  :hook (((prog-mode yaml-mode yaml-ts-mode) . symbol-overlay-mode)
+  :hook ((prog-mode yaml-mode yaml-ts-mode)
          (iedit-mode     . turn-off-symbol-overlay)
          (iedit-mode-end . turn-on-symbol-overlay))
-  :init (setq symbol-overlay-idle-time 0.3)
+  :custom (symbol-overlay-idle-time 0.3)
   :config
-  (with-no-warnings
-    ;; Disable symbol highlighting while selecting
-    (defun turn-off-symbol-overlay (&rest _)
-      "Turn off symbol highlighting."
-      (interactive)
-      (symbol-overlay-mode -1))
+  ;; Disable symbol highlighting while selecting
+  (defun turn-off-symbol-overlay (&rest _)
+    "Turn off symbol highlighting."
+    (interactive)
+    (symbol-overlay-mode -1))
 
-    (defun turn-on-symbol-overlay (&rest _)
-      "Turn on symbol highlighting."
-      (interactive)
-      (when (derived-mode-p 'prog-mode 'yaml-mode 'yaml-ts-mode)
-        (symbol-overlay-mode 1)))
+  (defun turn-on-symbol-overlay (&rest _)
+    "Turn on symbol highlighting."
+    (interactive)
+    (when (derived-mode-p 'prog-mode 'yaml-mode 'yaml-ts-mode)
+      (symbol-overlay-mode 1)))
 
-    (advice-add #'activate-mark :after #'turn-off-symbol-overlay)
-    (advice-add #'deactivate-mark :after #'turn-on-symbol-overlay)
-    (advice-add #'easy-kill :after #'turn-off-symbol-overlay)
-    (advice-add #'easy-kill-destroy-candidate :after #'turn-on-symbol-overlay)))
+  (advice-add #'activate-mark :after #'turn-off-symbol-overlay)
+  (advice-add #'deactivate-mark :after #'turn-on-symbol-overlay)
+  (advice-add #'easy-kill :after #'turn-off-symbol-overlay)
+  (advice-add #'easy-kill-destroy-candidate :after #'turn-on-symbol-overlay))
 
 ;; Mark occurrences of current region (selection)
 (use-package region-occurrences-highlighter
@@ -166,7 +156,7 @@ FACE defaults to inheriting from default and highlight."
   (indent-bars-prefer-character t)
   (indent-bars-treesit-scope '((python function_definition class_definition for_statement
 				                       if_statement with_statement while_statement)))
-  :hook ((prog-mode yaml-mode) . indent-bars-mode)
+  :hook (prog-mode yaml-mode)
   :config (require 'indent-bars-ts))
 
 ;; Colorize color names in buffers
@@ -179,7 +169,7 @@ FACE defaults to inheriting from default and highlight."
 
 ;; Highlight brackets according to their depth
 (use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
+  :hook prog-mode)
 
 ;; Highlight TODO and similar keywords in comments and strings
 (use-package hl-todo
@@ -238,45 +228,29 @@ FACE defaults to inheriting from default and highlight."
 
 ;; Highlight uncommitted changes using VC
 (use-package diff-hl
-  :custom (diff-hl-draw-borders nil)
-  :autoload diff-hl-flydiff-mode
-  :custom-face
-  (diff-hl-change ((t (:inherit custom-changed :foreground unspecified :background unspecified))))
-  (diff-hl-insert ((t (:inherit diff-added :background unspecified))))
-  (diff-hl-delete ((t (:inherit diff-removed :background unspecified))))
+  :diminish (diff-hl-mode diff-hl-flydiff-mode diff-hl-margin-mode)
+  :commands (diff-hl-flydiff-mode diff-hl-margin-mode)
   :bind (:map diff-hl-command-map
          ("SPC" . diff-hl-mark-hunk))
   :hook ((after-init . global-diff-hl-mode)
          (after-init . global-diff-hl-show-hunk-mouse-mode)
-         (dired-mode . diff-hl-dired-mode))
+         (dired-mode . diff-hl-dired-mode)
+         (magit-post-refresh . diff-hl-magit-post-refresh))
+  :custom
+  (diff-hl-draw-borders nil)
+  (diff-hl-update-async t)
+  (diff-hl-show-hunk-function (if (childframe-workable-p)
+                                  'diff-hl-show-hunk-posframe
+                                'diff-hl-show-hunk-inline))
   :config
-  ;; Highlight on-the-fly
-  (diff-hl-flydiff-mode 1)
-
   ;; Set fringe style
   (setq-default fringes-outside-margins t)
 
-  (with-no-warnings
-    (defun my-diff-hl-fringe-bmp-function (_type _pos)
-      "Fringe bitmap function for use as `diff-hl-fringe-bmp-function'."
-      (define-fringe-bitmap 'my-diff-hl-bmp
-        (vector (if sys/linuxp #b11111100 #b11100000))
-        1 8
-        '(center t)))
-    (setq diff-hl-fringe-bmp-function #'my-diff-hl-fringe-bmp-function)
+  ;; Highlight on-the-fly
+  (diff-hl-flydiff-mode 1)
 
-    (unless (display-graphic-p)
-      ;; Fall back to the display margin since the fringe is unavailable in tty
-      (diff-hl-margin-mode 1)
-      ;; Avoid restoring `diff-hl-margin-mode'
-      (with-eval-after-load 'desktop
-        (add-to-list 'desktop-minor-mode-table
-                     '(diff-hl-margin-mode nil))))
-
-    ;; Integration with magit
-    (with-eval-after-load 'magit
-      (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
-      (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))))
+  ;; Fall back to the display margin since the fringe is unavailable in tty
+  (unless (display-graphic-p) (diff-hl-margin-mode 1)))
 
 ;; Pulse current line
 (use-package pulse
@@ -324,7 +298,7 @@ FACE defaults to inheriting from default and highlight."
 ;; Pulse modified region
 (use-package goggles
   :diminish
-  :hook ((prog-mode text-mode conf-mode) . goggles-mode))
+  :hook (prog-mode text-mode conf-mode))
 
 (provide 'init-highlight)
 
