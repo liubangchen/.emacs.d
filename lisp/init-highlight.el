@@ -50,10 +50,11 @@
                      (((class color) (background dark))
                       (:box (:line-width (-1 . -1) :color "gray56")))))
   :hook (after-init . show-paren-mode)
-  :init (setq show-paren-when-point-inside-paren t
-              show-paren-when-point-in-periphery t)
+  :custom
+  (show-paren-when-point-inside-paren t)
+  (show-paren-when-point-in-periphery t)
   :config
-  (if emacs/>=29p
+  (if (fboundp 'show-paren-context-when-offscreen)
       (setq blink-matching-paren-highlight-offscreen t
             show-paren-context-when-offscreen
             (if (childframe-workable-p) 'child-frame 'overlay))
@@ -106,6 +107,16 @@ FACE defaults to inheriting from default and highlight."
 (use-package symbol-overlay
   :diminish
   :functions (easy-kill easy-kill-destroy-candidate)
+  :custom-face
+  (symbol-overlay-default-face ((t (:inherit region :background unspecified :foreground unspecified))))
+  (symbol-overlay-face-1 ((t (:inherit nerd-icons-blue :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-2 ((t (:inherit nerd-icons-pink :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-3 ((t (:inherit nerd-icons-yellow :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-4 ((t (:inherit nerd-icons-purple :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-5 ((t (:inherit nerd-icons-red :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-6 ((t (:inherit nerd-icons-orange :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-7 ((t (:inherit nerd-icons-green :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-8 ((t (:inherit nerd-icons-cyan :background unspecified :foreground unspecified :inverse-video t))))
   :bind (("M-i"  . symbol-overlay-put)
          ("M-n"  . symbol-overlay-jump-next)
          ("M-p"  . symbol-overlay-jump-prev)
@@ -202,10 +213,8 @@ FACE defaults to inheriting from default and highlight."
 
   ;; Integrate into magit
   (with-eval-after-load 'magit
-    (add-hook 'magit-log-wash-summary-hook
-              #'hl-todo-search-and-highlight t)
-    (add-hook 'magit-revision-wash-message-hook
-              #'hl-todo-search-and-highlight t))
+    (add-hook 'magit-log-wash-summary-hook #'hl-todo-search-and-highlight t)
+    (add-hook 'magit-revision-wash-message-hook #'hl-todo-search-and-highlight t))
 
   (defun hl-todo-rg (regexp &optional files dir)
     "Use `rg' to find all TODO or similar keywords."
@@ -228,23 +237,44 @@ FACE defaults to inheriting from default and highlight."
 
 ;; Highlight uncommitted changes using VC
 (use-package diff-hl
-  :diminish (diff-hl-mode diff-hl-flydiff-mode diff-hl-margin-mode)
+  :defines diff-hl-show-hunk-posframe-internal-border-color
   :commands (diff-hl-flydiff-mode diff-hl-margin-mode)
+  :custom-face
+  (diff-hl-change ((t (:inherit custom-changed :foreground unspecified :background unspecified))))
+  (diff-hl-insert ((t (:inherit diff-added :background unspecified))))
+  (diff-hl-delete ((t (:inherit diff-removed :background unspecified))))
   :bind (:map diff-hl-command-map
          ("SPC" . diff-hl-mark-hunk))
   :hook ((after-init . global-diff-hl-mode)
          (after-init . global-diff-hl-show-hunk-mouse-mode)
          (dired-mode . diff-hl-dired-mode)
-         (magit-post-refresh . diff-hl-magit-post-refresh))
+         (magit-post-refresh . diff-hl-magit-post-refresh)
+         (after-load-theme . diff-hl-set-posframe-appearance))
   :custom
   (diff-hl-draw-borders nil)
   (diff-hl-update-async t)
+  (diff-hl-global-modes '(not image-mode pdf-view-mode))
   (diff-hl-show-hunk-function (if (childframe-workable-p)
                                   'diff-hl-show-hunk-posframe
                                 'diff-hl-show-hunk-inline))
+  :init
+  (defun diff-hl-set-posframe-appearance ()
+    "Set appearance of diff-hl-posframe."
+    (setq diff-hl-show-hunk-posframe-internal-border-color
+          (face-background 'posframe-border nil t)))
+  (diff-hl-set-posframe-appearance)
   :config
   ;; Set fringe style
   (setq-default fringes-outside-margins t)
+
+  ;; Thin indicators on fringe
+  (defun my-diff-hl-fringe-bmp-function (_type _pos)
+    "Fringe bitmap function for use as `diff-hl-fringe-bmp-function'."
+    (define-fringe-bitmap 'my-diff-hl-bmp
+      (vector (if sys/linuxp #b11111100 #b11100000))
+      1 8
+      '(center t)))
+  (setq diff-hl-fringe-bmp-function 'my-diff-hl-fringe-bmp-function)
 
   ;; Highlight on-the-fly
   (diff-hl-flydiff-mode 1)

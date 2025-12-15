@@ -114,18 +114,6 @@ Same as '`replace-string' `C-q' `C-m' `RET' `RET''."
         (error "Cannot open tramp file")
       (browse-url (concat "file://" file-name)))))
 
-(defun copy-file-name ()
-  "Copy the current buffer file name to the clipboard."
-  (interactive)
-  (let ((filename (if (equal major-mode 'dired-mode)
-                      default-directory
-                    (buffer-file-name))))
-    (if filename
-        (progn
-          (kill-new filename)
-          (message "Copied '%s'" filename))
-      (warn "Current buffer is not attached to a file!"))))
-
 (defun create-scratch-buffer ()
   "Create a scratch buffer."
   (interactive)
@@ -459,7 +447,10 @@ Return the fastest package archive."
 (defun run-after-load-theme-hook (&rest _)
   "Run `after-load-theme-hook'."
   (run-hooks 'after-load-theme-hook))
-(advice-add #'load-theme :after #'run-after-load-theme-hook)
+
+(if (boundp 'enable-theme-functions)    ; Introduced in 29.1
+    (add-hook 'enable-theme-functions #'run-after-load-theme-hook)
+  (advice-add #'load-theme :after #'run-after-load-theme-hook))
 
 (defun childframe-workable-p ()
   "Whether childframe is workable."
