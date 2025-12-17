@@ -525,6 +525,8 @@
 
    ;; Java
    (use-package lsp-java
+     :config
+     (setq lsp-java-vmargs '("-XX:+UseParallelGC" "-XX:GCTimeRatio=4" "-XX:AdaptiveSizePolicyWeight=90" "-Dsun.zip.disableMemoryMapping=true" "-Xmx4G" "-Xms100m"))
      :hook ((java-mode java-ts-mode jdee-mode) . (lambda () (require 'lsp-java))))))
 
 (when centaur-lsp
