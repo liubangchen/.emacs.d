@@ -167,12 +167,12 @@
 (use-package aggressive-indent
   :diminish
   :autoload aggressive-indent-mode
-  :functions too-long-file-p
+  :functions file-too-long-p
   :hook ((after-init . global-aggressive-indent-mode)
          ;; NOTE: Disable in large files due to the performance issues
          ;; https://github.com/Malabarba/aggressive-indent-mode/issues/73
          (find-file . (lambda ()
-                        (when (too-long-file-p)
+                        (when (file-too-long-p)
                           (aggressive-indent-mode -1)))))
   :config
   ;; Disable in some modes
