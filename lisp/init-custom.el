@@ -76,7 +76,8 @@
   :type 'boolean)
 
 (defcustom centaur-use-exec-path-from-shell
-  (or (memq window-system '(mac ns x)) (daemonp))
+  (and (or (memq window-system '(mac ns x)) (daemonp))
+       (not (string-match-p "/emacs-plus" system-configuration-options)))
   "Use `exec-path-from-shell' or not.
 If using emacs-plus with path ejection, set to nil."
   :group 'centaur
