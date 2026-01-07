@@ -139,4 +139,58 @@
 
 (setq org-log-into-drawer t)
 (setq org-log-done 'time)
+
+(use-package org-super-agenda
+  :ensure t
+  :after org
+  :init
+  (org-super-agenda-mode 1)
+  :config
+  (setq org-super-agenda-header-separator "\n"
+        org-super-agenda-header-prefix " "
+        org-super-agenda-unmatched-name "📂 其他杂项")
+  (setq org-agenda-custom-commands
+        '(("a" "任务看板"
+           ((agenda "" ((org-agenda-span 'day)  ; 只看今天的日程
+                        (org-agenda-overriding-header "")
+                        (org-super-agenda-groups
+                         '((:name "🔥 逾期任务"
+                            :deadline past
+                            :order 1)
+                           (:name "🎯 今日重点"
+                            :and (:deadline today :scheduled today)
+                            :order 2)
+                           (:name "⏳ 正在进行"
+                            :todo "STARTED"
+                            :order 3)
+                           (:name "🔄 习惯养成"
+                            :habit t
+                            :order 4)
+                           (:name "📅 即将到来"
+                            :deadline future
+                            :order 5)))))
+            (alltodo "" ((org-agenda-overriding-header "")
+                         (org-super-agenda-groups
+                          '((:name "🏷️ 工作项目"
+                             :tag "work"
+                             :order 1)
+                            (:name "🏠 生活琐事"
+                             :tag "home"
+                             :order 2)
+                            (:name "📦 待办池"
+                             :todo "TODO"
+                             :order 3)
+                            (:name "⏳ 等待他人"
+                             :todo "WAITING"
+                             :order 4)
+                            (:discard (:tag ("archive" "ignore"))))))))))))
+
+(custom-set-faces
+ '(org-super-agenda-header ((t (:inherit org-modern-label :height 1.2 :weight bold :foreground "#51afef")))))
+
+;; 让 Agenda 占据整个窗口，心无旁骛
+(setq org-agenda-window-setup 'current-window)
+
+
+
 (provide 'init-orgtools)
