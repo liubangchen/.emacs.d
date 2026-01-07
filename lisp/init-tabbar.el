@@ -1,10 +1,12 @@
 ;;; -*- lexical-binding: t; -*-
 (use-package centaur-tabs
   :demand
+  :ensure t
   :config
   (centaur-tabs-mode t)
   :init
   (setq centaur-tabs-cycle-scope 'tabs
+        centaur-tabs-icon-type 'nerd-icons
         centaur-tabs-style "chamfer"
         centaur-tabs-height 28
         centaur-tabs-set-icons t
