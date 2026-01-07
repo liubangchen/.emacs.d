@@ -31,11 +31,21 @@
 ;;; Code:
 
 (use-package hydra
-  :defines posframe-border-width
+  :defines (consult-imenu-config posframe-border-width)
   :functions childframe-completion-workable-p
   :hook ((emacs-lisp-mode . hydra-add-imenu)
          (after-load-theme . hydra-set-posframe-appearance))
   :init
+  (with-eval-after-load 'consult-imenu
+    (setq consult-imenu-config
+          '((emacs-lisp-mode :toplevel "Functions"
+                             :types ((?f "Functions" font-lock-function-name-face)
+                                     (?h "Hydras"    font-lock-constant-face)
+                                     (?m "Macros"    font-lock-function-name-face)
+                                     (?p "Packages"  font-lock-constant-face)
+                                     (?t "Types"     font-lock-type-face)
+                                     (?v "Variables" font-lock-variable-name-face))))))
+
   (defun hydra-set-posframe-appearance ()
     "Set appearance of hydra."
     (when (childframe-completion-workable-p)
@@ -54,13 +64,13 @@
 (use-package pretty-hydra
   :functions icons-displayable-p
   :bind ("<f6>" . toggles-hydra/body)
-  :hook (emacs-lisp-mode . (lambda ()
-                             (add-to-list
-                              'imenu-generic-expression
-                              '("Hydras"
-                                "^.*(\\(pretty-hydra-define\\) \\([a-zA-Z-]+\\)"
-                                2))))
+  :hook (emacs-lisp-mode . pretty-hydra-add-imenu)
   :init
+  (defun pretty-hydra-add-imenu ()
+    "Have hydras in `imenu'."
+    (add-to-list 'lisp-imenu-generic-expression
+                 '("Hydras" "^.*(\\(pretty-hydra-define\\) \\([a-zA-Z-]+\\)" 2)))
+
   (cl-defun pretty-hydra-title (title &optional icon-type icon-name
                                       &key face height v-adjust)
     "Add an icon in the hydra title."
@@ -75,11 +85,12 @@
               (apply f (list icon-name :face face :height height :v-adjust v-adjust))
               " "))))
        (propertize title 'face face))))
-
-  ;; Global toggles
+  :config
   (with-no-warnings
-    (pretty-hydra-define toggles-hydra (:title (pretty-hydra-title "Toggles" 'faicon "nf-fa-toggle_on")
-                                        :color amaranth :quit-key ("q" "C-g"))
+    ;; Define hydra for global toggles
+    (pretty-hydra-define toggles-hydra
+      (:title (pretty-hydra-title "Toggles" 'faicon "nf-fa-toggle_on")
+       :color amaranth :quit-key ("q" "C-g"))
       ("Basic"
        (("n" (cond ((fboundp 'display-line-numbers-mode)
                     (display-line-numbers-mode (if display-line-numbers-mode -1 1)))
