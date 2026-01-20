@@ -192,5 +192,53 @@
 (setq org-agenda-window-setup 'current-window)
 
 
+(defun insert-org-common-header (&optional force)
+  "插入富途 ES 内核升级故障汇报的专用 Org 文件头。
+可通过 M-x 运行，若通过 C-u 触发则强制在开头插入。"
+  (interactive "P")
+  (if (and (not force) (not (= (buffer-size) 0)))
+      (message "Buffer is not empty, use C-u M-x to force insert.")
+    (save-excursion
+      (goto-char (point-min))
+      (insert "# -*- org -*-\n"
+              "#+STARTUP: indent\n"
+              "#+LaTeX_CLASS: article\n"
+              "#+LATEX_CLASS_OPTIONS: [a4paper]\n"
+              "#+STARTUP: showlevels 3\n"
+
+              "#+Title: \n"
+              "#+OPTIONS:author: liubangchen\n"
+              "#+OPTIONS:date:nil\n"
+              "#+LaTeX_HEADER: \\usepackage{ctex}\\ctexset{space=false}\\usepackage{listings}\n"
+              "#+LATEX_HEADER: \\usepackage[left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}\n"
+              "#+LaTeX_HEADER: \\linespread{1.2}\n"
+              "#+LaTeX_HEADER: \\usepackage{xcolor}\n"
+              "#+LaTeX_HEADER: \\usepackage{tabularx} \n"
+              "#+LaTeX_HEADER: \\usepackage{colortbl}\n"
+              "#+LaTeX_HEADER: \\usepackage{makecell}\n"
+              "#+LATEX_HEADER: \\usepackage{adjustbox}\n"
+              "# \\usepackage{adjustbox}\\usepackage{booktabs}\\usepackage{colortbl}\\usepackage{siunitx}\n"
+              "#+LaTeX_HEADER: \\usepackage{multirow}\\usepackage{fontawesome}\n"
+              "#+LaTeX_HEADER: \\usepackage{multicol}\n"
+              "#+LaTeX_HEADER: \\usepackage{fontspec}\\usepackage{xltabular}\n"
+              "#+BIND: org-latex-default-packages-alist nil\n\n"
+              "#+LATEX_HEADER: \\usepackage{titlesec}\n"
+              "#+LATEX_HEADER: \\titleformat{\\section}{\\Large\\bfseries\\color{blue}}{\\thesection}{1em}{}[\\titlerule]\n\n"
+              "#+LATEX_HEADER: \\usepackage{xeCJK}\n"
+              "#+LATEX_HEADER: \\usepackage{fontspec}\n"
+              "#+LATEX_HEADER: \\setmainfont{PingFang SC}\n"
+              "#+LATEX_HEADER: \\setCJKmainfont{PingFang SC}\n\n"
+              "#+LATEX_HEADER: \\usepackage{fancyhdr}\n"
+              "#+LATEX_HEADER: \\usepackage{graphicx}\n"
+              "#+LATEX_HEADER: \\pagestyle{fancy}\n"
+              "#+LATEX_HEADER: \\fancyhf{} % 清除所有默认设置\n"
+              "#+LATEX_HEADER: \\lhead{\\includegraphics[width=2cm]{logo.png}} % 左页眉\n"
+              "#+LATEX_HEADER: \\chead{富途2025-12-24 ES故障汇报} % 中页眉\n"
+              "#+LATEX_HEADER: \\rhead{\\thepage} % 右页眉，显示页码\n"
+              "#+LATEX_HEADER: \\lfoot{内部机密} % 左页脚\n"
+              "#+LATEX_HEADER: \\renewcommand{\\headrulewidth}{0.4pt} % 页眉下划线\n"
+              "\n\n")
+      (message "Common Org header inserted.")))
+  (goto-char (point-max)))
 
 (provide 'init-orgtools)
