@@ -74,24 +74,40 @@
         "Set workspace buffer list for consult-buffer.")
       (add-to-list 'consult-buffer-sources 'consult-source-workspace))
 
-    (defun tabspaces--backup-session (&rest _)
-      "Backup the session file."
-      (interactive)
+    (defun tabspaces--delete-old-files (dir days)
+      "Delete backup files of DIR, with timestamp suffix older than DAYS days."
+      (let ((cutoff (time-subtract (current-time)
+                                   (seconds-to-time (* days 24 60 60)))))
+        (dolist (file (directory-files dir 'full "\\.[0-9]\\{8\\}\\'"))
+          (when-let ((timestamp-str (substring file (string-match "\\([0-9]\\{8\\}\\)\\'" file))))
+            (when (time-less-p (date-to-time timestamp-str) cutoff)
+              (delete-file file 'trash))))))
+
+    (defun tabspaces--prepare-save-session (&rest _)
+      "Prepare for saving session."
+      ;; Backup session
       (when tabspaces-session
-        (let ((dir (concat user-emacs-directory "tabspaces")))
+        (let ((dir (expand-file-name "tabspaces" user-emacs-directory)))
           (unless (file-exists-p dir)
-            (mkdir dir)))
+            (mkdir dir))
+          ;; Delete the sessions that are older than 7 days
+          (tabspaces--delete-old-files dir 7))
+
         (when (file-exists-p tabspaces-session-file)
           (copy-file tabspaces-session-file
                      (format "%s.%s" tabspaces-session-file (format-time-string "%Y%m%d"))
-                     t))))
-    (advice-add #'tabspaces--save-session-smart :before #'tabspaces--backup-session)
+                     t)))
 
-    (defun tabspaces--delete-childframe (&rest _)
-      "Delete all child frames."
+      ;; Cleanup
+      (and (fboundp 'helpful-kill-buffers)
+           (helpful-kill-buffers))
+
+      (and (fboundp 'magit-mode-get-buffers)
+           (mapc #'kill-buffer (magit-mode-get-buffers)))
+
       (and (fboundp 'posframe-delete-all)
            (posframe-delete-all)))
-    (advice-add #'tabspaces--save-session-smart :before #'tabspaces--delete-childframe)
+    (advice-add #'tabspaces--save-session-smart :before #'tabspaces--prepare-save-session)
 
     (defun tabspaces--bury-messages (&rest _)
       "Bury *Messages* buffer."
