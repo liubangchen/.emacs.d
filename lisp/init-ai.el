@@ -41,18 +41,26 @@
   ;; Put the apikey to `auth-sources'
   ;; Format: "machine {HOST} login {USER} password {APIKEY}"
   ;; The LLM host is used as HOST, and "apikey" as USER.
-  ;; 配置 DeepSeek 后端
-  (gptel-backend
-   (gptel-make-openai "DeepSeek"
-     :host "api.deepseek.com"
-     :endpoint "/chat/completions"
-     :stream t
-     :key 'gptel-api-key
-     :models '("deepseek-chat" "deepseek-coder")))
+  ;; 配置多个后端
+  (gptel-backends
+   (list
+    ;; DeepSeek 后端
+    (gptel-make-openai "DeepSeek"
+      :host "api.deepseek.com"
+      :endpoint "/chat/completions"
+      :stream t
+      :key 'gptel-api-key
+      :models '("deepseek-chat" "deepseek-coder"))
+    ;; GitHub Models 后端（作为备用）
+    (gptel-make-openai "GitHub Models"
+      :host "models.inference.ai.azure.com"
+      :endpoint "/chat/completions?api-version=2024-05-01-preview"
+      :stream t
+      :key 'gptel-api-key
+      :models '("gpt-4o"))))
   :config
-  ;; 设置多个后端，可以通过 C-u M-x gptel 选择
-  (setq gptel-model 'deepseek-chat
-        gptel-backend (gptel-get-backend "DeepSeek")))
+  ;; 设置默认后端为 DeepSeek
+  (setq gptel-backend (gptel-get-backend "DeepSeek")))
 
 ;; Generate commit messages for magit
 (use-package gptel-magit
