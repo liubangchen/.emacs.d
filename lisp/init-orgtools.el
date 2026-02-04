@@ -233,9 +233,9 @@
               "#+LATEX_HEADER: \\pagestyle{fancy}\n"
               "#+LATEX_HEADER: \\fancyhf{} % 清除所有默认设置\n"
               "#+LATEX_HEADER: \\lhead{\\includegraphics[width=2cm]{logo.png}} % 左页眉\n"
-              "#+LATEX_HEADER: \\chead{富途2025-12-24 ES故障汇报} % 中页眉\n"
+              "#+LATEX_HEADER: \\chead{} % 中页眉\n"
               "#+LATEX_HEADER: \\rhead{\\thepage} % 右页眉，显示页码\n"
-              "#+LATEX_HEADER: \\lfoot{内部机密} % 左页脚\n"
+              "#+LATEX_HEADER: \\lfoot{} % 左页脚\n"
               "#+LATEX_HEADER: \\renewcommand{\\headrulewidth}{0.4pt} % 页眉下划线\n"
               "\n\n")
       (message "Common Org header inserted.")))
