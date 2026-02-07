@@ -241,4 +241,81 @@
       (message "Common Org header inserted.")))
   (goto-char (point-max)))
 
+
+;; --- 1. 动态资源扫描函数 ---
+(defun tj3/tj-get-resource-ids ()
+  "从当前 Buffer 的 'Resources' 节点下提取所有二级子节点的 :resource_id: 属性。"
+  (save-excursion
+    (goto-char (point-min))
+    (let ((resources '()))
+      ;; 1. 定位到一级标题 "Resources"
+      (if (re-search-forward "^\\* +Resources" nil t)
+          (let ((end (save-excursion (org-goto-sibling) (point)))) ; 确定 Resources 节点的范围
+            (org-narrow-to-subtree)
+            (goto-char (point-min))
+            ;; 2. 扫描该范围内的所有二级节点 (用 ^** 开头)
+            (while (re-search-forward "^\\*\\* +.*$" nil t)
+              (let ((rid (org-entry-get (point) "resource_id")))
+                (when rid
+                  (push rid resources))))
+            (widen))
+        (message "警告：未找到 'Resources' 根节点"))
+      (if resources
+          (reverse (delete-dups resources))
+        '("No_Resource_ID_Found")))))
+
+;; --- 2. 动态任务 ID 扫描 (从 task-001 开始) ---
+(defun tj3/tj-generate-next-task-id ()
+  "扫描全文，找到最大的 task-### 并生成下一个。"
+  (save-excursion
+    (goto-char (point-min))
+    (let ((max-id 0))
+      ;; 搜索属性抽屉中的 ID 或正文中的 task-xxx
+      (while (re-search-forward "task-\\([0-9]+\\)" nil t)
+        (let ((num (string-to-number (match-string 1))))
+          (when (> num max-id) (setq max-id num))))
+      (format "task-%03d" (1+ max-id)))))
+
+;; --- 3. 获取所有任务 ID (用于依赖选择) ---
+(defun tj3/tj-get-all-task-ids ()
+  "获取当前文件中所有以 task- 开头的 ID。"
+  (let (ids)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "task-[0-9]+" nil t)
+        (push (match-string 0) ids)))
+    (delete-dups ids)))
+
+;; --- 4. 综合交互函数 ---
+(defun tj3/tj-quick-setup-task ()
+  "一站式设置 TaskJuggler 任务。"
+  (interactive)
+  (let* ((current-resources (tj3/tj-get-resource-ids))
+         (all-tasks (tj3/tj-get-all-task-ids))
+         ;; 自动生成 ID
+         (next-id (tj3/tj-generate-next-task-id))
+         ;; 分配资源 (从标签节点动态获取)
+         (allocate (completing-read "分配资源 (Allocate): " current-resources))
+         ;; 负责人 (通常与资源一致)
+         (responsible (completing-read "负责人 (Responsible): " current-resources nil nil allocate))
+         ;; 依赖关系 (下拉选择已有的任务 ID)
+         (depends (completing-read "依赖任务 (Depends, 可手动输入): " all-tasks))
+         (effort (read-string "工作量 (effort, e.g. 2d, 4h): " "1d"))
+         (complete (read-string "进度 (complete, 0-100): " "0"))
+         (start (org-read-date nil nil nil "开始时间 (Start): "))
+         (priority (read-string "优先级 (Priority, 1-1000): " "500")))
+
+    ;; 写入属性
+    (org-set-property "ID" next-id)
+    (org-set-property "allocate" allocate)
+    (org-set-property "responsible" responsible)
+    (unless (string-empty-p depends)
+      (org-set-property "depends" depends))
+    (org-set-property "effort" effort)
+    (org-set-property "complete" (format "%s%%" complete))
+    (org-set-property "start" start)
+    (org-set-property "priority" priority)
+
+    (message "任务 %s 设置成功！资源: %s, 依赖: %s" next-id allocate depends)))
+
 (provide 'init-orgtools)
