@@ -364,7 +364,8 @@ targets."
     (keymap-set corfu-map "M-m" #'corfu-move-to-minibuffer)
     (add-to-list 'corfu-continue-commands #'corfu-move-to-minibuffer))
 
-  (unless (or (display-graphic-p) (featurep 'tty-child-frames))
+  (unless (or (display-graphic-p)
+              (featurep 'tty-child-frames))
     (use-package corfu-terminal
       :hook (global-corfu-mode . corfu-terminal-mode)))
 
