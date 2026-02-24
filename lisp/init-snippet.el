@@ -42,11 +42,9 @@
 (use-package yasnippet-capf
   :commands yasnippet-capf
   :functions cape-capf-super eglot-completion-at-point
-  :hook ((emacs-lisp-mode . my-yasnippet-capf-h)
+  :hook (((conf-mode prog-mode text-mode) . my-yasnippet-capf-h)
          (eglot-managed-mode . my-eglot-capf))
   :init
-  (add-to-list 'completion-at-point-functions #'yasnippet-capf)
-
   (defun my-yasnippet-capf-h ()
     (add-to-list 'completion-at-point-functions #'yasnippet-capf))
 
