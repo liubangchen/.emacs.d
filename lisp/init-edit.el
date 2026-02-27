@@ -131,32 +131,49 @@
          ("M-Z" . avy-zap-up-to-char-dwim)))
 
 ;; Quickly follow links
-(use-package ace-link
-  :bind ("M-o" . ace-link-addr)
-  :hook (after-init . ace-link-setup-default)
-  :config
-  (with-no-warnings
-    (bind-keys
-     :map package-menu-mode-map
-     ("o" . ace-link-help)
-     :map process-menu-mode-map
-     ("o" . ace-link-help))
+(use-package link-hint
+  :defines (Info-mode-map
+            compilation-mode-map custom-mode-map
+            devdocs-mode-map elfeed-show-mode-map eww-mode-map
+            help-mode-map helpful-mode-map nov-mode-map
+            woman-mode-map xref--xref-buffer-mode-map)
+  :functions embark-dwim
+  :bind (("M-o"     . link-hint-open-link)
+         ("C-c l o" . link-hint-open-link)
+         ("C-c l c" . link-hint-copy-link))
+  :init
+  (with-eval-after-load 'compile
+    (bind-key "o" #'link-hint-open-link compilation-mode-map))
+  (with-eval-after-load 'cus-edit
+    (bind-key "o" #'link-hint-open-link custom-mode-map))
+  (with-eval-after-load 'devdocs
+    (bind-key "o" #'link-hint-open-link devdocs-mode-map))
+  (with-eval-after-load 'elfeed-show
+    (bind-key "o" #'link-hint-open-link elfeed-show-mode-map))
+  (with-eval-after-load 'eww
+    (bind-key "o" #'link-hint-open-link eww-mode-map))
+  (with-eval-after-load 'help
+    (bind-key "o" #'link-hint-open-link help-mode-map))
+  (with-eval-after-load 'helpful
+    (bind-key "o" #'link-hint-open-link helpful-mode-map))
+  (with-eval-after-load 'info
+    (bind-key "o" #'link-hint-open-link Info-mode-map))
+  (with-eval-after-load 'nov
+    (bind-key "o" #'link-hint-open-link nov-mode-map))
+  (with-eval-after-load 'woman
+    (bind-key "o" #'link-hint-open-link woman-mode-map))
+  (with-eval-after-load 'xref
+    (bind-key "o" #'link-hint-open-link xref--xref-buffer-mode-map))
 
-    (with-eval-after-load 'org
-      (bind-key "M-o" #'ace-link-org org-mode-map))
-
-    (with-eval-after-load 'gnus
-      (bind-keys
-       :map gnus-summary-mode-map
-       ("M-o" . ace-link-gnus)
-       :map gnus-article-mode-map
-       ("M-o" . ace-link-gnus)))
-
-    (with-eval-after-load 'ert
-      (bind-key "o" #'ace-link-help ert-results-mode-map))
-
-    (with-eval-after-load 'elfeed
-      (bind-key "o" #'ace-link elfeed-show-mode-map))))
+  (with-eval-after-load 'embark
+    (setq link-hint-action-fallback-commands
+          (list :open (lambda ()
+                        (condition-case _
+                            (progn
+                              (embark-dwim)
+                              t)
+                          (error
+                           nil)))))))
 
 ;; Jump to Chinese characters
 (use-package ace-pinyin
