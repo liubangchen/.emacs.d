@@ -128,16 +128,9 @@
       (defun restore-session ()
         "Restore the previous session."
         (interactive)
-        (message "Restoring previous session...")
-        (quit-window t)
-
-        (when (fboundp 'tabspaces-mode)
-          (unless tabspaces-mode
-            (tabspaces-mode t))
-          (tabspaces-restore-session)
-          (tabspaces-switch-or-create-workspace tabspaces-default-tab))
-
-        (message "Restoring previous session...done"))
+        (quit-dashboard)
+        (when (bound-and-true-p tabspaces-mode)
+          (tabspaces-restore-session)))
 
       (defvar dashboard-recover-layout-p nil
         "Wether recovers the layout.")
@@ -146,13 +139,13 @@
         "Open the *dashboard* buffer and jump to the first widget."
         (interactive)
         ;; Check if need to recover layout
-        (if (length> (window-list-1)
-                     ;; exclude `treemacs' window
-                     (if (and (fboundp 'treemacs-current-visibility)
+        (when (length> (window-list-1)
+                       ;; exclude `treemacs' window
+                       (if (and (fboundp 'treemacs-current-visibility)
                               (eq (treemacs-current-visibility) 'visible))
                          2
                        1))
-            (setq dashboard-recover-layout-p t))
+          (setq dashboard-recover-layout-p t))
 
         ;; Display dashboard in maximized window
         (delete-other-windows)
@@ -164,17 +157,17 @@
         (dashboard-goto-recent-files))
 
       (defun quit-dashboard ()
-        "Quit dashboard window."
+        "Quit dashboard."
         (interactive)
-        (quit-window t)
+        (when (buffer-live-p (get-buffer dashboard-buffer-name))
+          (kill-buffer dashboard-buffer-name))
 
-        ;; Create workspace
-        (when (fboundp 'tabspaces-mode)
-          (unless tabspaces-mode
-            (tabspaces-mode t)
-            (tabspaces-switch-or-create-workspace tabspaces-default-tab)))
+        ;; Create workspace if necessary
+        (unless (bound-and-true-p tabspaces-mode)
+          (tabspaces-mode t)
+          (tabspaces-switch-or-create-workspace tabspaces-default-tab))
 
-        ;; Recover layout
+        ;; Recover layout or switch workspace
         (when dashboard-recover-layout-p
           (cond
            ((bound-and-true-p tab-bar-history-mode)
