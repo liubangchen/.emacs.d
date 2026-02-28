@@ -35,9 +35,10 @@
 
 (use-package tabspaces
   :bind (:map tabspaces-command-map
-         ("C-r" . tabspaces-restore-session)
-         ("C-s" . tabspaces-save-session)
-         ("C-w" . tabspaces-save-current-project-session))
+         ("C-r"   . tabspaces-restore-session)
+         ("C-S-r" . tabspaces-restore-session-alt)
+         ("C-s"   . tabspaces-save-session)
+         ("C-w"   . tabspaces-save-current-project-session))
   :hook ((after-init . tabspaces-mode)
          (tabspaces-mode . tab-bar-history-mode))
   :custom
@@ -54,6 +55,14 @@
   (tabspaces-session-file (concat user-emacs-directory "tabspaces/tabsession.el"))
   (tabspaces-session-project-session-store (concat user-emacs-directory "tabspaces/"))
   :config
+  (defun tabspaces-restore-session-alt ()
+    "Select file to restore tabspaces session."
+    (interactive)
+    (let ((project-or-session-file (read-file-name
+                                    "Select project or session file: "
+                                    tabspaces-session-project-session-store)))
+      (tabspaces-restore-session project-or-session-file)))
+
   (with-no-warnings
     ;; Filter Buffers for Consult-Buffer
     (with-eval-after-load 'consult
