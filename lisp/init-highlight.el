@@ -157,6 +157,26 @@ FACE defaults to inheriting from default and highlight."
          ("M-p" . region-occurrences-highlighter-prev))
   :hook (after-init . global-region-occurrences-highlighter-mode))
 
+;; Display fill-column indicator
+(use-package display-fill-column-indicator
+  :ensure nil
+  :functions adjust-fill-column-indicator-stipple
+  :hook (prog-mode . display-fill-column-indicator-mode)
+  :config
+  ;; Setup fill column indicator with stipple
+  (when (or (and sys/mac-x-p emacs/>=31p)
+            (and sys/linux-x-p sys/win32p emacs/>=30p))
+    (setq-default display-fill-column-indicator-character ?\s)
+    (defun adjust-fill-column-indicator-stipple ()
+      "Adjust the fill-column-indicator face with stipple using `set-face-attribute'."
+      (let* ((w (window-font-width))
+             (stipple `(,w 1 ,(apply #'unibyte-string
+                                     (append (make-list (1- (/ (+ w 7) 8)) ?\0)
+                                             '(1))))))
+        (set-face-attribute 'fill-column-indicator nil :stipple stipple)))
+    (add-hook 'emacs-startup-hook #'adjust-fill-column-indicator-stipple)
+    (add-hook 'text-scale-mode-hook #'adjust-fill-column-indicator-stipple)))
+
 ;; Highlight indentions
 (use-package indent-bars
   :custom
@@ -266,13 +286,13 @@ FACE defaults to inheriting from default and highlight."
   (setq-default fringes-outside-margins t)
 
   ;; Thin indicators on fringe
-  (defun my-diff-hl-fringe-bmp-function (_type _pos)
+  (defun my/diff-hl-fringe-bmp-function (_type _pos)
     "Fringe bitmap function for use as `diff-hl-fringe-bmp-function'."
-    (define-fringe-bitmap 'my-diff-hl-bmp
+    (define-fringe-bitmap 'my/diff-hl-bmp
       (vector (if sys/linuxp #b11111100 #b11100000))
       1 8
       '(center t)))
-  (setq diff-hl-fringe-bmp-function 'my-diff-hl-fringe-bmp-function)
+  (setq diff-hl-fringe-bmp-function 'my/diff-hl-fringe-bmp-function)
 
   ;; Highlight on-the-fly
   (diff-hl-flydiff-mode 1))
