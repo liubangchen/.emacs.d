@@ -2,13 +2,16 @@
 
 ;; Author: chenlong
 ;; Description: 通过 codex-internal exec 与 CodeBuddy 交互的 Emacs 模块
-;; 功能：弹出全局输入 buffer，绑定工作路径，输入问题后调用 codex-internal exec 执行
-;;       思考过程在临时 buffer 显示，最终结果在输入 buffer 显示
+;; 架构: 三窗口布局
+;;   左上: Result buffer (org-mode, 只读, AI 结果展示)
+;;   左下: Chat buffer (vterm, 交互式输入)
+;;   右侧: Thinking buffer (org-mode, 思考过程)
 
 ;;; Code:
 
-(require 'markdown-mode)
+(require 'org)
 (require 'nerd-icons)
+(require 'vterm)
 
 ;; ============================================================
 ;; 自定义变量
@@ -35,7 +38,12 @@
   :group 'codebuddy)
 
 (defcustom codebuddy-chat-buffer-name "*CodeBuddy-Chat*"
-  "全局输入/输出 buffer 名称."
+  "VTerm 输入 buffer 名称."
+  :type 'string
+  :group 'codebuddy)
+
+(defcustom codebuddy-result-buffer-name "*CodeBuddy-Result*"
+  "AI 结果展示 buffer 名称."
   :type 'string
   :group 'codebuddy)
 
@@ -45,8 +53,54 @@
   :type 'integer
   :group 'codebuddy)
 
+(defcustom codebuddy-enable-history nil
+  "是否开启会话历史功能（SQLite 持久化）.
+默认关闭。可在项目的 .dir-locals.el 中设置为 t 来开启:
+
+  ((nil . ((codebuddy-enable-history . t))))
+
+开启后会在工作目录下创建 .codebuddy/chat.db 存储对话历史，
+支持多轮上下文、会话管理等功能."
+  :type 'boolean
+  :group 'codebuddy
+  :safe #'booleanp)
+
+;; 显式标记为 safe local variable，确保 .dir-locals.el 不弹安全确认
+(put 'codebuddy-enable-history 'safe-local-variable #'booleanp)
+
 (defcustom codebuddy-db-dir-name ".codebuddy"
   "工作目录下存放 SQLite 数据库的子目录名."
+  :type 'string
+  :group 'codebuddy)
+
+(defcustom codebuddy-chat-window-ratio 0.65
+  "左侧窗口占 frame 宽度的比例 (0.0-1.0).
+剩余部分分配给 Thinking buffer."
+  :type 'float
+  :group 'codebuddy)
+
+(defcustom codebuddy-result-height-ratio 0.70
+  "Result buffer 占左侧高度的比例 (0.0-1.0).
+剩余部分分配给 Chat (vterm) buffer."
+  :type 'float
+  :group 'codebuddy)
+
+(defcustom codebuddy-context-full-rounds 3
+  "保留完整内容的最近对话轮数.
+超出此轮数的早期对话会被压缩为摘要以节省 token."
+  :type 'integer
+  :group 'codebuddy)
+
+(defcustom codebuddy-context-summary-max-chars 200
+  "早期对话摘要的最大字符数（每条消息）."
+  :type 'integer
+  :group 'codebuddy)
+
+(defcustom codebuddy-input-script
+  (expand-file-name "codebuddy-input.sh"
+                    (file-name-directory
+                     (or load-file-name buffer-file-name default-directory)))
+  "VTerm 输入循环脚本路径."
   :type 'string
   :group 'codebuddy)
 
@@ -59,6 +113,9 @@
 
 (defvar codebuddy--process nil
   "当前运行的 codex-internal 进程.")
+
+(defvar codebuddy--vterm-process nil
+  "VTerm 中运行的 shell 进程（用于发送 SIGUSR1 信号）.")
 
 (defvar codebuddy--output-buffer ""
   "累积的进程输出（用于解析思考/结果）.")
@@ -97,55 +154,55 @@
 ;; ============================================================
 
 (defvar codebuddy--icon-robot
-  (nerd-icons-mdicon "nf-md-robot" :face '(:foreground "#61afef"))
+  (nerd-icons-octicon "nf-oct-hubot" :face '(:foreground "#61afef"))
   "Robot 图标 (标题/AI 回复).")
 
 (defvar codebuddy--icon-user
-  (nerd-icons-mdicon "nf-md-account_circle_outline" :face '(:foreground "#98c379"))
+  (nerd-icons-faicon "nf-fa-user" :face '(:foreground "#98c379"))
   "User 图标 (用户输入 prompt).")
 
 (defvar codebuddy--icon-folder
-  (nerd-icons-mdicon "nf-md-folder_outline" :face '(:foreground "#e5c07b"))
+  (nerd-icons-faicon "nf-fa-folder_open" :face '(:foreground "#e5c07b"))
   "文件夹图标 (工作目录).")
 
 (defvar codebuddy--icon-send
-  (nerd-icons-mdicon "nf-md-send" :face '(:foreground "#61afef"))
+  (nerd-icons-faicon "nf-fa-paper_plane" :face '(:foreground "#61afef"))
   "发送图标 (RET).")
 
 (defvar codebuddy--icon-stop
-  (nerd-icons-mdicon "nf-md-stop_circle_outline" :face '(:foreground "#e06c75"))
+  (nerd-icons-faicon "nf-fa-stop_circle" :face '(:foreground "#e06c75"))
   "停止图标 (C-c C-c).")
 
 (defvar codebuddy--icon-close
-  (nerd-icons-mdicon "nf-md-close_circle_outline" :face '(:foreground "#e06c75"))
+  (nerd-icons-faicon "nf-fa-times_circle" :face '(:foreground "#e06c75"))
   "关闭图标 (C-c C-k).")
 
 (defvar codebuddy--icon-directory
-  (nerd-icons-mdicon "nf-md-swap_horizontal" :face '(:foreground "#e5c07b"))
+  (nerd-icons-faicon "nf-fa-exchange" :face '(:foreground "#e5c07b"))
   "切换目录图标 (C-c C-d).")
 
 (defvar codebuddy--icon-check
-  (nerd-icons-mdicon "nf-md-check_circle_outline" :face '(:foreground "#98c379"))
+  (nerd-icons-faicon "nf-fa-check_circle" :face '(:foreground "#98c379"))
   "完成图标.")
 
 (defvar codebuddy--icon-error
-  (nerd-icons-mdicon "nf-md-close_circle_outline" :face '(:foreground "#e06c75"))
+  (nerd-icons-faicon "nf-fa-times_circle" :face '(:foreground "#e06c75"))
   "错误/中断图标.")
 
 (defvar codebuddy--icon-warning
-  (nerd-icons-mdicon "nf-md-alert_circle_outline" :face '(:foreground "#e5c07b"))
+  (nerd-icons-faicon "nf-fa-exclamation_triangle" :face '(:foreground "#e5c07b"))
   "警告图标.")
 
 (defvar codebuddy--icon-loading
-  (nerd-icons-mdicon "nf-md-loading" :face '(:foreground "#c678dd"))
+  (nerd-icons-faicon "nf-fa-spinner" :face '(:foreground "#c678dd"))
   "加载中图标.")
 
 (defvar codebuddy--icon-thinking
-  (nerd-icons-mdicon "nf-md-brain" :face '(:foreground "#5c6370"))
+  (nerd-icons-octicon "nf-oct-light_bulb" :face '(:foreground "#5c6370"))
   "思考图标.")
 
 (defvar codebuddy--icon-keyboard
-  (nerd-icons-mdicon "nf-md-keyboard" :face '(:foreground "#abb2bf"))
+  (nerd-icons-faicon "nf-fa-keyboard_o" :face '(:foreground "#abb2bf"))
   "键盘/快捷键图标.")
 
 ;; ============================================================
@@ -166,6 +223,25 @@
   '((t :foreground "#c678dd" :weight bold))
   "状态信息样式."
   :group 'codebuddy)
+
+;; ============================================================
+;; Dir-locals 检测
+;; ============================================================
+
+(defun codebuddy--check-dir-local-history ()
+  "检查工作目录的 .dir-locals.el 中是否设置了 codebuddy-enable-history 为 t.
+返回 non-nil 表示开启会话历史."
+  (let ((dir-locals-file (expand-file-name ".dir-locals.el"
+                                           codebuddy--work-directory)))
+    (if (file-exists-p dir-locals-file)
+        ;; 用临时 buffer 加载 dir-locals 并读取变量值
+        (with-temp-buffer
+          (setq default-directory codebuddy--work-directory)
+          (hack-dir-local-variables-non-file-buffer)
+          (alist-get 'codebuddy-enable-history
+                     dir-local-variables-alist))
+      ;; 无 .dir-locals.el，返回全局默认值
+      codebuddy-enable-history)))
 
 ;; ============================================================
 ;; SQLite 数据库层
@@ -335,9 +411,17 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
 ;; 上下文拼接
 ;; ============================================================
 
+(defun codebuddy--summarize-content (content max-chars)
+  "将 CONTENT 压缩为不超过 MAX-CHARS 字符的摘要.
+保留开头内容，超出部分截断并加省略标记."
+  (if (<= (length content) max-chars)
+      content
+    (concat (substring content 0 (min max-chars (length content))) "...")))
+
 (defun codebuddy--build-context-prompt (new-input)
   "基于当前会话历史和 NEW-INPUT 构建完整的上下文 prompt.
-会根据 `codebuddy-max-context-chars' 裁剪早期对话."
+最近 `codebuddy-context-full-rounds' 轮对话保留完整内容，
+更早的对话压缩为摘要。会根据 `codebuddy-max-context-chars' 裁剪."
   (let* ((messages (codebuddy--db-get-session-messages))
          (pairs '())
          (current-pair nil)
@@ -359,71 +443,93 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
     (when current-pair
       (push current-pair pairs))
     (setq pairs (nreverse pairs))
-    ;; 裁剪：从最早的对话开始删除，直到总字符数在预算内
-    (let ((total-chars (+ (length new-input)
-                          (apply #'+ (mapcar (lambda (p)
-                                               (+ (length (car p))
-                                                  (length (or (cdr p) ""))))
-                                             pairs)))))
-      (while (and pairs (> total-chars codebuddy-max-context-chars))
-        (let ((removed (pop pairs)))
-          (setq total-chars (- total-chars
-                               (length (car removed))
-                               (length (or (cdr removed) ""))))
-          (setq skipped (1+ skipped)))))
-    ;; 拼接 prompt
-    (let ((parts '()))
-      (when (> (length pairs) 0)
-        (push "[以下是之前的对话上下文，请基于此继续回答]\n" parts)
-        (when (> skipped 0)
-          (push (format "[已省略更早的 %d 轮对话]\n\n" skipped) parts))
-        (let ((idx 1))
-          (dolist (pair pairs)
-            (push (format "### 对话 %d\n**User**: %s\n" idx (car pair)) parts)
-            (when (cdr pair)
-              (push (format "**Assistant**: %s\n" (cdr pair)) parts))
-            (push "\n" parts)
-            (setq idx (1+ idx))))
-        (push "---\n[当前问题]\n" parts))
-      (push new-input parts)
-      (apply #'concat (nreverse parts)))))
+    ;; 分离：最近 N 轮保留完整，更早的压缩为摘要
+    (let* ((total (length pairs))
+           (full-start (max 0 (- total codebuddy-context-full-rounds)))
+           (summary-pairs (seq-subseq pairs 0 full-start))
+           (full-pairs (seq-subseq pairs full-start))
+           ;; 压缩早期对话
+           (compressed-pairs
+            (mapcar (lambda (p)
+                      (cons (codebuddy--summarize-content
+                             (car p) codebuddy-context-summary-max-chars)
+                            (when (cdr p)
+                              (codebuddy--summarize-content
+                               (cdr p) codebuddy-context-summary-max-chars))))
+                    summary-pairs))
+           ;; 合并
+           (all-pairs (append compressed-pairs full-pairs)))
+      ;; 裁剪：从最早的对话开始删除，直到总字符数在预算内
+      (let ((total-chars (+ (length new-input)
+                            (apply #'+ (mapcar (lambda (p)
+                                                 (+ (length (car p))
+                                                    (length (or (cdr p) ""))))
+                                               all-pairs)))))
+        (while (and all-pairs (> total-chars codebuddy-max-context-chars))
+          (let ((removed (pop all-pairs)))
+            (setq total-chars (- total-chars
+                                 (length (car removed))
+                                 (length (or (cdr removed) ""))))
+            (setq skipped (1+ skipped)))))
+      ;; 拼接 prompt
+      (let ((parts '())
+            (summary-count (length compressed-pairs)))
+        (when (> (length all-pairs) 0)
+          (push "[以下是之前的对话上下文，请基于此继续回答]\n" parts)
+          (when (> skipped 0)
+            (push (format "[已省略更早的 %d 轮对话]\n\n" skipped) parts))
+          (let ((idx 1))
+            (dolist (pair all-pairs)
+              (let ((is-summary (and (> summary-count 0)
+                                     (<= idx (- summary-count skipped)))))
+                (push (format "%s### 对话 %d\n**User**: %s\n"
+                              (if is-summary "[摘要] " "")
+                              idx (car pair))
+                      parts)
+                (when (cdr pair)
+                  (push (format "**Assistant**: %s\n" (cdr pair)) parts))
+                (push "\n" parts)
+                (setq idx (1+ idx)))))
+          (push "---\n[当前问题]\n" parts))
+        (push new-input parts)
+        (apply #'concat (nreverse parts))))))
 
 ;; ============================================================
 ;; 魔法指令系统
 ;; ============================================================
 
 (defvar codebuddy--icon-magic
-  (nerd-icons-mdicon "nf-md-slash_forward_box" :face '(:foreground "#c678dd"))
+  (nerd-icons-faicon "nf-fa-magic" :face '(:foreground "#c678dd"))
   "魔法指令图标.")
 
 (defvar codebuddy--icon-info
-  (nerd-icons-mdicon "nf-md-information_outline" :face '(:foreground "#61afef"))
+  (nerd-icons-faicon "nf-fa-info_circle" :face '(:foreground "#61afef"))
   "信息图标.")
 
 (defvar codebuddy--icon-chart
-  (nerd-icons-mdicon "nf-md-chart_bar" :face '(:foreground "#98c379"))
+  (nerd-icons-faicon "nf-fa-bar_chart" :face '(:foreground "#98c379"))
   "统计图标.")
 
 (defvar codebuddy--icon-history
-  (nerd-icons-mdicon "nf-md-history" :face '(:foreground "#e5c07b"))
+  (nerd-icons-faicon "nf-fa-history" :face '(:foreground "#e5c07b"))
   "历史图标.")
 
 (defvar codebuddy--icon-new
-  (nerd-icons-mdicon "nf-md-plus_circle_outline" :face '(:foreground "#98c379"))
+  (nerd-icons-faicon "nf-fa-plus_circle" :face '(:foreground "#98c379"))
   "新建图标.")
 
 (defvar codebuddy--icon-delete
-  (nerd-icons-mdicon "nf-md-delete_outline" :face '(:foreground "#e06c75"))
+  (nerd-icons-faicon "nf-fa-trash" :face '(:foreground "#e06c75"))
   "删除图标.")
 
 (defvar codebuddy--icon-broom
-  (nerd-icons-mdicon "nf-md-broom" :face '(:foreground "#e5c07b"))
+  (nerd-icons-faicon "nf-fa-eraser" :face '(:foreground "#e5c07b"))
   "清理图标.")
 
 (defvar codebuddy--slash-commands
-  '("/new" "/clear" "/tokens" "/history" "/session " "/delete " "/delete all" "/purge" "/help")
+  '("/new" "/clear" "/tokens" "/history" "/session " "/delete " "/delete all" "/purge" "/cd " "/cd" "/help")
   "所有可用的魔法指令列表.
-带尾部空格的表示需要参数（如 /session N, /delete N）.")
+带尾部空格的表示需要参数（如 /session N, /delete N, /cd PATH）.")
 
 (defun codebuddy--handle-slash-command (input)
   "处理以 / 开头的魔法指令.
@@ -462,6 +568,14 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
      ((string= cmd "/purge")
       (codebuddy--cmd-purge)
       t)
+     ;; /cd PATH - 切换工作目录
+     ((string-match "^/cd\\s-+\\(.+\\)$" cmd)
+      (codebuddy--cmd-cd (string-trim (match-string 1 cmd)))
+      t)
+     ;; /cd - 无参数，交互式选择目录
+     ((string= cmd "/cd")
+      (codebuddy--cmd-cd nil)
+      t)
      ;; /help - 显示帮助
      ((string= cmd "/help")
       (codebuddy--cmd-help)
@@ -472,26 +586,24 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
 (defun codebuddy--cmd-new ()
   "执行 /new: 新建会话."
   (codebuddy--db-new-session)
-  (codebuddy--append-to-chat
-   (format "\n\n---\n\n## %s 新会话\n\n已开启新的会话 (ID: %d)，上下文已重置。\n"
+  (codebuddy--append-to-result
+   (format "\n\n-----\n\n* %s 新会话\n\n已开启新的会话 (ID: %d)，上下文已重置。\n"
            codebuddy--icon-new
-           codebuddy--current-session-id))
-  (codebuddy--insert-prompt))
+           codebuddy--current-session-id)))
 
 (defun codebuddy--cmd-clear ()
   "执行 /clear: 清屏 + 新建会话."
   (codebuddy--db-new-session)
-  (when-let* ((buf (get-buffer codebuddy-chat-buffer-name)))
+  (when-let* ((buf (get-buffer codebuddy-result-buffer-name)))
     (with-current-buffer buf
       (let ((inhibit-read-only t))
         (erase-buffer)
-        (codebuddy--insert-header))))
+        (codebuddy--insert-result-header))))
   (codebuddy--clear-thinking-buffer)
-  (codebuddy--append-to-chat
+  (codebuddy--append-to-result
    (format "\n%s 已清屏并开启新会话 (ID: %d)\n"
            codebuddy--icon-new
-           codebuddy--current-session-id))
-  (codebuddy--insert-prompt))
+           codebuddy--current-session-id)))
 
 (defun codebuddy--cmd-tokens ()
   "执行 /tokens: 显示 token 使用信息."
@@ -503,8 +615,8 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
          (budget-pct (if (> codebuddy-max-context-chars 0)
                          (min 100 (/ (* chars 100) codebuddy-max-context-chars))
                        0)))
-    (codebuddy--append-to-chat
-     (format "\n\n---\n\n%s **Token 使用统计**\n\n| 项目 | 数值 |\n|---|---|\n| 当前会话 | #%d |\n| 对话轮数 | %d 轮 |\n| 上下文字符数 | %s |\n| 估算 Token 数 | ~%s |\n| 实际消耗 Token | %s |\n| 上下文预算 | %d%% (%s / %s chars) |\n\n"
+    (codebuddy--append-to-result
+     (format "\n\n-----\n\n%s *Token 使用统计*\n\n| 项目 | 数值 |\n|-+-|\n| 当前会话 | #%d |\n| 对话轮数 | %d 轮 |\n| 上下文字符数 | %s |\n| 估算 Token 数 | ~%s |\n| 实际消耗 Token | %s |\n| 上下文预算 | %d%% (%s / %s chars) |\n\n"
              codebuddy--icon-chart
              codebuddy--current-session-id
              rounds
@@ -516,17 +628,16 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
              budget-pct
              (codebuddy--format-number chars)
              (codebuddy--format-number codebuddy-max-context-chars))))
-  (codebuddy--align-tables)
-  (codebuddy--insert-prompt))
+  (codebuddy--align-tables))
 
 (defun codebuddy--cmd-history ()
   "执行 /history: 列出所有历史会话."
   (let ((sessions (codebuddy--db-list-sessions)))
     (if (null sessions)
-        (codebuddy--append-to-chat
+        (codebuddy--append-to-result
          (format "\n\n%s 暂无历史会话记录。\n" codebuddy--icon-info))
-      (codebuddy--append-to-chat
-       (format "\n\n---\n\n%s **历史会话列表**\n\n| ID | 标题 | 创建时间 | 状态 | 消息数 |\n|---|---|---|---|---|\n"
+      (codebuddy--append-to-result
+       (format "\n\n-----\n\n%s *历史会话列表*\n\n| ID | 标题 | 创建时间 | 状态 | 消息数 |\n|-+-+-+-+-|\n"
                codebuddy--icon-history))
       (dolist (s sessions)
         (let ((id (nth 0 s))
@@ -534,15 +645,14 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
               (created (nth 2 s))
               (active (nth 3 s))
               (msg-count (nth 4 s)))
-          (codebuddy--append-to-chat
+          (codebuddy--append-to-result
            (format "| %d | %s | %s | %s | %d |\n"
                    id title created
-                   (if (= active 1) "**当前**" "-")
+                   (if (= active 1) "*当前*" "-")
                    msg-count))))
-      (codebuddy--append-to-chat
-       "\n> 使用 `/session N` 切换到指定会话\n\n")))
-  (codebuddy--align-tables)
-  (codebuddy--insert-prompt))
+      (codebuddy--append-to-result
+       "\n使用 =/session N= 切换到指定会话\n\n")))
+  (codebuddy--align-tables))
 
 (defun codebuddy--cmd-session (target-id)
   "执行 /session N: 切换到会话 TARGET-ID."
@@ -554,16 +664,15 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
         (progn
           (codebuddy--db-switch-session target-id)
           (let ((stats (codebuddy--db-get-session-stats target-id)))
-            (codebuddy--append-to-chat
-             (format "\n\n---\n\n%s 已切换到会话 #%d (%d 轮对话，~%s tokens 上下文)\n"
+            (codebuddy--append-to-result
+             (format "\n\n-----\n\n%s 已切换到会话 #%d (%d 轮对话，~%s tokens 上下文)\n"
                      codebuddy--icon-history
                      target-id
                      (or (nth 0 stats) 0)
                      (codebuddy--format-number (or (nth 2 stats) 0))))))
-      (codebuddy--append-to-chat
-       (format "\n\n%s 会话 #%d 不存在，请用 `/history` 查看可用会话。\n"
-               codebuddy--icon-warning target-id))))
-  (codebuddy--insert-prompt))
+      (codebuddy--append-to-result
+       (format "\n\n%s 会话 #%d 不存在，请用 =/history= 查看可用会话。\n"
+               codebuddy--icon-warning target-id)))))
 
 (defun codebuddy--cmd-delete (target-id)
   "执行 /delete N: 删除指定会话 TARGET-ID."
@@ -573,46 +682,77 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
                        (list target-id)))))
     (if (and exists (> exists 0))
         (let ((msg-count (codebuddy--db-delete-session target-id)))
-          (codebuddy--append-to-chat
-           (format "\n\n---\n\n%s 已删除会话 #%d（%d 条消息）\n"
+          (codebuddy--append-to-result
+           (format "\n\n-----\n\n%s 已删除会话 #%d（%d 条消息）\n"
                    codebuddy--icon-delete target-id msg-count))
-          (when (eql target-id codebuddy--current-session-id)
-            ;; 当前会话被删除后，db-delete-session 已自动创建新会话
-            ;; 这里 current-session-id 已经更新了，因为 eql 比较的是删前的值
-            nil)
-          (codebuddy--append-to-chat
-           (format "> 当前活跃会话: #%d\n" codebuddy--current-session-id)))
-      (codebuddy--append-to-chat
-       (format "\n\n%s 会话 #%d 不存在，请用 `/history` 查看可用会话。\n"
-               codebuddy--icon-warning target-id))))
-  (codebuddy--insert-prompt))
+          (codebuddy--append-to-result
+           (format "当前活跃会话: #%d\n" codebuddy--current-session-id)))
+      (codebuddy--append-to-result
+       (format "\n\n%s 会话 #%d 不存在，请用 =/history= 查看可用会话。\n"
+               codebuddy--icon-warning target-id)))))
 
 (defun codebuddy--cmd-delete-all ()
   "执行 /delete all: 删除所有会话."
   (let ((count (codebuddy--db-delete-all-sessions)))
-    (codebuddy--append-to-chat
-     (format "\n\n---\n\n%s 已删除全部 %d 个会话，已自动开启新会话 #%d\n"
-             codebuddy--icon-delete count codebuddy--current-session-id)))
-  (codebuddy--insert-prompt))
+    (codebuddy--append-to-result
+     (format "\n\n-----\n\n%s 已删除全部 %d 个会话，已自动开启新会话 #%d\n"
+             codebuddy--icon-delete count codebuddy--current-session-id))))
 
 (defun codebuddy--cmd-purge ()
   "执行 /purge: 删除所有非活跃的旧会话，只保留当前会话."
   (let ((count (codebuddy--db-purge-inactive)))
     (if (> count 0)
-        (codebuddy--append-to-chat
-         (format "\n\n---\n\n%s 已清理 %d 个旧会话，仅保留当前会话 #%d\n"
+        (codebuddy--append-to-result
+         (format "\n\n-----\n\n%s 已清理 %d 个旧会话，仅保留当前会话 #%d\n"
                  codebuddy--icon-broom count codebuddy--current-session-id))
-      (codebuddy--append-to-chat
-       (format "\n\n%s 没有需要清理的旧会话。\n" codebuddy--icon-info))))
-  (codebuddy--insert-prompt))
+      (codebuddy--append-to-result
+       (format "\n\n%s 没有需要清理的旧会话。\n" codebuddy--icon-info)))))
+
+(defun codebuddy--cmd-cd (path)
+  "执行 /cd: 切换工作目录.
+PATH 为目标路径，支持 ~ 展开。若 PATH 为 nil 则显示当前目录和用法提示."
+  (if (null path)
+      ;; 无参数：显示当前目录和用法
+      (codebuddy--append-to-result
+       (format "\n\n%s 当前工作目录: =%s=\n\n用法: =/cd PATH= （支持 =~= 展开）\n示例: =/cd ~/projects/myapp=\n\n在 Result buffer 中也可用 =C-c C-d= 交互式选择目录。\n"
+               codebuddy--icon-folder codebuddy--work-directory))
+    (let ((dir (expand-file-name (substitute-in-file-name path))))
+      (if (file-directory-p dir)
+          (progn
+            (setq codebuddy--work-directory (expand-file-name dir))
+            ;; 关闭旧 DB
+            (codebuddy--db-close)
+            ;; 根据新目录的 dir-locals 决定是否开启历史
+            (let ((enable-hist (codebuddy--check-dir-local-history)))
+              (if enable-hist
+                  (progn
+                    (codebuddy--db-init)
+                    (codebuddy--db-ensure-session))
+                (setq codebuddy--db nil)
+                (setq codebuddy--current-session-id nil)))
+            (codebuddy--append-to-result
+             (format "\n\n-----\n\n%s 工作目录已切换到 =%s=%s\n"
+                     codebuddy--icon-folder codebuddy--work-directory
+                     (if codebuddy--db " (会话历史: 开启)" " (会话历史: 关闭)")))
+            (when codebuddy--db
+              (let* ((stats (codebuddy--db-get-session-stats))
+                     (rounds (or (nth 0 stats) 0)))
+                (when (> rounds 0)
+                  (codebuddy--append-to-result
+                   (format "%s 已恢复会话 #%d (%d 轮历史对话)\n"
+                           codebuddy--icon-history
+                           codebuddy--current-session-id rounds)))))
+            (message "CodeBuddy: 工作目录已切换到 %s" codebuddy--work-directory))
+        (codebuddy--append-to-result
+         (format "\n\n%s 目录不存在: =%s=\n"
+                 codebuddy--icon-warning path))))))
 
 (defun codebuddy--cmd-help ()
   "执行 /help: 显示所有可用指令."
-  (codebuddy--append-to-chat
-   (format "\n\n---\n\n%s **可用指令**\n\n| 指令 | 功能 |\n|---|---|\n| `/new` | 新建会话（保留 buffer 内容） |\n| `/clear` | 清屏 + 新建会话 |\n| `/tokens` | 显示当前上下文 Token 使用统计 |\n| `/history` | 列出所有历史会话 |\n| `/session N` | 切换到第 N 个历史会话 |\n| `/delete N` | 删除指定会话 #N 及其所有消息 |\n| `/delete all` | 删除所有会话（清空历史） |\n| `/purge` | 清理旧会话，只保留当前会话 |\n| `/help` | 显示此帮助 |\n\n"
+  (codebuddy--append-to-result
+   (format "\n\n-----\n\n%s *可用指令*\n\n| 指令 | 功能 |\n|-+-|\n| =/new= | 新建会话（保留 buffer 内容） |\n| =/clear= | 清屏 + 新建会话 |\n| =/tokens= | 显示当前上下文 Token 使用统计 |\n| =/history= | 列出所有历史会话 |\n| =/session N= | 切换到第 N 个历史会话 |\n| =/delete N= | 删除指定会话 #N 及其所有消息 |\n| =/delete all= | 删除所有会话（清空历史） |\n| =/purge= | 清理旧会话，只保留当前会话 |\n| =/cd PATH= | 切换工作目录（支持 ~，无参数显示当前目录） |\n| =/help= | 显示此帮助 |\n\n"
            codebuddy--icon-magic))
-  (codebuddy--align-tables)
-  (codebuddy--insert-prompt))
+  (codebuddy--align-tables))
 
 (defun codebuddy--format-number (n)
   "将数字 N 格式化为带千分位的字符串."
@@ -640,13 +780,13 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
             (string-to-number num-str)))))
 
 (defun codebuddy--insert-token-stats ()
-  "在 chat buffer 中插入本次交互的 token 统计摘要."
+  "在 result buffer 中插入本次交互的 token 统计摘要."
   (let* ((stats (codebuddy--db-get-session-stats))
          (rounds (or (nth 0 stats) 0))
          (chars (or (nth 1 stats) 0))
          (est-tokens (or (nth 2 stats) 0)))
-    (codebuddy--append-to-chat
-     (format "\n> %s 上下文: ~%s tokens (%s chars, %d轮)%s\n"
+    (codebuddy--append-to-result
+     (format "\n%s 上下文: ~%s tokens (%s chars, %d轮)%s\n"
              codebuddy--icon-chart
              (codebuddy--format-number est-tokens)
              (codebuddy--format-number chars)
@@ -657,252 +797,161 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
                "")))))
 
 ;; ============================================================
-;; Keymap
+;; Result buffer (org-mode, 只读)
 ;; ============================================================
 
-(defvar codebuddy-chat-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "RET") #'codebuddy-send-input)
-    (define-key map (kbd "TAB") #'codebuddy-complete-slash-command)
-    (define-key map (kbd "C-c C-c") #'codebuddy-interrupt)
-    (define-key map (kbd "C-c C-k") #'codebuddy-kill-chat)
-    (define-key map (kbd "C-c C-l") #'codebuddy-clear-chat)
-    (define-key map (kbd "C-c C-d") #'codebuddy-change-directory)
-    (define-key map (kbd "M-p") #'codebuddy-history-prev)
-    (define-key map (kbd "M-n") #'codebuddy-history-next)
-    map)
-  "CodeBuddy chat mode keymap.")
-
-;; ============================================================
-;; Major Mode
-;; ============================================================
-
-(define-derived-mode codebuddy-chat-mode markdown-mode "CodeBuddy"
-  "CodeBuddy Chat 交互模式.
-基于 markdown-mode，自动渲染 Markdown 输出.
-
-\\{codebuddy-chat-mode-map}"
-  (setq-local buffer-read-only nil)
+(define-derived-mode codebuddy-result-mode org-mode "CB-Result"
+  "CodeBuddy Result 展示模式.
+基于 org-mode，只读，用于展示 AI 回复结果."
+  (setq-local buffer-read-only t)
   (setq-local truncate-lines nil)
   (setq-local word-wrap t)
-  (visual-line-mode 1)
-  ;; 隐藏 Markdown 标记符号（**、#、` 等），接近所见即所得
-  (when (fboundp 'markdown-toggle-markup-hiding)
-    (markdown-toggle-markup-hiding 1)))
+  (visual-line-mode 1))
 
-;; ============================================================
-;; 核心功能
-;; ============================================================
-
-(defvar codebuddy--prompt-string "You> "
-  "Prompt 字符串，用于定位用户输入区域.")
-
-;; ============================================================
-;; 指令补全
-;; ============================================================
-
-(defun codebuddy--input-start-pos ()
-  "返回当前 prompt 输入区域的起始位置，找不到则返回 nil."
-  (save-excursion
-    (goto-char (point-max))
-    (when (search-backward codebuddy--prompt-string nil t)
-      (+ (point) (length codebuddy--prompt-string)))))
-
-(defun codebuddy-complete-slash-command ()
-  "对以 / 开头的输入进行魔法指令补全.
-如果不在输入区域或输入不以 / 开头，执行默认 Tab 行为."
-  (interactive)
-  (let ((input-start (codebuddy--input-start-pos)))
-    (if (and input-start (>= (point) input-start))
-        (let* ((input (buffer-substring-no-properties input-start (point-max)))
-               (trimmed (string-trim input)))
-          (if (string-prefix-p "/" trimmed)
-              ;; 以 / 开头：进行补全
-              (let* ((candidates (cl-remove-if-not
-                                  (lambda (cmd)
-                                    (string-prefix-p trimmed cmd))
-                                  codebuddy--slash-commands))
-                     (common (try-completion trimmed
-                                             (mapcar #'list candidates))))
-                (cond
-                 ;; 唯一匹配或完整匹配
-                 ((eq common t)
-                  (message "已是完整指令"))
-                 ;; 有公共前缀可以扩展
-                 ((and (stringp common) (not (string= common trimmed)))
-                  (let ((inhibit-read-only t))
-                    (delete-region input-start (point-max))
-                    (goto-char input-start)
-                    (insert common))
-                  ;; 如果扩展后唯一匹配，提示
-                  (when (= (length candidates) 1)
-                    (message "%s" (car candidates))))
-                 ;; 多个候选，在 minibuffer 展示选择
-                 ((and candidates (> (length candidates) 1))
-                  (let ((chosen (completing-read "指令: " candidates nil t trimmed)))
-                    (when chosen
-                      (let ((inhibit-read-only t))
-                        (delete-region input-start (point-max))
-                        (goto-char input-start)
-                        (insert chosen)))))
-                 ;; 无匹配
-                 (t (message "无匹配的指令"))))
-            ;; 不以 / 开头：默认 Tab 行为
-            (indent-for-tab-command)))
-      ;; 不在输入区域
-      (indent-for-tab-command))))
-
-(defun codebuddy--insert-prompt ()
-  "在 chat buffer 末尾插入输入提示符."
-  (with-current-buffer (get-buffer codebuddy-chat-buffer-name)
-    (goto-char (point-max))
-    (let ((inhibit-read-only t))
-      (insert "\n---\n")
-      (insert (format "%s `[%s]`\n"
-                      codebuddy--icon-folder
-                      (abbreviate-file-name codebuddy--work-directory)))
-      (insert (propertize (format "%s You> " codebuddy--icon-user)
-                          'face 'codebuddy-prompt-face)))
-    (goto-char (point-max))))
-
-(defun codebuddy--insert-header ()
-  "在 chat buffer 插入欢迎头部信息 (Markdown 格式 + nerd-icons)."
+(defun codebuddy--insert-result-header ()
+  "在 result buffer 插入欢迎头部信息."
   (let ((inhibit-read-only t))
-    (insert (format "# %s CodeBuddy Chat\n\n---\n\n"
+    (insert (format "#+TITLE: %s CodeBuddy Result\n\n"
                     codebuddy--icon-robot))
-    (insert (format "> %s 工作目录: `%s`\n"
+    (insert (format "- %s 工作目录: =%s=\n"
                     codebuddy--icon-folder
                     codebuddy--work-directory))
-    (insert (format "> %s 快捷键: %s `RET` 发送 | %s `C-c C-c` 中断 | %s `C-c C-k` 关闭 | %s `C-c C-d` 切换目录\n"
-                    codebuddy--icon-keyboard
-                    codebuddy--icon-send
-                    codebuddy--icon-stop
-                    codebuddy--icon-close
-                    codebuddy--icon-directory))
-    (insert (format "> %s 输入 `/help` 查看所有指令\n\n---\n"
-                    codebuddy--icon-magic))))
+    (insert (format "- %s 会话历史: %s\n"
+                    codebuddy--icon-info
+                    (if codebuddy--db "开启" "关闭（在 .dir-locals.el 中设置 codebuddy-enable-history 为 t 开启）")))
+    (insert (format "- %s AI 回复结果将显示在此处\n\n-----\n"
+                    codebuddy--icon-info))))
 
-(defun codebuddy--get-user-input ()
-  "获取当前 prompt 后的用户输入文本."
-  (with-current-buffer (get-buffer codebuddy-chat-buffer-name)
-    (save-excursion
-      (goto-char (point-max))
-      (let ((end (point)))
-        ;; 向前搜索最后一个 "You> " 文本
-        (if (search-backward codebuddy--prompt-string nil t)
-            (progn
-              (forward-char (length codebuddy--prompt-string))
-              (string-trim (buffer-substring-no-properties (point) end)))
-          "")))))
-
-(defun codebuddy--append-to-chat (text)
-  "在 chat buffer 中追加 TEXT，并刷新 markdown font-lock."
-  (when-let* ((buf (get-buffer codebuddy-chat-buffer-name)))
+(defun codebuddy--append-to-result (text)
+  "在 result buffer 中追加 TEXT，并刷新 font-lock."
+  (when-let* ((buf (get-buffer codebuddy-result-buffer-name)))
     (with-current-buffer buf
       (let ((inhibit-read-only t)
             (start (point-max)))
         (goto-char start)
         (insert text)
-        ;; 刷新新插入区域的 font-lock
-        (font-lock-flush start (point-max))))))
+        (font-lock-flush start (point-max)))))
+  ;; 自动滚动 result buffer
+  (when-let* ((win (get-buffer-window codebuddy-result-buffer-name t)))
+    (with-current-buffer (get-buffer codebuddy-result-buffer-name)
+      (set-window-point win (point-max))
+      (with-selected-window win
+        (goto-char (point-max))
+        (recenter -1)))))
 
 (defun codebuddy--align-tables ()
-  "对齐 chat buffer 中所有 Markdown 表格."
-  (when-let* ((buf (get-buffer codebuddy-chat-buffer-name)))
+  "对齐 result buffer 中所有 org 表格."
+  (when-let* ((buf (get-buffer codebuddy-result-buffer-name)))
     (with-current-buffer buf
       (let ((inhibit-read-only t))
         (save-excursion
           (goto-char (point-min))
           (while (re-search-forward "^[ \t]*|" nil t)
             (beginning-of-line)
-            (when (markdown-table-at-point-p)
+            (when (org-at-table-p)
               (condition-case nil
-                  (markdown-table-align)
+                  (org-table-align)
                 (error nil)))
             (forward-line 1)))))))
+
+;; ============================================================
+;; Thinking buffer (org-mode)
+;; ============================================================
 
 (defun codebuddy--append-to-thinking (text)
   "在 thinking buffer 中追加 TEXT."
   (let ((buf (get-buffer-create codebuddy-thinking-buffer-name)))
     (with-current-buffer buf
-      (unless (derived-mode-p 'special-mode)
-        (special-mode)
+      (unless (derived-mode-p 'org-mode)
+        (org-mode)
         (setq-local buffer-read-only nil)
         (setq-local truncate-lines nil)
-        (setq-local word-wrap t))
+        (setq-local word-wrap t)
+        (visual-line-mode 1))
       (let ((inhibit-read-only t))
         (goto-char (point-max))
-        (insert (propertize text 'face 'codebuddy-thinking-face))))
+        (insert text)))
     ;; 自动滚动 thinking buffer（如果可见）
     (when-let* ((win (get-buffer-window buf t)))
-      (with-selected-window win
-        (goto-char (point-max))
-        (recenter -3)))))
+      (with-current-buffer buf
+        (set-window-point win (point-max))
+        ;; 确保窗口滚动到底部
+        (with-selected-window win
+          (goto-char (point-max))
+          (recenter -1))))))
 
 (defun codebuddy--clear-thinking-buffer ()
-  "清除 thinking buffer 内容并写入新的 header."
+  "清除 thinking buffer 内容并写入新的 org-mode header."
   (let ((buf (get-buffer-create codebuddy-thinking-buffer-name)))
     (with-current-buffer buf
+      (unless (derived-mode-p 'org-mode)
+        (org-mode)
+        (setq-local buffer-read-only nil)
+        (setq-local truncate-lines nil)
+        (setq-local word-wrap t)
+        (visual-line-mode 1))
       (let ((inhibit-read-only t))
         (erase-buffer)
-        (insert (propertize (format "%s CodeBuddy Thinking\n\n"
-                                    codebuddy--icon-thinking)
-                            'face 'codebuddy-status-face))))))
+        (insert (format "#+TITLE: %s CodeBuddy Thinking\n\n"
+                        codebuddy--icon-thinking))))))
+
+;; ============================================================
+;; 输出分发（状态机）
+;; ============================================================
 
 (defun codebuddy--dispatch-line (line)
-  "根据当前状态机阶段分发单行 LINE 到对应 buffer."
+  "根据当前状态机阶段分发单行 LINE 到对应 buffer.
+各阶段在 thinking buffer 中使用 org-mode 标题分隔，可折叠."
   (let ((trimmed (string-trim line)))
     (cond
      ;; ---- 阶段切换检测 ----
 
      ;; 分隔线 --------: header 阶段标记
      ((string-match-p "^--------$" trimmed)
-      (setq codebuddy--output-phase 'header)
-      (codebuddy--append-to-thinking (concat line "\n")))
+      (setq codebuddy--output-phase 'header))
 
      ;; "user" 独占一行 -> 进入 user 阶段
      ((and (string= "user" trimmed)
            (memq codebuddy--output-phase '(header user)))
       (setq codebuddy--output-phase 'user)
-      (codebuddy--append-to-thinking (concat line "\n")))
+      (codebuddy--append-to-thinking "\n* User Prompt\n"))
 
      ;; "thinking" 独占一行 -> 进入 thinking 阶段
      ((string= "thinking" trimmed)
       (setq codebuddy--output-phase 'thinking)
-      (codebuddy--append-to-thinking (concat line "\n")))
+      (codebuddy--append-to-thinking "\n* Thinking\n"))
 
      ;; "exec" 开头 -> 进入 exec 阶段 (工具调用)
      ((string-match-p "^exec$" trimmed)
       (setq codebuddy--output-phase 'exec)
-      (codebuddy--append-to-thinking (concat line "\n")))
+      (codebuddy--append-to-thinking "\n* Exec (Tool Call)\n"))
 
      ;; "mcp" 开头 -> mcp 信息，归入 thinking
      ((string-match-p "^mcp " trimmed)
-      (codebuddy--append-to-thinking (concat line "\n")))
+      (codebuddy--append-to-thinking (concat "** MCP: " trimmed "\n")))
 
-     ;; "codex" 独占一行 -> 进入 codex 阶段（结果输出到 chat buffer）
+     ;; "codex" 独占一行 -> 进入 codex 阶段（结果输出到 result buffer）
      ((string= "codex" trimmed)
-      (setq codebuddy--output-phase 'codex))
+      (setq codebuddy--output-phase 'codex)
+      (codebuddy--append-to-thinking "\n* Result (→ Result Buffer)\n"))
 
-     ;; "tokens used" -> 进入 tokens 阶段，之后所有内容忽略/归入 thinking
+     ;; "tokens used" -> 进入 tokens 阶段
      ((string-match-p "^tokens used$" trimmed)
       (setq codebuddy--output-phase 'tokens)
-      (codebuddy--append-to-thinking (concat "\n" line "\n")))
+      (codebuddy--append-to-thinking "\n* Tokens Used\n"))
 
      ;; ---- 各阶段内容分发 ----
 
-     ;; tokens 阶段: 统计信息及之后的重复结果 -> thinking（忽略）
-     ;; 同时尝试解析 token 使用数
+     ;; tokens 阶段: 统计信息 -> thinking
      ((eq codebuddy--output-phase 'tokens)
       (codebuddy--parse-tokens-line line)
       (codebuddy--append-to-thinking (concat line "\n")))
 
-     ;; codex 阶段: 最终结果 -> chat buffer (原始 Markdown，由 markdown-mode 渲染)
-     ;; 同时累积回复文本，用于存入 DB
+     ;; codex 阶段: 最终结果 -> result buffer
      ((eq codebuddy--output-phase 'codex)
       (setq codebuddy--current-response
             (concat codebuddy--current-response line "\n"))
-      (codebuddy--append-to-chat (concat line "\n")))
+      (codebuddy--append-to-result (concat line "\n")))
 
      ;; header/user/thinking/exec 阶段: 全部 -> thinking buffer
      ((memq codebuddy--output-phase '(header user thinking exec))
@@ -914,9 +963,7 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
 
 (defun codebuddy--process-filter (_proc output)
   "处理 codex-internal 的输出 OUTPUT.
-正确处理跨批次的不完整行：进程输出可能在任意字节处截断，
-将上次残余的 line-buffer 与本次 output 拼接后按换行切分，
-最后一段若无换行则暂存到 line-buffer 留待下次拼接."
+正确处理跨批次的不完整行."
   ;; 拼接上次残余
   (let* ((data (concat codebuddy--line-buffer output))
          (has-trailing-newline (string-suffix-p "\n" data))
@@ -933,26 +980,21 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
       (setq lines (butlast lines)))
     ;; 逐完整行分发
     (dolist (line lines)
-      (codebuddy--dispatch-line line)))
-  ;; 自动滚动 chat buffer
-  (when-let* ((win (get-buffer-window codebuddy-chat-buffer-name t)))
-    (with-selected-window win
-      (goto-char (point-max))
-      (recenter -3))))
+      (codebuddy--dispatch-line line))))
 
 (defun codebuddy--process-sentinel (_proc event)
   "codex-internal 进程结束时的处理函数."
   (let ((event-str (string-trim event)))
     (cond
      ((string-match-p "finished" event-str)
-      (codebuddy--append-to-chat
-       (format "\n\n---\n\n**%s 执行完成**\n" codebuddy--icon-check)))
+      (codebuddy--append-to-result
+       (format "\n\n-----\n\n*%s 执行完成*\n" codebuddy--icon-check)))
      ((string-match-p "\\(killed\\|interrupt\\)" event-str)
-      (codebuddy--append-to-chat
-       (format "\n\n---\n\n**%s 已中断**\n" codebuddy--icon-error)))
+      (codebuddy--append-to-result
+       (format "\n\n-----\n\n*%s 已中断*\n" codebuddy--icon-error)))
      (t
-      (codebuddy--append-to-chat
-       (format "\n\n---\n\n**%s 进程退出: %s**\n"
+      (codebuddy--append-to-result
+       (format "\n\n-----\n\n*%s 进程退出: %s*\n"
                codebuddy--icon-warning event-str)))))
   ;; 进程结束前，把 line-buffer 中残余的不完整行刷出
   (when (and (stringp codebuddy--line-buffer)
@@ -977,8 +1019,107 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
   (setq codebuddy--last-tokens-used nil)
   ;; 对齐所有 Markdown 表格
   (codebuddy--align-tables)
-  ;; 插入新的 prompt
-  (codebuddy--insert-prompt))
+  ;; 通知 vterm shell 可以继续输入
+  (codebuddy--vterm-notify-ready))
+
+;; ============================================================
+;; VTerm 集成
+;; ============================================================
+
+(defun codebuddy--vterm-send (input)
+  "VTerm 回调：接收用户输入 INPUT 并处理.
+由 vterm escape sequence 触发."
+  ;; 确保三窗口布局（用户可能已切换/关闭了某个窗口）
+  (codebuddy--ensure-layout)
+  ;; 保存到输入历史
+  (push input codebuddy--history)
+  (setq codebuddy--history-index -1)
+  ;; 在 result buffer 中显示用户问题
+  (codebuddy--append-to-result
+   (format "\n\n-----\n\n*%s You>* %s\n\n"
+           codebuddy--icon-user input))
+  ;; 检查是否为魔法指令
+  (if (and (string-prefix-p "/" input)
+           (codebuddy--handle-slash-command input))
+      ;; 指令已处理
+      (progn
+        (message "CodeBuddy: 指令已执行")
+        (codebuddy--vterm-notify-ready))
+    ;; 正常消息：保存到 DB 并发送
+    (when codebuddy--db
+      (codebuddy--db-save-message "user" input))
+    (codebuddy--append-to-result
+     (format "*%s 正在执行* =[%s]=\n\n"
+             codebuddy--icon-loading
+             (truncate-string-to-width input 40 nil nil "...")))
+    ;; 清空 thinking buffer
+    (codebuddy--clear-thinking-buffer)
+    ;; 重置状态
+    (setq codebuddy--output-buffer "")
+    (setq codebuddy--line-buffer "")
+    (setq codebuddy--is-thinking nil)
+    (setq codebuddy--output-phase 'header)
+    (setq codebuddy--current-response "")
+    (setq codebuddy--last-tokens-used nil)
+    ;; 构造带上下文的 prompt
+    (let* ((context-prompt (if codebuddy--db
+                               (codebuddy--build-context-prompt input)
+                             input))
+           (args (append codebuddy-default-args
+                         (list "-C" codebuddy--work-directory
+                               context-prompt)))
+           (process-environment (append '("TERM=dumb" "NO_COLOR=1")
+                                        process-environment))
+           (proc (make-process
+                  :name "codebuddy"
+                  :buffer nil
+                  :command (cons codebuddy-executable args)
+                  :connection-type 'pipe
+                  :filter #'codebuddy--process-filter
+                  :sentinel #'codebuddy--process-sentinel
+                  :noquery t)))
+      (setq codebuddy--process proc)
+      (message "CodeBuddy: 已提交 \"%s\""
+               (truncate-string-to-width input 50 nil nil "...")))))
+
+(defun codebuddy--vterm-interrupt ()
+  "VTerm 回调：中断当前正在运行的 codex-internal 进程."
+  (if (and codebuddy--process (process-live-p codebuddy--process))
+      (progn
+        (interrupt-process codebuddy--process)
+        (message "CodeBuddy: 已发送中断信号"))
+    (message "CodeBuddy: 没有正在运行的进程")))
+
+(defun codebuddy--vterm-notify-ready ()
+  "通知 vterm shell 进程可以继续接受输入.
+通过发送 SIGUSR1 信号."
+  (when codebuddy--vterm-process
+    (condition-case nil
+        (signal-process codebuddy--vterm-process 'sigusr1)
+      (error nil))))
+
+(defun codebuddy--init-vterm ()
+  "初始化 VTerm Chat buffer.
+启动 vterm 并运行 codebuddy-input.sh 脚本."
+  (let ((buf (get-buffer-create codebuddy-chat-buffer-name)))
+    ;; 如果已有 vterm 进程在运行，直接返回
+    (if (and (buffer-live-p buf)
+             (get-buffer-process buf))
+        buf
+      ;; 创建新的 vterm buffer
+      (with-current-buffer buf
+        (let ((vterm-shell (format "/bin/zsh -c '%s'" codebuddy-input-script))
+              (vterm-buffer-name codebuddy-chat-buffer-name)
+              (vterm-kill-buffer-on-exit nil))
+          (vterm-mode)
+          ;; 注册 vterm eval 回调
+          (setq-local vterm-eval-cmds
+                      (append vterm-eval-cmds
+                              '(("codebuddy--vterm-send" codebuddy--vterm-send)
+                                ("codebuddy--vterm-interrupt" codebuddy--vterm-interrupt))))
+          ;; 记录 vterm 内部的 shell 进程
+          (setq codebuddy--vterm-process (get-buffer-process buf))))
+      buf)))
 
 ;; ============================================================
 ;; 窗口布局
@@ -987,23 +1128,47 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
 (defvar codebuddy--saved-window-config nil
   "启动 codebuddy-chat 前保存的窗口配置，关闭时恢复.")
 
+(defun codebuddy--layout-ok-p ()
+  "检测当前 frame 是否处于 CodeBuddy 三窗口布局.
+即 Result / Chat / Thinking 三个 buffer 各自有对应窗口."
+  (let ((result-win (get-buffer-window codebuddy-result-buffer-name))
+        (chat-win   (get-buffer-window codebuddy-chat-buffer-name))
+        (think-win  (get-buffer-window codebuddy-thinking-buffer-name)))
+    (and result-win chat-win think-win
+         (window-live-p result-win)
+         (window-live-p chat-win)
+         (window-live-p think-win))))
+
+(defun codebuddy--ensure-layout ()
+  "若当前不是三窗口布局则自动恢复."
+  (unless (codebuddy--layout-ok-p)
+    (codebuddy--setup-layout)))
+
 (defun codebuddy--setup-layout ()
-  "设置左右分屏布局：左侧 Chat buffer，右侧 Thinking buffer.
-隐藏所有其他 buffer."
+  "设置三窗口布局:
+左上: Result buffer (org-mode, 只读)
+左下: Chat buffer (vterm, 输入)
+右侧: Thinking buffer (org-mode)"
   ;; 保存当前窗口配置（仅首次）
   (unless codebuddy--saved-window-config
     (setq codebuddy--saved-window-config (current-window-configuration)))
   ;; 清除所有窗口，独占 frame
   (delete-other-windows)
-  ;; 左侧: Chat buffer
-  (switch-to-buffer (get-buffer-create codebuddy-chat-buffer-name))
+  ;; 左侧: Result buffer（占 65% 宽度）
+  (switch-to-buffer (get-buffer-create codebuddy-result-buffer-name))
   (goto-char (point-max))
   ;; 右侧: Thinking buffer
-  (let ((right-win (split-window-right)))
+  (let* ((left-cols (floor (* (frame-width) codebuddy-chat-window-ratio)))
+         (right-win (split-window-right left-cols)))
     (set-window-buffer right-win (get-buffer-create codebuddy-thinking-buffer-name))
-    ;; 让 thinking buffer 自动滚动到底部
     (with-selected-window right-win
-      (goto-char (point-max)))))
+      (goto-char (point-max))))
+  ;; 左下: Chat (vterm) buffer
+  (let* ((result-rows (floor (* (window-height) codebuddy-result-height-ratio)))
+         (chat-win (split-window-below result-rows)))
+    (set-window-buffer chat-win (get-buffer-create codebuddy-chat-buffer-name))
+    ;; 聚焦到 Chat (vterm) 窗口，让用户可以直接输入
+    (select-window chat-win)))
 
 ;; ============================================================
 ;; 交互命令
@@ -1012,111 +1177,61 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
 ;;;###autoload
 (defun codebuddy-chat ()
   "启动 CodeBuddy Chat.
-弹出全局输入 buffer，选择工作路径后进入交互模式."
+弹出三窗口布局，选择工作路径后进入交互模式."
   (interactive)
   ;; 如果 buffer 已存在且有绑定路径，直接切过去
-  (if (and (get-buffer codebuddy-chat-buffer-name)
+  (if (and (get-buffer codebuddy-result-buffer-name)
+           (get-buffer codebuddy-chat-buffer-name)
            codebuddy--work-directory)
       (codebuddy--setup-layout)
     ;; 否则新建
     (let ((dir (read-directory-name "选择工作目录: " nil nil t)))
       (setq codebuddy--work-directory (expand-file-name dir))
-      ;; 初始化 SQLite 数据库
-      (codebuddy--db-init)
-      (codebuddy--db-ensure-session)
-      (let ((buf (get-buffer-create codebuddy-chat-buffer-name)))
-        (with-current-buffer buf
-          (codebuddy-chat-mode)
-          (codebuddy--insert-header)
-          ;; 显示会话恢复信息
-          (let* ((stats (codebuddy--db-get-session-stats))
-                 (rounds (or (nth 0 stats) 0)))
-            (when (> rounds 0)
-              (let ((inhibit-read-only t))
-                (insert (format "\n> %s 已恢复会话 #%d (%d 轮历史对话)\n"
-                                codebuddy--icon-history
-                                codebuddy--current-session-id
-                                rounds)))))
-          (codebuddy--insert-prompt)))
-      ;; 初始化 thinking buffer
+      ;; 读取工作目录的 dir-locals 设置，决定是否开启会话历史
+      (let ((enable-hist (codebuddy--check-dir-local-history)))
+        (if enable-hist
+            (progn
+              (codebuddy--db-init)
+              (codebuddy--db-ensure-session))
+          (setq codebuddy--db nil)
+          (setq codebuddy--current-session-id nil)))
+      ;; 初始化 Result buffer
+      (let ((result-buf (get-buffer-create codebuddy-result-buffer-name)))
+        (with-current-buffer result-buf
+          (codebuddy-result-mode)
+          (let ((inhibit-read-only t))
+            (codebuddy--insert-result-header)
+            ;; 显示会话恢复信息（仅历史功能开启时）
+            (when codebuddy--db
+              (let* ((stats (codebuddy--db-get-session-stats))
+                     (rounds (or (nth 0 stats) 0)))
+                (when (> rounds 0)
+                  (insert (format "\n%s 已恢复会话 #%d (%d 轮历史对话)\n"
+                                  codebuddy--icon-history
+                                  codebuddy--current-session-id
+                                  rounds))))))))
+      ;; 初始化 VTerm Chat buffer
+      (codebuddy--init-vterm)
+      ;; 初始化 Thinking buffer
       (let ((thinking-buf (get-buffer-create codebuddy-thinking-buffer-name)))
         (with-current-buffer thinking-buf
-          (special-mode)
+          (org-mode)
           (setq-local buffer-read-only nil)
+          (setq-local truncate-lines nil)
+          (setq-local word-wrap t)
+          (visual-line-mode 1)
           (let ((inhibit-read-only t))
             (erase-buffer)
-            (insert (propertize (format "%s CodeBuddy Thinking\n\n"
-                                        codebuddy--icon-thinking)
-                                'face 'codebuddy-status-face))
-            (insert (propertize "等待输入...\n" 'face 'codebuddy-thinking-face)))))
-      ;; 设置左右分屏布局
+            (insert (format "#+TITLE: %s CodeBuddy Thinking\n\n"
+                            codebuddy--icon-thinking))
+            (insert "等待输入...\n"))))
+      ;; 设置三窗口布局
       (codebuddy--setup-layout))))
-
-(defun codebuddy-send-input ()
-  "发送用户输入到 codex-internal exec.
-支持以 / 开头的魔法指令（如 /new /tokens /help 等）."
-  (interactive)
-  ;; 如果正在执行，不允许再次发送
-  (when (and codebuddy--process (process-live-p codebuddy--process))
-    (user-error "CodeBuddy 正在执行中，请等待完成或 C-c C-c 中断"))
-  (let ((input (codebuddy--get-user-input)))
-    (when (string-empty-p input)
-      (user-error "请输入问题"))
-    ;; 保存到输入历史（包括指令）
-    (push input codebuddy--history)
-    (setq codebuddy--history-index -1)
-    ;; 检查是否为魔法指令
-    (if (and (string-prefix-p "/" input)
-             (codebuddy--handle-slash-command input))
-        ;; 指令已处理，不需要调用 codex
-        (message "CodeBuddy: 指令已执行")
-      ;; 正常消息：保存到 DB 并发送
-      (when codebuddy--db
-        (codebuddy--db-save-message "user" input))
-      ;; 标记输入为只读
-      (with-current-buffer (get-buffer codebuddy-chat-buffer-name)
-        (let ((inhibit-read-only t))
-          (goto-char (point-max))
-          (insert (format "\n\n---\n\n**%s 正在执行** `[%s]`\n\n"
-                          codebuddy--icon-loading
-                          (truncate-string-to-width input 40 nil nil "...")))))
-      ;; 清空 thinking buffer
-      (codebuddy--clear-thinking-buffer)
-      ;; 重置状态
-      (setq codebuddy--output-buffer "")
-      (setq codebuddy--line-buffer "")
-      (setq codebuddy--is-thinking nil)
-      (setq codebuddy--output-phase 'header)
-      (setq codebuddy--current-response "")
-      (setq codebuddy--last-tokens-used nil)
-      ;; 构造带上下文的 prompt
-      (let* ((context-prompt (if codebuddy--db
-                                 (codebuddy--build-context-prompt input)
-                               input))
-             (args (append codebuddy-default-args
-                           (list "-C" codebuddy--work-directory
-                                 context-prompt)))
-             (process-environment (cons "TERM=dumb" process-environment))
-             (proc (make-process
-                    :name "codebuddy"
-                    :buffer nil
-                    :command (cons codebuddy-executable args)
-                    :connection-type 'pipe
-                    :filter #'codebuddy--process-filter
-                    :sentinel #'codebuddy--process-sentinel
-                    :noquery t)))
-        (setq codebuddy--process proc)
-        (message "CodeBuddy: 已提交 \"%s\""
-                 (truncate-string-to-width input 50 nil nil "..."))))))
 
 (defun codebuddy-interrupt ()
   "中断当前正在运行的 codex-internal 进程."
   (interactive)
-  (if (and codebuddy--process (process-live-p codebuddy--process))
-      (progn
-        (interrupt-process codebuddy--process)
-        (message "CodeBuddy: 已发送中断信号"))
-    (message "CodeBuddy: 没有正在运行的进程")))
+  (codebuddy--vterm-interrupt))
 
 (defun codebuddy-kill-chat ()
   "关闭 CodeBuddy Chat，清理所有资源并恢复之前的窗口布局."
@@ -1127,6 +1242,7 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
   (codebuddy--db-close)
   (setq codebuddy--current-session-id nil)
   (setq codebuddy--process nil)
+  (setq codebuddy--vterm-process nil)
   (setq codebuddy--work-directory nil)
   (setq codebuddy--output-buffer "")
   (setq codebuddy--line-buffer "")
@@ -1137,6 +1253,8 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
     (kill-buffer buf))
   (when-let* ((buf (get-buffer codebuddy-chat-buffer-name)))
     (kill-buffer buf))
+  (when-let* ((buf (get-buffer codebuddy-result-buffer-name)))
+    (kill-buffer buf))
   ;; 恢复之前的窗口配置
   (when codebuddy--saved-window-config
     (condition-case nil
@@ -1146,67 +1264,73 @@ ROLE 为 \"user\" 或 \"assistant\", CONTENT 为消息文本.
   (message "CodeBuddy: 已关闭"))
 
 (defun codebuddy-clear-chat ()
-  "清除 chat buffer 内容，保留工作目录绑定."
+  "清除 result buffer 内容，保留工作目录绑定."
   (interactive)
-  (when-let* ((buf (get-buffer codebuddy-chat-buffer-name)))
+  (when-let* ((buf (get-buffer codebuddy-result-buffer-name)))
     (with-current-buffer buf
       (let ((inhibit-read-only t))
         (erase-buffer)
-        (codebuddy--insert-header)
-        (codebuddy--insert-prompt))))
+        (codebuddy--insert-result-header))))
   (codebuddy--clear-thinking-buffer)
   (message "CodeBuddy: 已清屏"))
 
 (defun codebuddy-change-directory ()
-  "切换工作目录，同时切换到新目录的数据库."
+  "切换工作目录，根据新目录的 .dir-locals.el 决定是否开启会话历史."
   (interactive)
   (let ((dir (read-directory-name "切换工作目录: "
                                   codebuddy--work-directory nil t)))
     (setq codebuddy--work-directory (expand-file-name dir))
-    ;; 重新初始化 DB（新目录的 .codebuddy/chat.db）
-    (codebuddy--db-init)
-    (codebuddy--db-ensure-session)
-    (let* ((stats (codebuddy--db-get-session-stats))
-           (rounds (or (nth 0 stats) 0)))
-      (codebuddy--append-to-chat
-       (format "\n\n---\n\n%s 工作目录已切换到 `%s`\n"
-               codebuddy--icon-folder codebuddy--work-directory))
-      (when (> rounds 0)
-        (codebuddy--append-to-chat
-         (format "> %s 已恢复会话 #%d (%d 轮历史对话)\n"
-                 codebuddy--icon-history
-                 codebuddy--current-session-id rounds)))
-      (codebuddy--insert-prompt)
-      (message "CodeBuddy: 工作目录已切换到 %s" codebuddy--work-directory))))
+    ;; 关闭旧 DB
+    (codebuddy--db-close)
+    ;; 根据新目录的 dir-locals 决定是否开启历史
+    (let ((enable-hist (codebuddy--check-dir-local-history)))
+      (if enable-hist
+          (progn
+            (codebuddy--db-init)
+            (codebuddy--db-ensure-session))
+        (setq codebuddy--db nil)
+        (setq codebuddy--current-session-id nil)))
+    (codebuddy--append-to-result
+     (format "\n\n-----\n\n%s 工作目录已切换到 =%s=%s\n"
+             codebuddy--icon-folder codebuddy--work-directory
+             (if codebuddy--db " (会话历史: 开启)" " (会话历史: 关闭)")))
+    (when codebuddy--db
+      (let* ((stats (codebuddy--db-get-session-stats))
+             (rounds (or (nth 0 stats) 0)))
+        (when (> rounds 0)
+          (codebuddy--append-to-result
+           (format "%s 已恢复会话 #%d (%d 轮历史对话)\n"
+                   codebuddy--icon-history
+                   codebuddy--current-session-id rounds)))))
+    (message "CodeBuddy: 工作目录已切换到 %s" codebuddy--work-directory)))
 
-(defun codebuddy-history-prev ()
-  "切换到上一条历史输入."
-  (interactive)
-  (when codebuddy--history
-    (setq codebuddy--history-index
-          (min (1+ codebuddy--history-index)
-               (1- (length codebuddy--history))))
-    (codebuddy--replace-input (nth codebuddy--history-index codebuddy--history))))
+;; ============================================================
+;; 全局快捷键（在 vterm 外部也可使用）
+;; ============================================================
 
-(defun codebuddy-history-next ()
-  "切换到下一条历史输入."
-  (interactive)
-  (when (> codebuddy--history-index 0)
-    (setq codebuddy--history-index (1- codebuddy--history-index))
-    (codebuddy--replace-input (nth codebuddy--history-index codebuddy--history))))
+(defvar codebuddy-global-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-c") #'codebuddy-interrupt)
+    (define-key map (kbd "C-c C-k") #'codebuddy-kill-chat)
+    (define-key map (kbd "C-c C-l") #'codebuddy-clear-chat)
+    (define-key map (kbd "C-c C-d") #'codebuddy-change-directory)
+    map)
+  "CodeBuddy 全局快捷键（在 result buffer 中可用）.")
 
-(defun codebuddy--replace-input (text)
-  "替换当前输入区域为 TEXT."
-  (with-current-buffer (get-buffer codebuddy-chat-buffer-name)
-    (save-excursion
-      (goto-char (point-max))
-      (let ((end (point)))
-        (when (search-backward codebuddy--prompt-string nil t)
-          (forward-char (length codebuddy--prompt-string))
-          (let ((inhibit-read-only t))
-            (delete-region (point) end)
-            (insert text)))))
-    (goto-char (point-max))))
+;; 绑定到 result-mode
+(define-key codebuddy-result-mode-map (kbd "C-c C-c") #'codebuddy-interrupt)
+(define-key codebuddy-result-mode-map (kbd "C-c C-k") #'codebuddy-kill-chat)
+(define-key codebuddy-result-mode-map (kbd "C-c C-l") #'codebuddy-clear-chat)
+(define-key codebuddy-result-mode-map (kbd "C-c C-d") #'codebuddy-change-directory)
+
+;; ============================================================
+;; nerd-icons 集成：为自定义 mode 注册图标
+;; ============================================================
+
+(with-eval-after-load 'nerd-icons
+  ;; Result buffer: 使用 org 图标
+  (add-to-list 'nerd-icons-mode-icon-alist
+               '(codebuddy-result-mode nerd-icons-sucicon "nf-custom-orgmode" :face nerd-icons-lgreen)))
 
 (provide 'init-codebuddy)
 ;;; init-codebuddy.el ends here
