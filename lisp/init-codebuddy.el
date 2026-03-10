@@ -27,7 +27,7 @@
   :type 'string
   :group 'codebuddy)
 
-(defcustom codebuddy-default-args '("exec" "--full-auto")
+(defcustom codebuddy-default-args '("exec" "--full-auto" "--skip-git-repo-check")
   "codex-internal exec 的默认参数列表."
   :type '(repeat string)
   :group 'codebuddy)
