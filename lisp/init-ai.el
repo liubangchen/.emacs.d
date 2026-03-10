@@ -37,7 +37,8 @@
 (use-package gptel
   :diminish
   :functions (gptel-make-openai gptel-make-deepseek gptel-make-anthropic)
-  :bind ("C-<f12>" . gptel)
+  :bind (("C-<f12>"   . gptel)
+         ("C-M-<f12>" . gptel-menu))
   :hook (gptel-mode . gptel-highlight-mode)
   :config
   ;; Register backends and setup models
@@ -52,6 +53,20 @@
           :key (lambda () (getenv "DEEPSEEK_API_KEY"))
           :models '(deepseek-chat deepseek-coder)))
 
+  (gptel-make-openai "Nvidia"
+    :host "integrate.api.nvidia.com"
+    :endpoint "/v1/chat/completions"
+    :stream t
+    :key 'gptel-api-key
+    :models '(z-ai/glm4.7 minimaxai/minimax-m2.1 deepseek-ai/deepseek-v3.1-terminus))
+
+  (gptel-make-openai "ChatGLM"
+    :host "open.bigmodel.cn"
+    :endpoint "/api/paas/v4/chat/completions"
+    :stream t
+    :key 'gptel-api-key
+    :models '(glm-4.7 glm-4.7-flash))
+
   (gptel-make-openai "Moonshot"
     :host "api.moonshot.cn"
     :key 'gptel-api-key
@@ -60,7 +75,7 @@
 
   (gptel-make-anthropic "Claude"
     :stream t
-    :key 'aptel-api-key))
+    :key 'gptel-api-key))
 
 ;; Generate commit messages for magit
 (use-package gptel-magit
