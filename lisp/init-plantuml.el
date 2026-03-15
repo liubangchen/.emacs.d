@@ -1,17 +1,23 @@
 ;;; -*- lexical-binding: t; -*-
+;; PlantUML and diagram related configurations
+
 (use-package plantuml-mode
   :ensure t
-  :mode ("\\.plu\\'" "\\.plantuml\\'" "\\.puml\\'")
+  :mode ("\\.plu\\'" "\\.plantuml\\'" "\\.puml\\'" "\\.pu\\'")
   :config
   (setq plantuml-jar-path (expand-file-name "~/.emacs.d/javalibs/plantumllib/plantuml.jar")
-        plantuml-default-exec-mode 'jar))
-
+        plantuml-default-exec-mode 'jar
+        plantuml-java-options ""
+        plantuml-output-type "svg"
+        plantuml-options "-charset UTF-8"))
 
 (add-hook 'plantuml-mode-hook
           (lambda ()
-            ;; 或禁用 corfu-mode
+            ;; 禁用 corfu-mode（plantuml 不需要补全）
             (corfu-mode -1)
-           ))
+            ;; Execute plantuml-save-png function with C-c C-s
+            (local-set-key (kbd "C-c C-s") 'plantuml-save-png)))
+
 (use-package flycheck-plantuml
   :ensure t
   :commands (flycheck-plantuml-setup)
@@ -21,66 +27,11 @@
 
 (use-package graphviz-dot-mode
   :ensure t
-  :mode "\\.dot\\'")
+  :mode ("\\.dot\\'"))
 
 (use-package gnuplot
   :mode "\\.gp\\'\\|\\.plot\\'"
   :commands gnuplot-make-buffer)
-
-(use-package dockerfile-mode
-  :ensure t
-  :mode "/Dockerfile\\'")
-
-(add-to-list 'auto-mode-alist '("\.pu$" . plantuml-mode))
-
-;;(setq plantuml-jar-path
-;;(expand-file-name "~/.emacs.d/javalibs/plantuml.jar"))
-
-(setq plantuml-java-options "")
-(setq plantuml-output-type "svg")
-(setq plantuml-options "-charset UTF-8")
-
-;; Execute plantuml-save-png function with C-c C-s at plantuml-mode
-(add-hook 'plantuml-mode-hook
-          (lambda () (local-set-key (kbd "C-c C-s") 'plantuml-save-png)))
-
-(setq default-tab-width 2)
-(add-to-list 'auto-mode-alist '("\.dot$" . graphviz-dot-mode))
-;; If you want to save png file when saving .pu file, comment in here
-;; (add-hook ‘plantuml-mode-hook
-;; (lambda () (add-hook ‘after-save-hook ‘plantuml-save-png)))
-
-(defun md2pdf ()
-  "Generate pdf from currently open markdown."
-  (interactive)
-  (let ((filename (buffer-file-name (current-buffer))))
-    (shell-command-to-string
-     (concat "pandoc "
-             filename
-             " -o "
-             (file-name-sans-extension filename)
-             ".pdf -V mainfont=IPAPGothic -V fontsize=16pt --pdf-engine=lualatex"))
-    (shell-command-to-string
-     (concat "xdg-open "
-             (file-name-sans-extension filename)
-             ".pdf"))))
-
-
-(defun md2docx ()
-  "Generate docx from currently open markdown."
-  (interactive)
-  (let ((filename (buffer-file-name (current-buffer))))
-    (shell-command-to-string
-     (concat "pandoc "
-             filename
-             " -t docx -o "
-             (file-name-sans-extension filename)
-             ".docx -V mainfont=IPAPGothic -V fontsize=16pt --toc --highlight-style=zenburn"))
-    (shell-command-to-string
-     (concat "xdg-open "
-             (file-name-sans-extension filename)
-             ".docx"))))
-
 
 ;; Function to save plantuml as png
 (defun plantuml-save-png ()
@@ -101,4 +52,5 @@
                (buffer-file-name)))
     (message cmd)
     (call-process-shell-command cmd nil 0)))
+
 (provide 'init-plantuml)

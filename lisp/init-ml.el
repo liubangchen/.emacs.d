@@ -34,7 +34,7 @@
   :ensure t)
 
 (use-package aidermacs
-  :bind (("C-c a" . aidermacs-transient-menu))
+  :bind (("C-c M-a" . aidermacs-transient-menu))
   :config
   (setq aidermacs-auto-commits nil
         aidermacs-exit-kills-buffer t

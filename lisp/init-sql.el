@@ -25,12 +25,8 @@
 
 (add-hook 'sql-interactive-mode-hook
           (lambda ()
-            (company-mode t)
             (set-face-attribute 'region nil :background "#99CC00" :foreground "#ffffff")
             ))
-
-(use-package docker-compose-mode)
-
 
 (defun sql-beautify-region (beg end)
   "Beautify SQL in region between beg and END.

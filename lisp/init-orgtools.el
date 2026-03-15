@@ -53,10 +53,10 @@
 
 (setq org-confirm-babel-evaluate nil)
 
-;;(use-package valign
-;;  :hook (org-mode . valign-mode)
-;;  :config
-;;  (setq valign-fancy-bar t))
+(use-package valign
+  :hook ((org-mode markdown-mode) . valign-mode)
+  :config
+  (setq valign-fancy-bar t))
 
 ;;(defun org-screenshot ()
 ;;  "Take a screenshot into a time stamped unique-named file in the

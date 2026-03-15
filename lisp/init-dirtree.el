@@ -1,6 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
+;; NOTE: neotree has been removed. Use treemacs instead (configured in init-treemacs.el).
+;; Keeping this file to avoid breaking (require 'init-dirtree) in init.el.
 
-(use-package neotree
-  :init
-  (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
 (provide 'init-dirtree)

@@ -73,6 +73,20 @@
     ;;         return (progn
     ;;                  (setq face-font-rescale-alist `((,font . 1.3)))
     ;;                  (set-fontset-font t 'han (font-spec :family font))))
+
+    ;; Box Drawing / Block Elements / Geometric Shapes — 使用等宽字体确保 ASCII art 对齐
+    ;; 覆盖 U+2500–U+257F (Box Drawing), U+2580–U+259F (Block Elements),
+    ;;       U+25A0–U+25FF (Geometric Shapes), U+2190–U+21FF (Arrows),
+    ;;       U+2600–U+26FF (Misc Symbols), U+2700–U+27BF (Dingbats)
+    (cl-loop for font in '("Sarasa Mono SC" "LXGW WenKai Mono" "Menlo" "DejaVu Sans Mono")
+             when (font-available-p font)
+             return (dolist (range '((#x2500 . #x257F)    ;; Box Drawing ─│┌┐└┘├┤┬┴┼
+                                    (#x2580 . #x259F)    ;; Block Elements ▀▄█▌▐░▒▓
+                                    (#x25A0 . #x25FF)    ;; Geometric Shapes ■□▲△▶▷▼▽
+                                    (#x2190 . #x21FF)    ;; Arrows ←↑→↓↔↕
+                                    (#x2600 . #x26FF)    ;; Misc Symbols ★☆☉☎☐☑
+                                    (#x2700 . #x27BF)))  ;; Dingbats ✓✗✘✚✜
+                      (set-fontset-font t range (font-spec :family font) nil 'prepend)))
     ))
 
 (centaur-setup-fonts)

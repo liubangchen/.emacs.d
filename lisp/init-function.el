@@ -86,12 +86,8 @@
     (nxml-mode)
     (indent-region begin end)))
 
-(add-hook 'c-mode-common-hook   'hs-minor-mode)
-(add-hook 'emacs-lisp-mode-hook 'hs-minor-mode)
-(add-hook 'java-mode-hook       'hs-minor-mode)
-(add-hook 'go-mode-hook       'hs-minor-mode)
-(add-hook 'sh-mode-hook         'hs-minor-mode)
-(add-hook 'python-mode-hook         'hs-minor-mode)
+;; NOTE: hs-minor-mode hooks removed — already enabled globally
+;; via (prog-mode . hs-minor-mode) in init-edit.el
 
 (setq org-html-scripts "<![CDATA[/*><!--*/
  function CodeHighlightOn(elem, id)

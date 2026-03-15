@@ -68,7 +68,8 @@
 (use-package markdown-mode
   :ensure t
   :mode ("\\.md\\'" . gfm-mode)
-  :hook (markdown-mode . my/markdown-ensure-css)
+  :hook ((markdown-mode . my/markdown-ensure-css)
+         (markdown-mode . my/markdown-setup-table-and-fonts))
   :init
   (setq markdown-command
         (concat "pandoc -f gfm -t html5"
@@ -82,6 +83,23 @@
               #'my/markdown-export-file-name)
 
   :config
+  ;; ----- 隐藏 Markup 标记 -----
+  ;; 隐藏 **、*、~~、`` 等标记符号，直接显示粗体/斜体/删除线等效果
+  ;; 使用 C-c C-x C-m 或 M-x markdown-toggle-markup-hiding 临时切换
+  (setq markdown-hide-markup t)
+
+  ;; ----- 表格自动对齐 -----
+  ;; markdown-mode 内置：在表格中按 TAB 时自动格式化对齐
+  (setq markdown-table-align-p t)
+
+  ;; ----- 代码块强制等宽字体 -----
+  ;; 确保代码块/行内代码使用 fixed-pitch，防止混合字体导致 ASCII art 不对齐
+  (defun my/markdown-setup-table-and-fonts ()
+    "为 Markdown buffer 设置代码块等宽字体。"
+    (face-remap-add-relative 'markdown-code-face :inherit 'fixed-pitch)
+    (face-remap-add-relative 'markdown-pre-face :inherit 'fixed-pitch)
+    (face-remap-add-relative 'markdown-inline-code-face :inherit 'fixed-pitch))
+
   ;; 优先用 xwidget-webkit
   (when (featurep 'xwidget-internal)
     (setq markdown-live-preview-window-function
