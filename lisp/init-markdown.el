@@ -29,72 +29,119 @@
 ;;
 
 ;;; Code:
+(defvar my/markdown-cache-dir
+  (expand-file-name "markdown/" (locate-user-emacs-file ".cache/"))
+  "Markdown 预览相关文件的缓存目录。")
+
+(defvar my/markdown-css-file
+  (expand-file-name "github-markdown.css" my/markdown-cache-dir)
+  "本地缓存的 github-markdown CSS 文件路径。")
+
+(defvar my/markdown-template-file
+  (expand-file-name "preview.html" my/markdown-cache-dir)
+  "pandoc 自定义 HTML 模板路径。")
+
+(defun my/markdown-ensure-cache-dir ()
+  "确保缓存目录存在。"
+  (unless (file-directory-p my/markdown-cache-dir)
+    (make-directory my/markdown-cache-dir t)))
+
+(defun my/markdown-ensure-css ()
+  "确保本地有 github-markdown.css，没有则下载。"
+  (my/markdown-ensure-cache-dir)
+  (unless (file-exists-p my/markdown-css-file)
+    (url-copy-file
+     "https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"
+     my/markdown-css-file t)
+    (message "Markdown CSS 已下载到 %s" my/markdown-css-file)))
+
+(defun my/markdown-export-file-name (&optional extension)
+  "导出 HTML 到缓存目录，避免污染源文件目录。"
+  (my/markdown-ensure-cache-dir)
+  (let* ((base (if (buffer-file-name)
+                   (file-name-sans-extension
+                    (file-name-nondirectory (buffer-file-name)))
+                 (md5 (buffer-name))))
+         (ext (or extension ".html")))
+    (concat my/markdown-cache-dir base ext)))
 
 (use-package markdown-mode
-  :mode (("README\\.md\\'" . gfm-mode))
+  :ensure t
+  :mode ("\\.md\\'" . gfm-mode)
+  :hook (markdown-mode . my/markdown-ensure-css)
   :init
-  (setq markdown-enable-wiki-links t
-        markdown-italic-underscore t
-        markdown-asymmetric-header t
-        markdown-make-gfm-checkboxes-buttons t
-        markdown-gfm-uppercase-checkbox t
-        markdown-fontify-code-blocks-natively t
+  (setq markdown-command
+        (concat "pandoc -f gfm -t html5"
+                " --template=" my/markdown-template-file
+                " --syntax-highlighting=pygments"
+                " --embed-resources"
+                " --metadata title=Preview"
+                " --css=" my/markdown-css-file))
 
-        markdown-content-type "application/xhtml+xml"
-        markdown-css-paths '("https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"
-                             "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/github.min.css")
-        markdown-xhtml-header-content "
-<meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
-<style>
-body {
-  box-sizing: border-box;
-  max-width: 740px;
-  width: 100%;
-  margin: 40px auto;
-  padding: 0 10px;
-}
-</style>
+  (advice-add 'markdown-export-file-name :override
+              #'my/markdown-export-file-name)
 
-<link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/default.min.css'>
-<script src='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js'></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  document.body.classList.add('markdown-body');
-  document.querySelectorAll('pre code').forEach((code) => {
-    if (code.className != 'mermaid') {
-      hljs.highlightBlock(code);
-    }
-  });
-});
-</script>
-
-<script src='https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js'></script>
-<script>
-mermaid.initialize({
-  theme: 'default',  // default, forest, dark, neutral
-  startOnLoad: true
-});
-</script>
-"
-        markdown-gfm-additional-languages "Mermaid")
-
-  ;; `multimarkdown' is necessary for `highlight.js' and `mermaid.js'
-  (when (executable-find "multimarkdown")
-    (setq markdown-command "multimarkdown"))
   :config
-  ;; Support `mermaid'
-  (add-to-list 'markdown-code-lang-modes '("mermaid" . mermaid-mode))
+  ;; 优先用 xwidget-webkit
+  (when (featurep 'xwidget-internal)
+    (setq markdown-live-preview-window-function
+          (lambda (file)
+            (let ((url (concat "file://" (expand-file-name file))))
+              (xwidget-webkit-browse-url url t)
+              ;; markdown-live-preview-export 要求返回一个 buffer，
+              ;; xwidget-webkit-browse-url 不返回 buffer，需要手动查找。
+              (let ((buf (xwidget-buffer (xwidget-webkit-current-session))))
+                (when buf
+                  (my/markdown-preview-setup-keymap buf))
+                (or buf (current-buffer)))))))
 
-  (with-no-warnings
-    ;; Use `which-key' instead
-    (advice-add #'markdown--command-map-prompt :override #'ignore)
-    (advice-add #'markdown--style-map-prompt   :override #'ignore)
+  (defun my/markdown-preview-jump-back ()
+    "从 xwidget 预览窗口跳回 markdown 源 buffer。"
+    (interactive)
+    (if-let* ((src markdown-live-preview-source-buffer)
+              (win (get-buffer-window src)))
+        (select-window win)
+      ;; 退而求其次：跳到上一个窗口
+      (other-window -1)))
 
-    ;; Preview with webkit
-    (defun my/markdown-export-and-preview ()
-      "Preview with `xwidget' if applicable, otherwise with the default browser."
-      (centaur-browse-url-of-file (markdown-export)))
-    (advice-add #'markdown-export-and-preview :override #'my/markdown-export-and-preview)))
+  (defun my/markdown-preview-setup-keymap (preview-buf)
+    "为 Markdown 预览的 xwidget-webkit buffer 设置精简按键，
+避免方向键/鼠标滚轮被劫持导致无法操作其他窗口。"
+    (with-current-buffer preview-buf
+      ;; 创建一个简化版 keymap：保留 xwidget 基本功能，
+      ;; 但把方向键/常用导航键改为跳回源 buffer
+      (let ((map (make-sparse-keymap)))
+        ;; 鼠标滚轮：在预览区域仍可滚动预览内容
+        (define-key map [mouse-4] #'xwidget-webkit-scroll-down-line)
+        (define-key map [mouse-5] #'xwidget-webkit-scroll-up-line)
+        (define-key map [wheel-up] #'xwidget-webkit-scroll-down)
+        (define-key map [wheel-down] #'xwidget-webkit-scroll-up)
+        ;; 方向键：跳回 markdown 编辑窗口，不再劫持
+        (define-key map [up]    #'my/markdown-preview-jump-back)
+        (define-key map [down]  #'my/markdown-preview-jump-back)
+        (define-key map [left]  #'my/markdown-preview-jump-back)
+        (define-key map [right] #'my/markdown-preview-jump-back)
+        ;; q / ESC 跳回
+        (define-key map "q" #'my/markdown-preview-jump-back)
+        (define-key map (kbd "ESC") #'my/markdown-preview-jump-back)
+        ;; 保留一些 xwidget 有用的按键
+        (define-key map "+" #'xwidget-webkit-zoom-in)
+        (define-key map "-" #'xwidget-webkit-zoom-out)
+        (define-key map "r" #'xwidget-webkit-reload)
+        (define-key map "0" #'xwidget-webkit-zoom-in)  ; 重置缩放
+        ;; 使用 buffer-local minor mode keymap 覆盖 xwidget-webkit-mode-map
+        (setq-local my/markdown-preview-mode-map map)
+        (use-local-map (make-composed-keymap map xwidget-webkit-mode-map)))))
+
+  ;; 禁止 apheleia 格式化 markdown 预览缓存的 HTML
+  (defun my/disable-apheleia-in-markdown-cache ()
+    (when (and buffer-file-name
+               (string-prefix-p
+                (expand-file-name my/markdown-cache-dir)
+                (expand-file-name buffer-file-name)))
+      (apheleia-mode -1)))
+  (add-hook 'html-mode-hook #'my/disable-apheleia-in-markdown-cache)
+  (add-hook 'mhtml-mode-hook #'my/disable-apheleia-in-markdown-cache))
 
 ;; Table of contents
 (use-package markdown-toc
