@@ -38,8 +38,8 @@
   "本地缓存的 github-markdown CSS 文件路径。")
 
 (defvar my/markdown-template-file
-  (expand-file-name "preview.html" my/markdown-cache-dir)
-  "pandoc 自定义 HTML 模板路径。")
+  (expand-file-name "lisp/templates/preview.html" user-emacs-directory)
+  "pandoc 自定义 HTML 模板路径（放在 git 跟踪目录下，换机不丢失）。")
 
 (defun my/markdown-ensure-cache-dir ()
   "确保缓存目录存在。"
@@ -74,8 +74,8 @@
   (setq markdown-command
         (concat "pandoc -f gfm -t html5"
                 " --template=" my/markdown-template-file
-                " --syntax-highlighting=pygments"
-                " --embed-resources"
+                " --toc --toc-depth=3"
+                " --syntax-highlighting=none"
                 " --metadata title=Preview"
                 " --css=" my/markdown-css-file))
 

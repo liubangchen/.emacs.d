@@ -78,6 +78,9 @@ site-lisp/
 snippets/
 tabspaces/
 templates/
+# 但保留 lisp/templates/（自定义模板文件，需要 git 跟踪）
+!lisp/templates/
+!lisp/templates/**
 thumbs/
 tldr/
 tmp*
