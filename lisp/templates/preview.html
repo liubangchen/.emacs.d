@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="$lang$" xml:lang="$lang$"$if(dir)$ dir="$dir$"$endif$>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+$for(author-meta)$
+  <meta name="author" content="$author-meta$" />
+$endfor$
+$if(date-meta)$
+  <meta name="dcterms.date" content="$date-meta$" />
+$endif$
+  <title>$if(title-prefix)$$title-prefix$ – $endif$$pagetitle$</title>
+  <style>
+    $styles.html()$
+  </style>
+$for(css)$
+  <link rel="stylesheet" href="$css$" />
+$endfor$
+$for(header-includes)$
+  $header-includes$
+$endfor$
+
+  <!-- LXGW WenKai Mono 字体 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-mono-webfont@1.1.0/style.css" />
+
+  <!-- highlight.js 代码着色 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css"
+        media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css"
+        media="(prefers-color-scheme: dark)" />
+  <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <!-- common 包不含的语言，按需加载 -->
+  <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/scala.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/haskell.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/lisp.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/clojure.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/scheme.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/dockerfile.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/cmake.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/protobuf.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/thrift.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/groovy.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/vim.min.js"></script>
+
+  <!-- Mermaid.js 流程图/序列图/甘特图渲染 -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    // 检测暗色模式
+    var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: isDark ? 'dark' : 'default',
+      securityLevel: 'loose',
+      sequence: { useMaxWidth: true, wrap: true },
+      flowchart: { useMaxWidth: true, htmlLabels: true },
+      gantt: { useMaxWidth: true }
+    });
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      // pandoc 输出: <pre class="mermaid"><code>...</code></pre>
+      // Mermaid 需要: <pre class="mermaid">...</pre> 或 <div class="mermaid">...</div>
+      var mermaidBlocks = document.querySelectorAll('pre.mermaid');
+      mermaidBlocks.forEach(function(pre) {
+        var code = pre.querySelector('code');
+        if (code) {
+          // 提取纯文本内容，替换 pre 的 innerHTML
+          var text = code.textContent;
+          pre.textContent = text;
+          pre.classList.add('mermaid');
+          // 移除代码块样式
+          pre.style.border = 'none';
+          pre.style.background = 'transparent';
+          pre.removeAttribute('data-lang');
+        }
+      });
+
+      if (mermaidBlocks.length > 0) {
+        await mermaid.run({ nodes: mermaidBlocks });
+      }
+    });
+  </script>
+
+  <style>
+    /* ===== 全局布局 ===== */
+    .markdown-body {
+      box-sizing: border-box;
+      min-width: 200px;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 45px;
+      font-family: "LXGW WenKai Mono", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+    @media (max-width: 767px) {
+      .markdown-body { padding: 15px; }
+    }
+
+    /* ===== 左侧抽屉式 TOC ===== */
+    /* 半透明遮罩层 */
+    .toc-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+    .toc-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* 左侧侧边栏面板 */
+    .toc-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 300px;
+      max-width: 80vw;
+      height: 100vh;
+      background: #f6f8fa;
+      border-right: 1px solid #d0d7de;
+      z-index: 1001;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 0 16px rgba(0, 0, 0, 0.08);
+    }
+    .toc-sidebar.open {
+      transform: translateX(0);
+    }
+
+    /* 侧边栏头部 */
+    .toc-sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid #d0d7de;
+      flex-shrink: 0;
+    }
+    .toc-sidebar-header h3 {
+      margin: 0;
+      font-size: 0.95em;
+      font-weight: 600;
+      color: #24292f;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toc-sidebar-close {
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #656d76;
+      font-size: 18px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .toc-sidebar-close:hover {
+      background: #eaeef2;
+      color: #24292f;
+    }
+
+    /* 侧边栏内容（可滚动） */
+    .toc-sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px 24px 16px;
+    }
+    .toc-sidebar-content ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    .toc-sidebar-content ul ul {
+      padding-left: 1em;
+      margin-top: 0;
+    }
+    .toc-sidebar-content li {
+      margin: 0;
+      line-height: 1.4;
+    }
+    .toc-sidebar-content a {
+      display: block;
+      padding: 6px 10px;
+      color: #24292f;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.88em;
+      transition: background 0.15s, color 0.15s;
+      word-break: break-word;
+    }
+    .toc-sidebar-content a:hover {
+      background: #eaeef2;
+      color: #0969da;
+    }
+    .toc-sidebar-content a.active {
+      background: #ddf4ff;
+      color: #0969da;
+      font-weight: 500;
+    }
+
+    /* 左侧触发按钮（默认状态 = 折叠时可见） */
+    .toc-toggle-btn {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: opacity 0.2s, transform 0.2s, background 0.15s;
+      color: #656d76;
+      font-size: 20px;
+    }
+    .toc-toggle-btn:hover {
+      background: #eaeef2;
+      color: #24292f;
+    }
+    .toc-toggle-btn.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-10px);
+    }
+
+    /* ===== 代码块美化 ===== */
+    pre, code {
+      /* 中英文等宽字体栈：确保中文宽度 = 2×英文宽度（ASCII art 对齐） */
+      font-family:
+        "Sarasa Mono SC",      /* 更纱黑体等宽：CJK 最佳 2:1 等宽 */
+        "Noto Sans Mono CJK SC", /* Google CJK 等宽 */
+        "Source Han Mono SC",   /* Adobe 思源等宽 */
+        "PingFang SC",         /* macOS 内置，接近等宽 */
+        "Menlo", "Monaco",     /* macOS 英文等宽回退 */
+        "Consolas",            /* Windows 回退 */
+        monospace;
+    }
+    pre {
+      border-radius: 6px;
+      border: 1px solid #d0d7de;
+      padding: 16px;
+      overflow-x: auto;
+      font-size: 0.85em;
+      line-height: 1.5;
+      position: relative;
+    }
+    pre code {
+      background: none !important;
+      padding: 0 !important;
+      border: none !important;
+      font-size: inherit;
+    }
+    /* 代码块语言标签 */
+    pre[data-lang]::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 6px;
+      right: 10px;
+      font-size: 0.75em;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== Mermaid 图表 ===== */
+    pre.mermaid {
+      text-align: center;
+      background: transparent !important;
+      border: none !important;
+      padding: 16px 0;
+      overflow-x: auto;
+    }
+    pre.mermaid svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* ===== 行内代码 ===== */
+    code:not(pre code) {
+      background: rgba(175, 184, 193, 0.2);
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    /* ===== 回到顶部按钮 ===== */
+    .back-to-top {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #0969da;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 999;
+    }
+    .back-to-top.visible {
+      opacity: 0.8;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .back-to-top:hover { opacity: 1; }
+
+    /* ===== 标题锚点平滑滚动 ===== */
+    html { scroll-behavior: smooth; }
+
+    /* ===== 标题悬停锚点链接 ===== */
+    h1, h2, h3, h4, h5, h6 {
+      scroll-margin-top: 16px;
+    }
+
+    /* ===== 暗色模式 ===== */
+    @media (prefers-color-scheme: dark) {
+      body { background: #0d1117; }
+      .markdown-body { color: #c9d1d9; }
+      .markdown-body a { color: #58a6ff; }
+
+      .toc-sidebar {
+        background: #161b22;
+        border-right-color: #30363d;
+        box-shadow: 4px 0 16px rgba(0, 0, 0, 0.3);
+      }
+      .toc-sidebar-header { border-bottom-color: #30363d; }
+      .toc-sidebar-header h3 { color: #c9d1d9; }
+      .toc-sidebar-close { color: #8b949e; }
+      .toc-sidebar-close:hover { background: #1c2128; color: #c9d1d9; }
+      .toc-sidebar-content a { color: #c9d1d9; }
+      .toc-sidebar-content a:hover { background: #1c2128; color: #58a6ff; }
+      .toc-sidebar-content a.active { background: #1a2332; color: #58a6ff; }
+      .toc-overlay { background: rgba(0, 0, 0, 0.5); }
+      .toc-toggle-btn {
+        background: #161b22;
+        border-color: #30363d;
+        color: #8b949e;
+      }
+      .toc-toggle-btn:hover { background: #1c2128; color: #c9d1d9; }
+
+      pre {
+        background: #161b22 !important;
+        border-color: #30363d;
+      }
+      code:not(pre code) {
+        background: rgba(110, 118, 129, 0.25);
+      }
+
+      .back-to-top { background: #58a6ff; }
+    }
+  </style>
+$if(math)$
+  $math$
+$endif$
+</head>
+<body class="markdown-body">
+$for(include-before)$
+$include-before$
+$endfor$
+$if(toc)$
+<!-- 左侧 TOC 触发按钮 -->
+<button class="toc-toggle-btn" id="tocToggle" aria-label="展开目录" title="目录">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="10" y2="18"/>
+  </svg>
+</button>
+
+<!-- 遮罩层 -->
+<div class="toc-overlay" id="tocOverlay"></div>
+
+<!-- 侧边栏 -->
+<nav class="toc-sidebar" id="tocSidebar">
+  <div class="toc-sidebar-header">
+    <h3>📑 目录</h3>
+    <button class="toc-sidebar-close" id="tocClose" aria-label="关闭目录">✕</button>
+  </div>
+  <div class="toc-sidebar-content" id="tocContent">
+    $table-of-contents$
+  </div>
+</nav>
+$endif$
+$body$
+$for(include-after)$
+$include-after$
+$endfor$
+
+<!-- 回到顶部按钮 -->
+<button class="back-to-top" onclick="window.scrollTo({top:0})" aria-label="回到顶部">↑</button>
+
+<script>
+  // highlight.js 初始化
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('pre').forEach(function(pre) {
+      var code = pre.querySelector('code');
+      if (!code) return;
+
+      // 跳过 mermaid 代码块（由 Mermaid.js 处理）
+      if (pre.classList.contains('mermaid')) return;
+
+      // 从多个位置提取语言名：
+      // 1. <code class="language-xxx"> (标准 markdown-it 格式)
+      // 2. <pre class="python"><code> (pandoc --syntax-highlighting=none 格式)
+      // 3. <pre class="sourceCode python"><code> (pandoc 默认格式)
+      var lang = '';
+      var codeClass = code.className || '';
+      var preClass = pre.className || '';
+
+      var m;
+      if ((m = codeClass.match(/language-(\w+)/))) {
+        lang = m[1];
+      } else if ((m = preClass.match(/\b(?:sourceCode\s+)?(\w+)\b/))) {
+        lang = m[1];
+        // 排除非语言类名
+        if (['sourceCode', 'highlight', 'codehilite'].indexOf(lang) !== -1) {
+          var m2 = preClass.match(/sourceCode\s+(\w+)/);
+          lang = m2 ? m2[1] : '';
+        }
+      }
+
+      // 语言别名映射（pandoc 标识 → highlight.js 标识）
+      var langAliases = {
+        'elisp': 'lisp', 'emacs-lisp': 'lisp',
+        'commonlisp': 'lisp', 'common-lisp': 'lisp',
+        'sh': 'bash', 'zsh': 'bash',
+        'objective-c': 'objectivec', 'objc': 'objectivec',
+        'tsx': 'typescript', 'jsx': 'javascript'
+      };
+
+      if (lang) {
+        // 显示原始语言名作为标签
+        pre.setAttribute('data-lang', lang);
+        // 映射为 highlight.js 识别的语言名
+        var hljsLang = langAliases[lang.toLowerCase()] || lang;
+        code.className = '';  // 清理旧 class
+        code.classList.add('language-' + hljsLang);
+      }
+
+      if (typeof hljs !== 'undefined') {
+        hljs.highlightElement(code);
+      }
+    });
+
+    // 回到顶部按钮显隐
+    var btn = document.querySelector('.back-to-top');
+    if (btn) {
+      window.addEventListener('scroll', function() {
+        btn.classList.toggle('visible', window.scrollY > 300);
+      });
+    }
+
+    // ===== 左侧 TOC 抽屉交互 =====
+    var tocToggle = document.getElementById('tocToggle');
+    var tocSidebar = document.getElementById('tocSidebar');
+    var tocOverlay = document.getElementById('tocOverlay');
+    var tocClose = document.getElementById('tocClose');
+    var tocContent = document.getElementById('tocContent');
+
+    if (tocToggle && tocSidebar) {
+      function openToc() {
+        tocSidebar.classList.add('open');
+        tocOverlay.classList.add('visible');
+        tocToggle.classList.add('hidden');
+        updateActiveLink();
+      }
+      function closeToc() {
+        tocSidebar.classList.remove('open');
+        tocOverlay.classList.remove('visible');
+        tocToggle.classList.remove('hidden');
+      }
+
+      tocToggle.addEventListener('click', openToc);
+      tocClose.addEventListener('click', closeToc);
+      tocOverlay.addEventListener('click', closeToc);
+
+      // ESC 键关闭
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && tocSidebar.classList.contains('open')) {
+          closeToc();
+        }
+      });
+
+      // 点击 TOC 链接 → 跳转 + 自动关闭侧边栏
+      var tocLinks = tocContent ? tocContent.querySelectorAll('a[href^="#"]') : [];
+      tocLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          var targetId = decodeURIComponent(this.getAttribute('href').slice(1));
+          var target = document.getElementById(targetId);
+          if (target) {
+            closeToc();
+            // 等侧边栏动画完成后滚动
+            setTimeout(function() {
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 150);
+          }
+        });
+      });
+
+      // 滚动时高亮当前章节
+      function updateActiveLink() {
+        if (!tocContent) return;
+        var headings = document.querySelectorAll('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]');
+        var scrollTop = window.scrollY + 80;
+        var currentId = '';
+        headings.forEach(function(h) {
+          if (h.offsetTop <= scrollTop) {
+            currentId = h.id;
+          }
+        });
+        tocLinks.forEach(function(link) {
+          var linkTarget = decodeURIComponent(link.getAttribute('href').slice(1));
+          link.classList.toggle('active', linkTarget === currentId);
+        });
+
+        // 确保激活的链接在可见区域
+        var activeLink = tocContent.querySelector('a.active');
+        if (activeLink) {
+          activeLink.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+      }
+
+      var scrollTimer;
+      window.addEventListener('scroll', function() {
+        if (tocSidebar.classList.contains('open')) {
+          clearTimeout(scrollTimer);
+          scrollTimer = setTimeout(updateActiveLink, 100);
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>
