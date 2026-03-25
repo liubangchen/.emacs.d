@@ -11,6 +11,20 @@
 
 (require 'org)
 (require 'nerd-icons)
+
+;; vterm 需要加载动态模块 (.dylib/.so)，但 early-init.el 为了加速启动
+;; 将 load-suffixes 限制为 (".elc" ".el")，去掉了动态模块后缀。
+;; 必须在 require vterm 之前恢复，否则 require 'vterm-module 会找不到 .dylib。
+(when (and module-file-suffix
+          (not (member module-file-suffix load-suffixes)))
+  (push module-file-suffix load-suffixes))
+
+;; vterm 在 use-package 中被 defer，其 elpa 目录可能未加入 load-path。
+(unless (locate-library "vterm")
+  (let ((vterm-dir (car (file-expand-wildcards
+                         (expand-file-name "elpa/vterm-*" user-emacs-directory)))))
+    (when (and vterm-dir (file-directory-p vterm-dir))
+      (add-to-list 'load-path vterm-dir))))
 (require 'vterm)
 
 ;; ============================================================

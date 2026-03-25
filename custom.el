@@ -12,7 +12,7 @@
 ;; (setq centaur-server nil)                      ; Enable `server-mode' or not: t or nil
 ;; (setq centaur-use-exec-path-from-shell nil)    ; Use `exec-path-from-shell' or not. If using emacs-plus with path ejection, set to nil
 (setq centaur-icon t)                        ; Display icons or not: t or nil
-(setq centaur-package-archives 'ustc)         ; Package repo: melpa, bfsu, iscas, netease, sjtu, tencent, tuna or ustc
+(setq centaur-package-archives 'melpa)         ; Package repo: melpa, bfsu, iscas, netease, sjtu, tencent, tuna or ustc
 (setq centaur-theme 'default)                     ; Color theme: auto, random, system, default, pro, dark, light, warm, cold, day or night
 (setq centaur-completion-style 'childframe)    ; Completion display style: minibuffer or childframe
 (setq centaur-org-directory "~/notes/org")
@@ -81,11 +81,11 @@
     (cl-loop for font in '("Sarasa Mono SC" "LXGW WenKai Mono" "Menlo" "DejaVu Sans Mono")
              when (font-available-p font)
              return (dolist (range '((#x2500 . #x257F)    ;; Box Drawing ─│┌┐└┘├┤┬┴┼
-                                    (#x2580 . #x259F)    ;; Block Elements ▀▄█▌▐░▒▓
-                                    (#x25A0 . #x25FF)    ;; Geometric Shapes ■□▲△▶▷▼▽
-                                    (#x2190 . #x21FF)    ;; Arrows ←↑→↓↔↕
-                                    (#x2600 . #x26FF)    ;; Misc Symbols ★☆☉☎☐☑
-                                    (#x2700 . #x27BF)))  ;; Dingbats ✓✗✘✚✜
+                                     (#x2580 . #x259F)    ;; Block Elements ▀▄█▌▐░▒▓
+                                     (#x25A0 . #x25FF)    ;; Geometric Shapes ■□▲△▶▷▼▽
+                                     (#x2190 . #x21FF)    ;; Arrows ←↑→↓↔↕
+                                     (#x2600 . #x26FF)    ;; Misc Symbols ★☆☉☎☐☑
+                                     (#x2700 . #x27BF)))  ;; Dingbats ✓✗✘✚✜
                       (set-fontset-font t range (font-spec :family font) nil 'prepend)))
     ))
 
