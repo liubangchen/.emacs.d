@@ -93,9 +93,9 @@
     :defines (xref-show-xrefs-function xref-show-definitions-function)
     :defines shr-color-html-colors-alist
     :autoload (consult-register-format consult-register-window consult-xref)
-    :autoload (consult--read consult--customize-put)
+    :autoload (consult--read consult--customize-put consult--grep)
     :commands (consult-narrow-help)
-    :functions (list-colors-duplicates consult-colors--web-list)
+    :functions (list-colors-duplicates consult-colors--web-list my/consult--read)
     :bind (;; C-c bindings in `mode-specific-map'
            ("C-c M-x" . consult-mode-command)
            ("C-c h"   . consult-history)
@@ -225,12 +225,23 @@ value of the selected COLOR."
     ;; For some commands and buffer sources it is useful to configure the
     ;; :preview-key on a per-command basis using the `consult-customize' macro.
     (consult-customize
-     consult-line consult-line-multi :preview-key 'any
-     consult-buffer consult-recent-file consult-theme :preview-key '(:debounce 1.0 any)
-     consult-goto-line :preview-key '(:debounce 0.5 any)
+     consult-goto-line :preview-key 'any
+     consult-buffer consult-recent-file :preview-key '("M-.")
+     consult-theme :preview-key '("M-." :debounce 0.5 "<up>" "<down>")
+     consult-line consult-line-multi
      consult-ripgrep consult-git-grep consult-grep
      :initial (selected-region-or-symbol-at-point)
-     :preview-key '(:debounce 0.5 any))
+     :preview-key 'any)
+
+    (defun my/consult--read (fn &rest args)
+      "Select initial texts in `consult--read'."
+      (minibuffer-with-setup-hook
+          (lambda ()
+            "Select initial texts."
+            (set-mark (point-max))
+            (goto-char (minibuffer-prompt-end)))
+        (apply fn args)))
+    (advice-add #'consult--read :around #'my/consult--read)
 
     ;; Optionally configure the narrowing key.
     ;; Both < and C-+ work reasonably well.

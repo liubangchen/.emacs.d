@@ -30,6 +30,9 @@
 
 ;;; Code:
 
+(eval-when-compile
+  (require 'init-const))
+
 (use-package shell
   :ensure nil
   :hook ((shell-mode . my/shell-mode-hook)
@@ -104,9 +107,10 @@
   (advice-add 'gud-filter :around #'my/advice-compilation-filter))
 
 ;; Better terminal emulator
-(use-package eat
-  :hook ((eshell-load . eat-eshell-mode)
-         (eshell-load . eat-eshell-visual-command-mode)))
+(unless sys/win32p
+  (use-package eat
+    :hook ((eshell-load . eat-eshell-mode)
+           (eshell-load . eat-eshell-visual-command-mode))))
 
 ;; Shell Pop
 (with-no-warnings
@@ -122,6 +126,13 @@
           shell-pop--window nil
           shell-pop--frame nil))
 
+  (defun shell-pop--reset-cursor-point ()
+    "Reset cursor point."
+    (with-current-buffer shell-pop--buffer
+      (goto-char (point-max))
+      (when (fboundp 'vterm-reset-cursor-point)
+        (vterm-reset-cursor-point))))
+
   (defun shell-pop--shell (&optional arg)
     "Run shell and return the buffer."
     (setq shell-pop--buffer
@@ -131,6 +142,7 @@
                 (t (shell))))
     (when (and shell-pop--buffer
                (buffer-live-p shell-pop--buffer))
+      (shell-pop--reset-cursor-point)
       (setq shell-pop--window (get-buffer-window shell-pop--buffer))
       (add-hook 'kill-buffer-hook #'shell-pop--reset t)))
 
@@ -180,13 +192,13 @@
         ;; Create shell
         (shell-pop--shell)
 
-        (when (and shell-pop--buffer
-                   (buffer-live-p shell-pop--buffer))
+        (when (and shell-pop--buffer (buffer-live-p shell-pop--buffer))
           (shell-pop--hide-window)
           ;; Pop shell in child frame
           (setq shell-pop--frame
                 (posframe-show
                  shell-pop--buffer
+                 :cursor 'box
                  :poshandler #'posframe-poshandler-frame-center
                  :hidehandler #'shell-pop-posframe-hidehandler
                  :left-fringe 8
@@ -200,17 +212,14 @@
                  :background-color (face-background 'default nil t)
                  :foreground-color (face-foreground 'default nil t)
                  :override-parameters '((minibuffer . nil))
-                 :cursor 'box
+                 :tty-non-selected-cursor t
                  :accept-focus t))
 
           ;; Focus in child frame
           (select-frame-set-input-focus shell-pop--frame)
 
           ;; Set cursor to the last
-          (with-current-buffer shell-pop--buffer
-            (goto-char (point-max))
-            (when (fboundp 'vterm-reset-cursor-point)
-              (vterm-reset-cursor-point)))))))
+          (shell-pop--reset-cursor-point)))))
 
   (defun shell-pop-toggle ()
     "Toggle shell in a split window or child frame."
