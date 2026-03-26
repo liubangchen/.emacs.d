@@ -299,6 +299,64 @@ $endfor$
       font-size: 0.85em;
     }
 
+    /* ===== 无语言代码块（伪代码/树状结构）专属配色 ===== */
+    pre.nohighlight {
+      background: #fafbfc;
+      border-color: #e1e4e8;
+      color: #393a34;
+    }
+    pre.nohighlight code {
+      color: inherit;
+    }
+    /* 树状结构符号（├── └── │ ─ → ★ ） */
+    pre.nohighlight .nh-tree {
+      color: #8b949e;
+    }
+    /* 关键词（if, else, true, false, null, return 等） */
+    pre.nohighlight .nh-keyword {
+      color: #cf222e;
+      font-weight: 500;
+    }
+    /* 数字 */
+    pre.nohighlight .nh-number {
+      color: #0550ae;
+    }
+    /* 字符串（引号内容） */
+    pre.nohighlight .nh-string {
+      color: #0a3069;
+    }
+    /* 函数/方法调用（xxx(...)） */
+    pre.nohighlight .nh-func {
+      color: #8250df;
+    }
+    /* 类型/类名（大写开头的标识符） */
+    pre.nohighlight .nh-type {
+      color: #953800;
+    }
+    /* 操作符（= → > < + - * / ） */
+    pre.nohighlight .nh-op {
+      color: #cf222e;
+    }
+    /* 注释风格文本（// # -- 开头） */
+    pre.nohighlight .nh-comment {
+      color: #6e7781;
+      font-style: italic;
+    }
+    /* SQL 关键词（SELECT, INSERT, UPDATE, DELETE, FROM, WHERE 等） */
+    pre.nohighlight .nh-sql {
+      color: #0550ae;
+      font-weight: 500;
+    }
+    /* 标签/标注（WARN, ERROR, INFO, NOTE, Phase 等） */
+    pre.nohighlight .nh-label {
+      color: #bf8700;
+      font-weight: 600;
+    }
+    /* 括号内的参数说明 */
+    pre.nohighlight .nh-param {
+      color: #57606a;
+    }
+
     /* ===== 回到顶部按钮 ===== */
     .back-to-top {
       position: fixed;
@@ -371,6 +429,24 @@ $endfor$
         background: rgba(110, 118, 129, 0.25);
       }
 
+      /* 无语言代码块暗色配色 */
+      pre.nohighlight {
+        background: #161b22 !important;
+        border-color: #30363d;
+        color: #c9d1d9;
+      }
+      pre.nohighlight .nh-tree { color: #484f58; }
+      pre.nohighlight .nh-keyword { color: #ff7b72; font-weight: 500; }
+      pre.nohighlight .nh-number { color: #79c0ff; }
+      pre.nohighlight .nh-string { color: #a5d6ff; }
+      pre.nohighlight .nh-func { color: #d2a8ff; }
+      pre.nohighlight .nh-type { color: #ffa657; }
+      pre.nohighlight .nh-op { color: #ff7b72; }
+      pre.nohighlight .nh-comment { color: #8b949e; font-style: italic; }
+      pre.nohighlight .nh-sql { color: #79c0ff; font-weight: 500; }
+      pre.nohighlight .nh-label { color: #e3b341; font-weight: 600; }
+      pre.nohighlight .nh-param { color: #8b949e; }
+
       .back-to-top { background: #58a6ff; }
     }
   </style>
@@ -415,6 +491,80 @@ $endfor$
 <script>
   // highlight.js 初始化
   document.addEventListener('DOMContentLoaded', function() {
+
+    // ===== 轻量级伪代码/纯文本着色器 =====
+    function highlightPlainBlock(codeEl) {
+      var text = codeEl.textContent;
+      // 先 HTML 转义
+      var html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      // 着色规则（顺序重要：先处理不会嵌套的，用占位符保护已着色区域）
+      var tokens = [];
+      var placeholder = function(cls, match) {
+        var idx = tokens.length;
+        tokens.push('<span class="nh-' + cls + '">' + match + '</span>');
+        return '\x00T' + idx + 'T\x00';
+      };
+
+      // 1. 字符串（双引号/单引号）
+      html = html.replace(/"[^"]*"|'[^']*'/g, function(m) {
+        return placeholder('string', m);
+      });
+
+      // 2. 注释（行末 // 或 # 开头的注释，排除 #{...} 模板）
+      html = html.replace(/(\/\/[^\n]*|#\s[^\n]*|--\s[^\n]*)/g, function(m) {
+        return placeholder('comment', m);
+      });
+
+      // 3. SQL 关键词
+      html = html.replace(/\b(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|INTO|VALUES|SET|CREATE|DROP|ALTER|JOIN|LEFT|RIGHT|INNER|ON|AND|OR|ORDER\s+BY|GROUP\s+BY|HAVING|LIMIT|OFFSET|DUPLICATE|KEY|TABLE|INDEX|VIEW|TEMP|FUNCTION|HSET|HGET)\b/g, function(m) {
+        return placeholder('sql', m);
+      });
+
+      // 4. 标签/标注（WARN, ERROR, INFO, Phase, O(...)）
+      html = html.replace(/\b(WARN|ERROR|INFO|DEBUG|TRACE|NOTE|TODO|FIXME|Phase\s+\d+|O\([^)]*\))\b/gi, function(m) {
+        return placeholder('label', m);
+      });
+
+      // 5. 类型/类名（大写字母开头的 CamelCase 标识符，至少2个大写或含小写混合）
+      html = html.replace(/\b([A-Z][a-zA-Z0-9]*(?:[A-Z][a-zA-Z0-9]*)+)\b/g, function(m) {
+        return placeholder('type', m);
+      });
+
+      // 6. 函数/方法调用（标识符后紧跟括号）
+      html = html.replace(/\b([a-zA-Z_]\w*)\s*(?=\()/g, function(all, name) {
+        // 不重复着色已被标记的关键词
+        return placeholder('func', name);
+      });
+
+      // 7. 关键词
+      html = html.replace(/\b(if|else|elif|then|fi|for|while|do|done|return|break|continue|true|false|null|nil|None|def|class|import|var|val|let|const|new|this|self|async|await|yield|throw|try|catch|finally|default|case|switch|match|when|end|begin|module|interface|trait|extends|implements|override|abstract|static|final|private|public|protected|void|int|long|double|float|string|boolean|bool|enabled|disabled)\b/g, function(m) {
+        return placeholder('keyword', m);
+      });
+
+      // 8. 数字（整数、小数、带单位如 30s 100ms）
+      html = html.replace(/\b(\d+(?:\.\d+)?)\s*(s|ms|m|h|d|px|em|rem|%|KB|MB|GB|TB|行)?\b/g, function(all, num, unit) {
+        return placeholder('number', num) + (unit || '');
+      });
+
+      // 9. 树状结构符号
+      html = html.replace(/([├└│─┌┐┘┤┬┴┼╔╗╚╝║═╠╣╦╩╬]+|[|]+(?=\s)|──|└──|├──)/g, function(m) {
+        return placeholder('tree', m);
+      });
+
+      // 10. 箭头和操作符
+      html = html.replace(/(→|←|↔|⟶|⟵|=&gt;|&lt;-|&lt;=|&gt;=|!=|==|:=|\+=|-=)/g, function(m) {
+        return placeholder('op', m);
+      });
+
+      // 还原占位符
+      html = html.replace(/\x00T(\d+)T\x00/g, function(_, idx) {
+        return tokens[parseInt(idx)];
+      });
+
+      codeEl.innerHTML = html;
+    }
+
     document.querySelectorAll('pre').forEach(function(pre) {
       var code = pre.querySelector('code');
       if (!code) return;
@@ -458,10 +608,15 @@ $endfor$
         var hljsLang = langAliases[lang.toLowerCase()] || lang;
         code.className = '';  // 清理旧 class
         code.classList.add('language-' + hljsLang);
-      }
 
-      if (typeof hljs !== 'undefined') {
-        hljs.highlightElement(code);
+        if (typeof hljs !== 'undefined') {
+          hljs.highlightElement(code);
+        }
+      } else {
+        // 无语言代码块 → 跳过 hljs 自动检测，使用自定义伪代码着色
+        pre.classList.add('nohighlight');
+        code.classList.add('nohighlight');
+        highlightPlainBlock(code);
       }
     });
 
