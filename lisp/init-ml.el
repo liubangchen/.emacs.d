@@ -1,4 +1,4 @@
-;; init-ai   --- Better default configurations.	-*- lexical-binding: t -*-
+;;; init-ml.el --- AI/ML tools configuration -*- lexical-binding: t -*-
 ;;
 ;;
 ;;; code
@@ -23,15 +23,11 @@
   ;; an arbitrary non-null environment variable as placeholder
   (plist-put minuet-openai-fim-compatible-options :name "Ollama")
   (plist-put minuet-openai-fim-compatible-options :api-key "TERM")
-  (plist-put minuet-openai-fim-compatible-options :model "qwen2.5-coder:32b")
-  )
+  (plist-put minuet-openai-fim-compatible-options :model "qwen2.5-coder:32b"))
 
 
 (setq python-interpreter "~/.pyenv/shims/python3")
 (setq python-shell-interpreter "~/.pyenv/shims/python3")
-
-(use-package vterm
-  :ensure t)
 
 (use-package aidermacs
   :bind (("C-c M-a" . aidermacs-transient-menu))
@@ -40,10 +36,6 @@
         aidermacs-exit-kills-buffer t
         aidermacs-extra-args '("--thinking-tokens" "128k")
         aidermacs-backend 'vterm))
-;;(setenv "OLLAMA_API_BASE" "http://127.0.0.1:11434")
-;;:custom
-;;(aidermacs-default-chat-mode 'architect)
-;;(aidermacs-default-model "ollama_chat/qwen2.5-coder:14b"))
 
 (use-package ellama
   :ensure t
@@ -54,5 +46,16 @@
   (setopt ellama-provider
 		  (make-llm-ollama
 		   :chat-model "qwen3-coder:30b" :embedding-model "pull granite-embedding:latest")))
+
+(use-package claude-code-ide
+  :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
+  :bind ("C-c C-'" . claude-code-ide-menu)
+  :config
+  (setq claude-code-ide-cli-path
+        (or (executable-find "claude")
+            (executable-find "claude-internal")
+            "claude"))
+  (setq claude-code-ide-terminal-backend 'vterm)
+  (claude-code-ide-emacs-tools-setup))
 
 (provide 'init-ml)

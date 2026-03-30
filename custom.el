@@ -129,13 +129,16 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(org-display-custom-times t)
+ '(org-timestamp-custom-formats '("[%Y-%m-%d %A]" . "[%Y %m %d  %A [%H:%M]]"))
+ '(package-vc-selected-packages
+   '((claude-code-ide :url "https://github.com/manzaltu/claude-code-ide.el"))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(org-super-agenda-header ((t (:inherit org-modern-label :height 1.2 :weight bold :foreground "#51afef")))))
 
 ;;; custom.el ends here

@@ -166,7 +166,6 @@ Avoid placing large files like EAF in `site-lisp` to prevent slow startup."
 (require 'init-scala)
 (require 'init-dirtree)
 ;;(require 'init-ivy)
-(require 'init-ollama)
 (require 'init-jupyter)
 (require 'init-orgtools)
 (require 'init-ml)
