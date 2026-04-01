@@ -628,6 +628,20 @@ $endfor$
       });
     }
 
+    // ===== Cmd+C 复制支持（绕过 macOS NSResponder chain） =====
+    document.addEventListener('keydown', function(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'c') {
+        var sel = window.getSelection();
+        if (sel && sel.toString().length > 0) {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(sel.toString());
+          } else {
+            document.execCommand('copy');
+          }
+        }
+      }
+    }, true);
+
     // ===== 左侧 TOC 抽屉交互 =====
     var tocToggle = document.getElementById('tocToggle');
     var tocSidebar = document.getElementById('tocSidebar');
