@@ -51,6 +51,19 @@
   :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
   :bind ("C-c C-'" . claude-code-ide-menu)
   :config
+  ;; Fix: `make-directory' signals "File exists" when ~/.claude/ide/ already
+  ;; exists on some Emacs builds.  Guard the call so it only runs when the
+  ;; directory is truly absent.
+  (defun my/claude-ide-mkdir-safe (orig-fn port project-dir)
+    "Call ORIG-FN only creating the lockfile dir when it doesn't exist yet."
+    (let ((dir (expand-file-name "~/.claude/ide/")))
+      (unless (file-directory-p dir)
+        (make-directory dir t)))
+    (cl-letf (((symbol-function 'make-directory) #'ignore))
+      (funcall orig-fn port project-dir)))
+  (advice-add 'claude-code-ide-mcp--create-lockfile
+              :around #'my/claude-ide-mkdir-safe)
+
   (setq claude-code-ide-cli-path
         (or (executable-find "claude")
             (executable-find "claude-internal")

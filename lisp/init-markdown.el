@@ -131,38 +131,46 @@
         ;; 多窗口但源 buffer 不可见：跳到上一个窗口
         (other-window -1))))
 
+  ;; 定义 minor mode —— keymap 优先级高于 major mode，
+  ;; 不会被 xwidget-webkit-mode 内部的 use-local-map 覆盖。
+  (defvar my/markdown-preview-minor-mode-map
+    (let ((map (make-sparse-keymap)))
+      ;; 鼠标滚轮：在预览区域仍可滚动预览内容
+      (define-key map [mouse-4] #'xwidget-webkit-scroll-down-line)
+      (define-key map [mouse-5] #'xwidget-webkit-scroll-up-line)
+      (define-key map [wheel-up] #'xwidget-webkit-scroll-down)
+      (define-key map [wheel-down] #'xwidget-webkit-scroll-up)
+      ;; 方向键：跳回 markdown 编辑窗口，不再劫持
+      (define-key map [up]    #'my/markdown-preview-jump-back)
+      (define-key map [down]  #'my/markdown-preview-jump-back)
+      (define-key map [left]  #'my/markdown-preview-jump-back)
+      (define-key map [right] #'my/markdown-preview-jump-back)
+      ;; q / ESC 跳回
+      (define-key map "q" #'my/markdown-preview-jump-back)
+      (define-key map [escape] #'my/markdown-preview-jump-back)
+      ;; 保留一些 xwidget 有用的按键
+      (define-key map "+" #'xwidget-webkit-zoom-in)
+      (define-key map "-" #'xwidget-webkit-zoom-out)
+      (define-key map "r" #'xwidget-webkit-reload)
+      (define-key map "0" #'xwidget-webkit-zoom-in)  ; 重置缩放
+      ;; 复制/选择：保留系统快捷键
+      (define-key map (kbd "s-c") #'xwidget-webkit-copy-selection-as-kill)
+      (define-key map (kbd "s-a") #'xwidget-webkit-select-all)
+      (define-key map (kbd "M-w") #'xwidget-webkit-copy-selection-as-kill)
+      map)
+    "Keymap for `my/markdown-preview-minor-mode'.")
+
+  (define-minor-mode my/markdown-preview-minor-mode
+    "Minor mode for Markdown xwidget-webkit preview buffers.
+Overrides arrow keys to jump back to the source buffer and
+preserves Cmd+C copy, scroll, and zoom bindings."
+    :lighter " MdPrev"
+    :keymap my/markdown-preview-minor-mode-map)
+
   (defun my/markdown-preview-setup-keymap (preview-buf)
-    "为 Markdown 预览的 xwidget-webkit buffer 设置精简按键，
-避免方向键/鼠标滚轮被劫持导致无法操作其他窗口。"
+    "为 Markdown 预览的 xwidget-webkit buffer 启用预览 minor mode。"
     (with-current-buffer preview-buf
-      ;; 创建一个简化版 keymap：保留 xwidget 基本功能，
-      ;; 但把方向键/常用导航键改为跳回源 buffer
-      (let ((map (make-sparse-keymap)))
-        ;; 鼠标滚轮：在预览区域仍可滚动预览内容
-        (define-key map [mouse-4] #'xwidget-webkit-scroll-down-line)
-        (define-key map [mouse-5] #'xwidget-webkit-scroll-up-line)
-        (define-key map [wheel-up] #'xwidget-webkit-scroll-down)
-        (define-key map [wheel-down] #'xwidget-webkit-scroll-up)
-        ;; 方向键：跳回 markdown 编辑窗口，不再劫持
-        (define-key map [up]    #'my/markdown-preview-jump-back)
-        (define-key map [down]  #'my/markdown-preview-jump-back)
-        (define-key map [left]  #'my/markdown-preview-jump-back)
-        (define-key map [right] #'my/markdown-preview-jump-back)
-        ;; q / ESC 跳回
-        (define-key map "q" #'my/markdown-preview-jump-back)
-        (define-key map (kbd "ESC") #'my/markdown-preview-jump-back)
-        ;; 保留一些 xwidget 有用的按键
-        (define-key map "+" #'xwidget-webkit-zoom-in)
-        (define-key map "-" #'xwidget-webkit-zoom-out)
-        (define-key map "r" #'xwidget-webkit-reload)
-        (define-key map "0" #'xwidget-webkit-zoom-in)  ; 重置缩放
-        ;; 复制/选择：保留系统快捷键
-        (define-key map (kbd "s-c") #'xwidget-webkit-copy-selection-as-kill)
-        (define-key map (kbd "s-a") #'xwidget-webkit-select-all)
-        (define-key map (kbd "M-w") #'xwidget-webkit-copy-selection-as-kill)
-        ;; 使用 buffer-local minor mode keymap 覆盖 xwidget-webkit-mode-map
-        (setq-local my/markdown-preview-mode-map map)
-        (use-local-map (make-composed-keymap map xwidget-webkit-mode-map)))))
+      (my/markdown-preview-minor-mode 1)))
 
   ;; 禁止 apheleia 格式化 markdown 预览缓存的 HTML
   (defun my/disable-apheleia-in-markdown-cache ()
