@@ -110,7 +110,10 @@
               ;; xwidget-webkit-browse-url 不返回 buffer，需要手动查找。
               (let ((buf (xwidget-buffer (xwidget-webkit-current-session))))
                 (when buf
-                  (my/markdown-preview-setup-keymap buf))
+                  (my/markdown-preview-setup-keymap buf)
+                  ;; 清除 no-delete-other-windows 参数，让 C-x 1 能关闭预览窗口
+                  (when-let* ((win (get-buffer-window buf)))
+                    (set-window-parameter win 'no-delete-other-windows nil)))
                 (or buf (current-buffer)))))))
 
   ;; ---- xwidget-webkit 键盘焦点问题解决方案 ----
