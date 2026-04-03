@@ -84,6 +84,8 @@
      :init (setq lsp-use-plists t
                  lsp-log-io nil
 
+                 lsp-auto-guess-root t
+
                  lsp-keymap-prefix "C-c l"
                  lsp-keep-workspace-alive nil
                  lsp-signature-auto-activate nil

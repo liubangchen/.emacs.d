@@ -63,6 +63,20 @@
   (advice-add 'claude-code-ide-mcp--create-lockfile
               :around #'my/claude-ide-mkdir-safe)
 
+  ;; 修复 C-x 1 无法关闭 claude side window 的问题
+  ;; claude-code-ide 给 side window 设置了 (no-delete-other-windows . t)，
+  ;; 导致 delete-other-windows 永远跳过它。
+  ;; 在窗口创建后清除该参数即可恢复 C-x 1 的正常行为。
+  (defun my/claude-ide-fix-delete-window (orig-fn buffer)
+    "Advice: 创建 side window 后移除 no-delete-other-windows 参数。"
+    (let ((window (funcall orig-fn buffer)))
+      (when (and window (window-live-p window))
+        (set-window-parameter window 'no-delete-other-windows nil))
+      window))
+
+  (advice-add 'claude-code-ide--display-buffer-in-side-window
+              :around #'my/claude-ide-fix-delete-window)
+
   (setq claude-code-ide-cli-path
         (or (executable-find "claude")
             (executable-find "claude-internal")
@@ -94,21 +108,45 @@
   (advice-add 'claude-code-ide--display-buffer-in-side-window
               :around #'my/claude-ide-scroll-to-bottom)
 
-  ;; 通过 switch-buffer / consult-buffer 切到 claude session 时也自动滚底
-  (defun my/claude-ide-auto-scroll-bottom ()
-    "当窗口显示 claude session 的 vterm buffer 时，自动滚动到底部。"
-    (when (and (derived-mode-p 'vterm-mode)
-              (claude-code-ide--session-buffer-p (current-buffer)))
-      (goto-char (point-max))
-      (let ((win (get-buffer-window (current-buffer))))
-        (when win
-          (set-window-point win (point-max))
-          (with-selected-window win
-            (recenter -1))))))
+  ;; 通过 switch-buffer / consult-buffer / C-x o 切到 claude session 时自动滚底
+  ;;
+  ;; 修复：旧方案用 window-buffer-change-functions 且无条件执行，导致：
+  ;; 1. 用户手动向上滚动阅读时被反复拉回底部
+  ;; 2. C-x 1 执行期间触发 recenter 干扰窗口管理
+  ;;
+  ;; 新方案：
+  ;; - 用 window-selection-change-functions（切换窗口）和
+  ;;   window-buffer-change-functions（同窗口换 buffer）双钩子
+  ;; - 跟踪 prev-buffer，同一 buffer 只滚动一次
+  ;; - 忽略 minibuffer，避免 M-x / C-x b 往返时误触发
+  ;; - condition-case 保护，不干扰 delete-other-windows 等操作
 
+  (defvar my/claude-ide--prev-buffer nil
+    "上次在 selected window 中看到的非 minibuffer buffer。
+用于检测实际的 buffer/window 切换，避免重复滚动。")
+
+  (defun my/claude-ide--maybe-scroll-claude (&rest _)
+    "切换到 claude session buffer 时滚动到底部（每次进入只触发一次）。"
+    (condition-case nil
+        (let* ((win (selected-window))
+               (buf (window-buffer win)))
+          (when (and (not (minibufferp buf))
+                     (not (eq buf my/claude-ide--prev-buffer)))
+            (setq my/claude-ide--prev-buffer buf)
+            (when (and (window-live-p win)
+                       (buffer-live-p buf)
+                       (with-current-buffer buf
+                         (and (derived-mode-p 'vterm-mode)
+                              (claude-code-ide--session-buffer-p buf))))
+              (set-window-point win (point-max))
+              (with-selected-window win
+                (recenter -1)))))
+      (error nil)))
+
+  (add-hook 'window-selection-change-functions
+            #'my/claude-ide--maybe-scroll-claude)
   (add-hook 'window-buffer-change-functions
-            (lambda (_frame)
-              (my/claude-ide-auto-scroll-bottom)))
+            #'my/claude-ide--maybe-scroll-claude)
 
   ;; ── 自定义 MCP 工具 ──────────────────────────────────────
 
@@ -299,6 +337,25 @@ Optional FILE_GLOB limits to matching files (e.g. \"*.el\")."
         (with-current-buffer session-buf
           (claude-code-ide--terminal-send-string (concat ref " "))))))
 
+  (defun my/claude-ide-at-project-file ()
+    "从项目文件中选择，将路径以 @path 形式插入 Claude 终端输入。
+使用 project-files + completing-read（vertico/orderless 自动接管）。"
+    (interactive)
+    (let* ((buffer-name (claude-code-ide--get-buffer-name))
+           (session-buf (get-buffer buffer-name)))
+      (unless session-buf
+        (user-error "No Claude Code session for this project"))
+      (let* ((proj (or (project-current)
+                       (user-error "Not in a project")))
+             (root (project-root proj))
+             (files (project-files proj))
+             ;; 显示相对路径，更易阅读
+             (rel-files (mapcar (lambda (f) (file-relative-name f root)) files))
+             (choice (completing-read "@ project file: " rel-files nil t))
+             (abs-path (expand-file-name choice root)))
+        (with-current-buffer session-buf
+          (claude-code-ide--terminal-send-string (concat "@" abs-path " "))))))
+
   (defun my/claude-ide-paste-image ()
     "检测系统剪贴板是否有图片，有则保存到临时文件并以 @path 形式发送。
 无图片时执行正常的终端粘贴。
@@ -330,6 +387,49 @@ Optional FILE_GLOB limits to matching files (e.g. \"*.el\")."
   :bind (("C-c C-'" . claude-code-ide-menu)
          ("C-c @ @" . my/claude-ide-at-buffer)
          ("C-c @ ." . my/claude-ide-at-current-buffer)
+         ("C-c @ f" . my/claude-ide-at-project-file)
          ("C-c @ v" . my/claude-ide-paste-image)))
+
+(use-package gterm
+  ;; 使用 cxa 的 fork（PR #4），修复 ghostty 1.3.2+ 编译问题
+  ;; TODO: 主仓库合并后切回 rwc9u/emacs-libgterm
+  :vc (:url "https://github.com/cxa/emacs-libgterm" :branch "main")
+  :commands gterm
+  :init
+  (setq gterm-always-compile-module t)
+  :config
+  (setq gterm-shell "/bin/zsh")
+
+  ;; 修复闪烁：用 inhibit-redisplay 抑制 erase-buffer 后的中间态显示
+  (defun my/gterm-refresh-no-flicker (&rest _)
+    "Override gterm--refresh: inhibit-redisplay 包裹整个渲染过程。"
+    (when (bound-and-true-p gterm--term)
+      (let ((inhibit-read-only t)
+            (inhibit-redisplay t)
+            cursor-pos)
+        (erase-buffer)
+        (setq cursor-pos (gterm-render gterm--term))
+        (when (integerp cursor-pos)
+          (goto-char cursor-pos))
+        (when (fboundp 'gterm-cursor-info)
+          (let* ((info (gterm-cursor-info gterm--term))
+                 (visible (car info))
+                 (style (cdr info)))
+            (setq-local cursor-type (if visible style nil)))))))
+
+  (advice-add 'gterm--refresh :override #'my/gterm-refresh-no-flicker)
+
+  ;; 修复中文输入：gterm-mode-map 只绑定了 ASCII 32-126，
+  ;; CJK 等非 ASCII 字符事件没有 keymap 绑定，fallback 到
+  ;; self-insert-command，但 buffer 是 read-only 所以被忽略。
+  ;; 用 remap 将所有 self-insert-command 重定向到 gterm-send-key，
+  ;; gterm-send-key 通过 this-command-keys-vector 获取实际按键字符
+  ;; 并发送到终端进程，天然支持任何 Unicode 字符。
+  (define-key gterm-mode-map [remap self-insert-command] #'gterm-send-key)
+
+  ;; 确保光标在 gterm buffer 中始终可见
+  (add-hook 'gterm-mode-hook
+            (lambda ()
+              (setq-local cursor-type 'bar))))
 
 (provide 'init-ml)

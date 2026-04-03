@@ -74,6 +74,20 @@
     ;;                  (setq face-font-rescale-alist `((,font . 1.3)))
     ;;                  (set-fontset-font t 'han (font-spec :family font))))
 
+    ;; Nerd Font icons (Private Use Area) — eza/lsd/starship 等终端工具使用的图标
+    (cl-loop for font in '("FiraCode Nerd Font" "CaskaydiaCove Nerd Font"
+                           "Symbols Nerd Font Mono" "Hack Nerd Font")
+             when (font-available-p font)
+             return (dolist (range '((#xe000  . #xe7ff)    ;; Nerd Font PUA Block 1
+                                     (#xed00  . #xedff)    ;; Nerd Font PUA Block 2
+                                     (#xf000  . #xf2ff)    ;; Nerd Font PUA Block 3 (Font Awesome etc.)
+                                     (#xf300  . #xf372)    ;; Nerd Font PUA Block 4
+                                     (#xf400  . #xf532)    ;; Nerd Font PUA Block 5 (Octicons)
+                                     (#xf500  . #xfd46)    ;; Nerd Font PUA Block 6 (Material Design)
+                                     (#x23fb  . #x23fe)    ;; IEC Power Symbols
+                                     (#xf0001 . #xf1af0))) ;; Nerd Font PUA Supplement (大码点)
+                      (set-fontset-font t range (font-spec :family font) nil 'prepend)))
+
     ;; Box Drawing / Block Elements / Geometric Shapes — 使用等宽字体确保 ASCII art 对齐
     ;; 覆盖 U+2500–U+257F (Box Drawing), U+2580–U+259F (Block Elements),
     ;;       U+25A0–U+25FF (Geometric Shapes), U+2190–U+21FF (Arrows),
@@ -132,7 +146,8 @@
  '(org-display-custom-times t)
  '(org-timestamp-custom-formats '("[%Y-%m-%d %A]" . "[%Y %m %d  %A [%H:%M]]"))
  '(package-vc-selected-packages
-   '((claude-code-ide :url "https://github.com/manzaltu/claude-code-ide.el"))))
+   '((gterm :url "https://github.com/rwc9u/emacs-libgterm" :branch "main")
+     (claude-code-ide :url "https://github.com/manzaltu/claude-code-ide.el"))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
