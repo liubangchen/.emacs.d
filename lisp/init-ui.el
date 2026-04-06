@@ -81,6 +81,8 @@
       (add-hook hook #'refresh-ns-appearance))))
 
 ;; Theme
+(add-to-list 'custom-theme-load-path
+             (expand-file-name "themes/" user-emacs-directory))
 (if (centaur-compatible-theme-p centaur-theme)
     (progn
       ;; Make certain buffers grossly incandescent
