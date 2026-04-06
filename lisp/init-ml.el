@@ -44,6 +44,18 @@
     (setq claude-code-ide-cli-path "claude-internal"))
   (claude-code-ide-emacs-tools-setup)
 
+  ;; 修复 C-x 1 无法关闭 claude side window 的问题
+  ;; claude-code-ide 给 side window 设置了 (no-delete-other-windows . t)，
+  ;; 导致 delete-other-windows 永远跳过它。创建后清除该参数即可恢复。
+  (defun my/claude-ide-fix-delete-window (orig-fn buffer)
+    "Advice: 创建 side window 后移除 no-delete-other-windows 参数。"
+    (let ((window (funcall orig-fn buffer)))
+      (when (and window (window-live-p window))
+        (set-window-parameter window 'no-delete-other-windows nil))
+      window))
+  (advice-add 'claude-code-ide--display-buffer-in-side-window
+              :around #'my/claude-ide-fix-delete-window)
+
   ;; @file 快速引用功能
   (defun my/claude-code-ide--send-at-files (files)
     "将 FILES 列表以 @path 格式发送到 Claude Code 终端。
