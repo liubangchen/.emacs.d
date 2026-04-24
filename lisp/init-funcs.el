@@ -40,6 +40,7 @@
 (defvar socks-noproxy)
 (defvar socks-server)
 
+(declare-function apheleia-global-mode "apheleia")
 (declare-function browse-url-file-url "browse-url")
 (declare-function browse-url-interactive-arg "browse-url")
 (declare-function chart-bar-quickie "chart")
@@ -393,7 +394,9 @@ Return the fastest package archive."
   "Refresh package contents and update all packages."
   (interactive)
   (message "Updating packages...")
+  (and (fboundp 'apheleia-global-mode) (apheleia-global-mode -1))
   (package-upgrade-all)
+  (and (fboundp 'apheleia-global-mode) (apheleia-global-mode 1))
   (message "Updating packages...done"))
 (defalias 'centaur-update-packages #'update-packages)
 

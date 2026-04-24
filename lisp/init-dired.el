@@ -88,11 +88,14 @@
     :hook dired-mode
     :init
     (defface nerd-icons-dired-dir-face
-      '((t (:inherit 'font-lock-doc-face)))
+      '((t nil))
       "Face for the directory icon."
       :group 'nerd-icons-faces)
-    (defun my/nerd-icons-icon-for-dir (dir)
-      (nerd-icons-icon-for-dir dir :face 'nerd-icons-dired-dir-face))
+    (defun my/nerd-icons-icon-for-dir (dir &rest args)
+      (apply #'nerd-icons-icon-for-dir
+             dir
+             :face 'nerd-icons-dired-dir-face
+             args))
     (setq nerd-icons-dired-dir-icon-function #'my/nerd-icons-icon-for-dir))
 
   ;; Extra Dired functionality
