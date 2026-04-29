@@ -144,9 +144,24 @@
         (funcall ofun pkg-desc force nosave)))))
 
 ;; Initialize packages
+;; Allow upgrading built-in packages (e.g., `transient', `seq') from GNU ELPA.
+;; Required by Magit on Emacs 31+ where the built-in versions may be outdated.
+(when (boundp 'package-install-upgrade-built-in)
+  (setq package-install-upgrade-built-in t))
+
 (unless (bound-and-true-p package--initialized) ; To avoid warnings in 27
   (setq package-enable-at-startup nil)          ; To prevent initializing twice
   (package-initialize))
+
+;; HACK: Emacs 31 dev built-in `transient' claims version 0.13.0 but lacks
+;; `transient--string-pixel-width' which Magit requires.  Since the ELPA
+;; release is the same version number, `package-initialize' won't shadow
+;; the built-in.  Manually prioritize the ELPA copy when available.
+(when-let* (((not (fboundp 'transient--string-pixel-width)))
+            (desc (car (alist-get 'transient package-alist)))
+            (dir (package-desc-dir desc))
+            ((file-directory-p dir)))
+  (push dir load-path))
 
 ;; Prettify package list
 (set-face-attribute 'package-status-available nil :inherit 'font-lock-string-face)
