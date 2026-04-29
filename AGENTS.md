@@ -2,263 +2,368 @@
 
 ## Overview
 
-This is the **Centaur Emacs** configuration - an Emacs distribution that enhances the default Emacs experience. The codebase consists of **Emacs Lisp (.el) files** organized in the `lisp/` directory.
-
-- **Repository**: https://github.com/seagle0128/.emacs.d
-- **Emacs Version Required**: 28.1+ (tested against 28.2, 29.4, 30.1, and snapshot)
-- **Platforms**: Linux, macOS, Windows (via Cygwin/MSYS2)
+**Centaur Emacs** - A fancy and fast Emacs distribution.
+- **Repo**: https://github.com/seagle0128/.emacs.d
+- **Emacs**: 28.1+ (CI tests 28.2, 29.4, 30.1, snapshot)
+- **Platforms**: Linux, macOS, Windows (Cygwin/MSYS2)
 
 ---
 
-## Build, Lint, and Test Commands
+## Build, Lint, Test
 
-### Loading the Configuration (Basic Test)
+### Test Configuration
 
+**CI Command** (equivalent local test):
 ```bash
-# Full config test (batch mode)
 emacs -q --batch \
-  --eval "(message \"Testing...\")" \
+  --eval "(setq package-check-signature nil)" \
   --eval "(let ((early-init-file (locate-user-emacs-file \"early-init.el\"))
               (user-init-file (locate-user-emacs-file \"init.el\")))
-          (and (>= emacs-major-version 27) (load early-init-file))
+          (load early-init-file)
           (load user-init-file))" \
-  --eval "(message \"Testing...done\")"
+  --eval "(message \"Test passed\")"
 
-# Minimal config test (for troubleshooting)
+# Minimal troubleshooting test
 emacs -Q -l ~/.emacs.d/init-mini.el
 ```
 
-### Byte Compilation
+**Note**: CI only validates that config loads. No automated test suites exist.
 
-```elisp
-;; In Emacs
-M-x byte-compile-file           ; Compile current buffer
-M-x byte-recompile-directory    ; Recompile directory
-M-x centaur-recompile            ; Custom command if available
+### Byte Compilation & Lint
+
+**IMPORTANT**: Always use `emacsclient` (never `emacs` or `--batch`):
+```bash
+emacsclient --eval '(byte-compile-file "/path/to/file.el")'
+emacsclient --eval '(with-temp-buffer (insert-file-contents "/path/to/file.el") (check-parens))'
 ```
 
-### Linting
+**Linting**: `elisp-flymake-byte-compile` (Flymake backend, enabled in `prog-mode`)
 
-The project uses `elisp-flymake-byte-compile` for on-the-fly linting. In Emacs:
+### Package Management
 
 ```elisp
-M-x flymake-mode                ; Enable flymake
-M-x elisp-flymake-byte-compile  ; Byte compile for errors
+M-x package-refresh-contents    ; Refresh archives
+M-x centaur-update              ; Update configs + packages
+M-x centaur-update-packages     ; Update packages only
+M-x set-package-archives        ; Switch mirrors
 ```
 
 ### Package Archives
 
-Default archive is `melpa`. Change in `custom.el`:
+Options: `melpa`, `bfsu`, `iscas`, `netease`, `sjtu`, `tencent`, `tuna`, `ustc` (China mirrors)
+
+Set in `custom.el`:
 ```elisp
-(setq centaur-package-archives 'melpa)  ; Options: melpa, bfsu, iscas, netease, sjtu, tencent, tuna, ustc
+(setq centaur-package-archives 'melpa)
 ```
 
 ---
 
-## Code Style Guidelines
+## Architecture
 
-### File Header Convention
+### Load Order
 
-Every `.el` file MUST start with this header:
-
-```elisp
-;;; <filename> --- <description> -*- lexical-binding: t no-byte-compile: t -*-
-
-;; Copyright (C) 2006-2026 Vincent Zhang
-;; Author: Vincent Zhang <seagle0128@gmail.com>
-;; URL: https://github.com/seagle0128/.emacs.d
-
-;; This file is not part of GNU Emacs.
-
-;; This program is free software; you can redistribute it and/or
-;; modify it under the terms of the GNU General Public License as
-;; published by the Free Software Foundation; either version 3, or
-;; (at your option) any later version.
-;;
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-;; General Public License for more details.
-;;
-;; You should have received a copy of the GNU General Public License
-;; along with this program; see the file COPYING.  If not, write to
-;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth
-;; Floor, Boston, MA 02110-1301, USA.
-
-;;; Commentary:
-;;
-;; <description>
-
-;;; Code:
-
-;; ... code here ...
+```
+early-init.el (Emacs 27+)
+    ↓
+init.el
+    ↓
+init-const (constants, sys/* predicates)  ← Layer 0: Foundation
+    ↓
+init-custom (defcustom API)               ← Layer 1: API
+    ↓
+init-funcs (utility functions)            ← Layer 2: Utilities
+    ↓
+init-package (package system)              ← Layer 3: Package
+    ↓
+init-base (base settings, gcmh-mode)       ← Layer 4: Core
+    ↓
+init-hydra, init-ui, init-edit, ...       ← Layer 5+: Features
 ```
 
-### Lexical Binding
+### Startup Optimizations
 
-- **ALWAYS use `lexical-binding: t`** in file headers
-- **ALWAYS use `no-byte-compile: t`** in this project to prevent native compilation issues
+**early-init.el**:
+- `gc-cons-threshold` → `most-positive-fixnum` (GUI) or 128MB (CLI)
+- `file-name-handler-alist` → Saved to `centaur--file-name-handler-alist`, set to `nil`
+- `load-suffixes` → `(".elc" ".el")` only (skip .so/.dll/.gz)
+- `native-comp-jit-compilation` → `nil` (defer runtime compilation)
+- UI disabled via `default-frame-alist` (before frame creation)
 
-### Naming Conventions
+**init.el**:
+- Restores `file-name-handler-alist` via `emacs-startup-hook` (priority 101)
 
-| Type | Convention | Examples |
-|------|------------|----------|
-| Files | `init-<feature>.el` | `init-base.el`, `init-prog.el` |
-| Functions | `kebab-case` | `defun centaur-update`, `defun update-load-path` |
-| Variables | `kebab-case` | `setq centaur-full-name` |
-| Constants | `kebab-case` with `*` prefix | `defconst centaur-version` |
-| Faces | `kebab-case` with `-face` suffix | `centaur-heading-face` |
-| Groups | `kebab-case` | `defgroup centaur` |
+**init-base.el**:
+- `gcmh-mode` restores GC to ~64MB after startup
+- `inhibit-compacting-font-caches t` (prevents GC jank)
+
+### Critical Dependencies
+
+**Must load in order**:
+1. `init-const` - No dependencies
+2. `init-custom` - Depends on init-const
+3. `init-funcs` - Depends on init-const, init-custom
+4. `init-package` - Depends on init-const, init-custom, init-funcs
+5. All other `init-*.el` files - Depend on init-const, init-custom
+
+**NO circular dependencies** - Architecture is strictly layered.
+
+### Platform Predicates (init-const.el)
+
+```elisp
+sys/win32p       ; Windows native
+sys/macp         ; macOS
+sys/linuxp       ; Linux
+sys/mac-port-p   ; Emacs Mac port build
+sys/mac-ns-p     ; macOS Cocoa (NextStep)
+daemonp          ; Daemon mode
+```
+
+---
+
+## Code Style
+
+### File Headers
+
+Mandatory for all `.el` files:
+```elisp
+;;; <filename> --- <description> -*- lexical-binding: t no-byte-compile: t -*-
+```
+
+**`no-byte-compile: t` is project-wide policy** - prevents native compilation issues.
+
+### Naming
+
+- Functions/variables: `kebab-case` (e.g., `centaur-update`, `centaur-full-name`)
+- Internal variables: `centaur--` prefix (double hyphen)
+- Faces: `-face` suffix (e.g., `centaur-heading-face`)
+- Files: `init-<feature>.el` (e.g., `init-base.el`, `init-prog.el`)
 
 ### Required Imports
 
 ```elisp
 ;;; Code:
-
 (eval-when-compile
   (require 'init-const)
   (require 'init-custom))
-
 (require 'init-funcs)
 ```
 
 ### Forward Declarations
 
-Use `declare-function` for functions from external packages:
-
 ```elisp
 (declare-function browse-url-file-url "browse-url")
 (declare-function consult-theme "ext:consult")
-(declare-function nerd-icons-install-fonts "ext:nerd-icons")
 ```
 
-### Error Handling
-
-- Use `with-no-warnings` to suppress compiler warnings for known-safe code
-- Use `condition-case` for graceful error handling
-- Never use empty catch blocks
-
-```elisp
-(with-no-warnings
-  (setq some-var t))
-
-(condition-case err
-    (some-function)
-  (error (message "Error: %s" err)))
-```
-
-### Use `cl-lib` Instead of Old CL
-
-```elisp
-(require 'cl-lib)
-;; Use cl-lib functions: cl-loop, cl-push, cl-pop, cl-first, cl-rest, etc.
-;; AVOID: funcall, apply, mapcar* from old CL
-```
-
-### Use `defvar` and `defcustom` Properly
-
-```elisp
-(defvar internal-var nil "Internal variable.")
-
-(defcustom user-option t
-  "User-configurable option."
-  :type 'boolean
-  :group 'centaur)
-```
-
-### Conditionals for Platform-Specific Code
+### Platform Conditionals
 
 ```elisp
 (cond
- ((sys/win32p) (setq ...))
- ((sys/mac-port-p) (setq ...))
- ((sys/linuxp) (setq ...)))
+ ((sys/win32p) ...)
+ ((sys/mac-port-p) ...)
+ ((sys/linuxp) ...))
 ```
 
-Common system predicates: `sys/win32p`, `sys/macp`, `sys/mac-port-p`, `sys/linuxp`, `daemonp`
+### use-package Defaults
 
-### Minimize Startup Impact
-
-- Use `autoload` for functions not needed at startup
-- Use `with-eval-after-load` instead of `eval-after-load`
-- Defer loading with `demand` in use-package `:demand` keyword
-
----
-
-## Project Structure
-
-```
-.emacs.d/
-├── early-init.el          ; Early initialization (Emacs 27+)
-├── init.el                ; Main entry point
-├── init-mini.el           ; Minimal config for troubleshooting
-├── custom.el              ; User customizations (copy from custom-example.el)
-├── env.el                 ; Environment variables
-├── lisp/
-│   ├── init-base.el       ; Base settings
-│   ├── init-funcs.el      ; Utility functions
-│   ├── init-const.el     ; Constants
-│   ├── init-custom.el    ; Customization API
-│   ├── init-package.el   ; Package management
-│   ├── init-ui.el        ; UI settings
-│   ├── init-prog.el      ; Programming modes
-│   └── init-*.el         ; Language/feature-specific configs
-└── .github/workflows/
-    └── ci.yml            ; CI configuration
+Set in `init-package.el`:
+```elisp
+(setq use-package-always-ensure t
+      use-package-always-defer t)      ; Lazy load by default
 ```
 
 ---
 
-## Common Development Tasks
+## Customization
 
-### Adding a New Package
+### File Hierarchy
 
-1. Add configuration in a new `lisp/init-<feature>.el` file
-2. Require it in `init.el` or in the appropriate init file
-3. Use `use-package` for declarative configuration
+| File | Tracked? | Purpose |
+|------|----------|---------|
+| `custom-example.el` | ✓ | Template for custom.el |
+| `custom.el` | ✗ | User customizations (auto-copied on first startup) |
+| `custom-post.el` | ✗ | Post-init overrides (loaded via after-init-hook) |
+| `env-example.el` | ✓ | Template for env.el |
+| `env.el` | ✗ | Environment variables (loaded in early-init.el) |
 
-### Running a Single Feature Test
+### Loading Sequence
 
-```bash
-emacs -q --batch \
-  -l ~/.emacs.d/lisp/init-funcs.el \
-  -l ~/.emacs.d/lisp/init-const.el \
-  -l ~/.emacs.d/lisp/init-custom.el \
-  --eval "(message \"Feature test complete\")"
+1. `early-init.el` → Loads `env.el`
+2. `init.el` → Loads init-const, init-custom, init-funcs
+3. `init-package.el` → Copies `custom-example.el` to `custom.el`, loads `custom.el`
+4. `after-init-hook` → Loads `custom-post.el` (or `custom-post.org`)
+5. All other `init-*.el` files
+
+### Customization API (centaur-* variables)
+
+All 24 variables defined in `init-custom.el`, accessible via `M-x customize-group centaur`:
+
+```elisp
+;; User info
+centaur-full-name, centaur-mail-address
+
+;; Network
+centaur-proxy, centaur-socks-proxy
+
+;; Package
+centaur-package-archives  ; melpa, bfsu, iscas, netease, sjtu, tuna, ustc
+
+;; UI
+centaur-icon, centaur-theme, centaur-completion-style, centaur-dashboard
+
+;; Development
+centaur-lsp              ; lsp-mode, eglot, or nil
+centaur-tree-sitter      ; nil or t (Emacs 29+)
+centaur-lsp-format-on-save
+
+;; Features
+centaur-chinese-calendar, centaur-player, centaur-prettify-symbols-alist
 ```
 
-### Updating Packages
+### What Users SHOULD Modify
 
-In Emacs:
-- `M-x package-refresh-contents` - Refresh package contents
-- `M-x centaur-update` - Update all (configs + packages)
-- `M-x centaur-update-packages` - Update packages only
+- `custom.el` - Centaur variable settings, fonts, proxy
+- `custom-post.el` - Advanced customizations, use-package configs, hooks
+- `env.el` - Environment variables (PATH, LSP performance settings)
 
----
+### What Users SHOULD NOT Modify
 
-## Key Configuration Variables
+- All `lisp/init-*.el` files - Core configuration
+- `early-init.el` - Startup optimizations
+- `init.el` - Main initialization
 
-| Variable                   | Description    | Default      |
-|----------------------------|----------------|--------------|
-| `centaur-full-name`        | User full name | User's name  |
-| `centaur-mail-address`     | User email     | User's email |
-| `centaur-theme`            | Theme choice   | `auto`       |
-| `centaur-lsp`              | LSP client     | `lsp-mode`   |
-| `centaur-icon`             | Display icons  | `t`          |
-| `centaur-package-archives` | Package mirror | `melpa`      |
+### Extension Points
+
+- `after-init-hook` - Post-init customizations
+- `emacs-startup-hook` - Startup completions
+- Mode-specific hooks (e.g., `prog-mode-hook`, `org-mode-hook`)
 
 ---
 
-## Troubleshooting
+## Key Gotchas
 
-- **Packages won't install**: Check network, try different mirror, or use proxy
-- **Emacs crashes on startup**: Use `emacs -Q -l init-mini.el` to diagnose
-- **Icons not showing**: Run `M-x nerd-icons-install-fonts` or `M-x centaur-install-fonts`
+### 1. GC Restoration is Critical
+
+**early-init.el** sets `gc-cons-threshold` to `most-positive-fixnum`. Without restoration, Emacs will consume unlimited memory.
+
+**Solution**: `gcmh-mode` (in `init-base.el`) restores to ~64MB after startup. Never disable gcmh-mode.
+
+### 2. file-name-handler-alist Variable Name
+
+Saved as `centaur--file-name-handler-alist` (double hyphen) in `early-init.el`. Use this exact name when restoring.
+
+### 3. no-byte-compile is Mandatory
+
+All `.el` files must have `no-byte-compile: t` in their header. Omitting this causes native compilation issues.
+
+### 4. env.el Timing
+
+`env.el` is loaded in `early-init.el` (before package init). Critical for PATH setup and LSP performance variables.
+
+**For emacs-plus users**: Set `centaur-use-exec-path-from-shell` to `nil` and use `env.el` instead (avoid spawning shell).
+
+### 5. custom-post.el Loading Order
+
+Loaded via `after-init-hook` after all packages initialized. Use this for package-dependent customizations.
+
+### 6. Windows Package Optimization
+
+On Windows, all packages are consolidated into `elpa/all` to reduce `load-path` entries (performance hack in `init-package.el:90-144`).
+
+### 7. Platform-Specific Workarounds
+
+**Windows**:
+- WSL path handling: `/mnt/c/...`
+- Encoding: cmdproxy uses GBK
+- Clipboard: PowerShell or wl-copy for WSL
+
+**macOS**:
+- Requires GNU coreutils for full dired features
+- TUI dark mode needs osascript fallback
+
+**Linux**:
+- Frame transparency uses `alpha-background` parameter
+
+### 8. Daemon-Specific Handling
+
+- `centaur-dashboard` is disabled by default in daemon mode
+- WSL browser override in daemon mode
+- No GUI features (PDF, xwidget) work in daemon
+
+### 9. No Automated Tests
+
+CI only validates that config loads. No unit tests, integration tests, or ERT tests exist.
+
+### 10. emacsclient Only
+
+Always use `emacsclient` for operations (byte compilation, evaluation, testing). Never `emacs` or `--batch`.
+
+---
+
+## Platform-Specific Notes
+
+### Windows
+
+**Performance Optimizations**:
+- `w32-get-true-file-attributes nil` - Disable file attribute checks
+- `w32-pipe-read-delay 0` - Faster IPC
+- `w32-pipe-buffer-size 65536` - Larger pipe buffer
+
+**Features Disabled**:
+- EAT terminal (falls back to eshell)
+- xclip (uses PowerShell or wl-copy)
+- sudo-edit
+- Docker (before Emacs 29)
+
+**Encoding**:
+```elisp
+(add-to-list 'process-coding-system-alist '("cmdproxy" utf-8 . gbk))
+```
+
+### macOS
+
+**Key Modifiers**:
+```elisp
+(setq mac-option-modifier 'meta)
+(setq mac-command-modifier 'super)
+```
+
+**Font Rendering**:
+```elisp
+(setq ns-use-thin-smoothing t)
+```
+
+**Auto-Dark Mode**:
+```elisp
+;; Falls back to osascript in TUI
+(setq auto-dark-detection-method 'osascript)
+```
+
+**Directory Listing**:
+```elisp
+(if (executable-find "gls")
+    (setq insert-directory-program "gls")
+  (setq dired-use-ls-dired nil))  ; Suppress --dired warning
+```
+
+### Linux
+
+**File Opening**:
+```elisp
+(setq dired-guess-shell-alist-user `((".*\\'" "xdg-open")))
+```
+
+**Frame Transparency**:
+```elisp
+(when sys/linux-x-p
+  (setq transwin-parameter-alpha 'alpha-background))
+```
 
 ---
 
 ## References
 
 - [Centaur Emacs README](https://github.com/seagle0128/.emacs.d)
+- [use-package docs](https://github.com/jwiegley/use-package)
 - [Emacs Lisp Reference](https://www.gnu.org/software/emacs/manual/html_node/elisp/)
-- [use-package Documentation](https://github.com/jwiegley/use-package)

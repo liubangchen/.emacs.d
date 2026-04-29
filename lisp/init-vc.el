@@ -1,4 +1,4 @@
-;; init-vcs.el --- Initialize version control system configurations.	-*- lexical-binding: t -*-
+;; init-vc.el --- Initialize version control system configurations.	-*- lexical-binding: t -*-
 
 ;; Copyright (C) 2016-2026 Vincent Zhang
 
@@ -217,7 +217,7 @@
 ;; Git configuration modes
 (use-package git-modes)
 
-(provide 'init-vcs)
+(provide 'init-vc)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; init-vcs.el ends here
+;;; init-vc.el ends here
