@@ -44,6 +44,10 @@
 
 Put private configurations to override defaults here.")
 
+(defconst centaur-env-file
+  (expand-file-name "env.el" user-emacs-directory)
+  "Environment file at startup.")
+
 (defconst centaur-custom-post-org-file
   (expand-file-name "custom-post.org" user-emacs-directory)
   "Custom org file after startup.

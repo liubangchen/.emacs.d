@@ -31,6 +31,7 @@
 ;;; Code:
 
 (eval-when-compile
+  (require 'init-const)
   (require 'init-custom))
 
 ;; Dashboard
@@ -96,8 +97,8 @@
               (lambda (&rest _) (restore-session)))
              (,(when (icons-displayable-p)
                  (nerd-icons-mdicon "nf-md-tools" :height 1.3))
-              "Settings" "Open custom file (S)"
-              (lambda (&rest _) (find-file custom-file)))
+              "Settings" "Open setting files (S)"
+              (lambda (&rest _) (find-custom-file)))
              (,(when (icons-displayable-p)
                  (nerd-icons-mdicon "nf-md-update" :height 1.3))
               "Update" "Update Centaur Emacs (U)"
