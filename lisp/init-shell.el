@@ -108,6 +108,11 @@
 
 ;; Better terminal emulator
 (unless sys/win32p
+  (use-package ghostel
+    :commands ghostel-download-module
+    :config (unless (featurep 'ghostel-module)
+              (ghostel-download-module)))
+
   (use-package eat
     :hook ((eshell-load . eat-eshell-mode)
            (eshell-load . eat-eshell-visual-command-mode))))
@@ -129,15 +134,13 @@
   (defun shell-pop--reset-cursor-point ()
     "Reset cursor point."
     (with-current-buffer shell-pop--buffer
-      (goto-char (point-max))
-      (when (fboundp 'vterm-reset-cursor-point)
-        (vterm-reset-cursor-point))))
+      (goto-char (point-max))))
 
   (defun shell-pop--shell (&optional arg)
     "Run shell and return the buffer."
     (setq shell-pop--buffer
-          (cond ((fboundp 'eat) (eat arg))
-                ((fboundp 'vterm) (vterm arg))
+          (cond ((fboundp 'ghostel) (ghostel arg))
+                ((fboundp 'eat) (eat arg))
                 (sys/win32p (eshell arg))
                 (t (shell))))
     (when (and shell-pop--buffer
