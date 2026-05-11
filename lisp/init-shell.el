@@ -152,7 +152,9 @@
   (defun shell-pop--hide-window ()
     "Hide shell window."
     (when (and shell-pop--window
-               (window-live-p shell-pop--window))
+               (window-live-p shell-pop--window)
+               shell-pop--window
+               (get-buffer-window (buffer-name shell-pop--buffer) 'visible))
       (delete-window shell-pop--window)))
 
   (defun shell-pop--hide-frame ()
@@ -167,8 +169,8 @@
     "Toggle shell in a split window."
     (interactive)
     (shell-pop--hide-frame)
-    (if (and shell-pop--window
-             (window-live-p shell-pop--window))
+    (if (and shell-pop--buffer
+             (get-buffer-window (buffer-name shell-pop--buffer) 'visible))
         (shell-pop--hide-window)
       (shell-pop--shell)))
 
@@ -196,6 +198,10 @@
         (shell-pop--shell)
 
         (when (and shell-pop--buffer (buffer-live-p shell-pop--buffer))
+          ;; Bury `shell-pop--buffer'
+          (when (and shell-pop--window
+                     (get-buffer-window (buffer-name shell-pop--buffer) 'visible))
+            (switch-to-prev-buffer shell-pop--window))
           (shell-pop--hide-window)
 
           ;; Pop shell in child frame
