@@ -110,6 +110,7 @@
 (unless sys/win32p
   (use-package ghostel
     :commands ghostel-download-module
+    :hook (eshell-load . ghostel-eshell-visual-command-mode)
     :config (unless (featurep 'ghostel-module)
               (ghostel-download-module)))
 
@@ -134,7 +135,10 @@
   (defun shell-pop--reset-cursor-point ()
     "Reset cursor point."
     (with-current-buffer shell-pop--buffer
-      (goto-char (point-max))))
+      (goto-char (point-max))
+
+      (when (derived-mode-p 'ghostel-mode)
+        (ghostel-send-key "down"))))
 
   (defun shell-pop--shell (&optional arg)
     "Run shell and return the buffer."
@@ -145,7 +149,6 @@
                 (t (shell))))
     (when (and shell-pop--buffer
                (buffer-live-p shell-pop--buffer))
-      (shell-pop--reset-cursor-point)
       (setq shell-pop--window (get-buffer-window shell-pop--buffer))
       (add-hook 'kill-buffer-hook #'shell-pop--reset t)))
 
