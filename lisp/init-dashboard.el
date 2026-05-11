@@ -159,8 +159,7 @@
           (tabspaces-switch-or-create-workspace tabspaces-default-tab))
 
         ;; Recover layout
-        (when (bound-and-true-p tab-bar-history-mode)
-          (tab-bar-history-back))))))
+        (centaur-recover-layout)))))
 
 (provide 'init-dashboard)
 
