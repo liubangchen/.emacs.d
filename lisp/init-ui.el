@@ -245,8 +245,8 @@
       "set gnus interval" :exit t)))))
 
 (use-package hide-mode-line
-  :hook (((eat-mode
-           eshell-mode ghostel-mode shell-mode term-mode
+  :hook (((eshell-mode
+           ghostel-mode shell-mode term-mode
            embark-collect-mode lsp-ui-imenu-mode
            pdf-annot-list-mode) . turn-on-hide-mode-line-mode)))
 

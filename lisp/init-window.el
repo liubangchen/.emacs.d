@@ -152,7 +152,6 @@
           "^\\*gt-result\\*$" "^\\*gt-log\\*$"
           "^\\*Process List\\*$" process-menu-mode cargo-process-mode
 
-          "^\\*.*eat.*\\*.*$" eat-mode
           "^\\*.*eshell.*\\*.*$" eshell-mode
           "^\\*ghostel\\*$" ghostel-mode
           "^\\*.*shell.*\\*.*$" shell-mode

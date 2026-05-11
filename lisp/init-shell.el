@@ -109,11 +109,7 @@
 ;; Better terminal emulator
 (unless sys/win32p
   (use-package ghostel
-    :hook (eshell-load . ghostel-eshell-visual-command-mode))
-
-  (use-package eat
-    :hook ((eshell-load . eat-eshell-mode)
-           (eshell-load . eat-eshell-visual-command-mode))))
+    :hook (eshell-load . ghostel-eshell-visual-command-mode)))
 
 ;; Shell Pop
 (with-no-warnings
@@ -141,7 +137,6 @@
     "Run shell and return the buffer."
     (setq shell-pop--buffer
           (cond ((fboundp 'ghostel) (ghostel arg))
-                ((fboundp 'eat) (eat arg))
                 (sys/win32p (eshell arg))
                 (t (shell))))
     (when (and shell-pop--buffer
