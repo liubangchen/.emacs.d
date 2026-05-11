@@ -109,10 +109,7 @@
 ;; Better terminal emulator
 (unless sys/win32p
   (use-package ghostel
-    :commands ghostel-download-module
-    :hook (eshell-load . ghostel-eshell-visual-command-mode)
-    :config (unless (featurep 'ghostel-module)
-              (ghostel-download-module)))
+    :hook (eshell-load . ghostel-eshell-visual-command-mode))
 
   (use-package eat
     :hook ((eshell-load . eat-eshell-mode)
