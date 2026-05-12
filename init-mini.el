@@ -159,20 +159,5 @@
 ;; Keybindings
 (global-set-key (kbd "<C-return>") #'rectangle-mark-mode)
 
-(defun revert-current-buffer ()
-  "Revert the current buffer."
-  (interactive)
-  (message "Revert this buffer")
-  (text-scale-set 0)
-  (widen)
-  (revert-buffer t t))
-(global-set-key (kbd "<f5>") #'revert-current-buffer)
-
-(add-hook 'emacs-lisp-mode-hook
-          (lambda ()
-            (local-set-key (kbd "C-c C-x") #'ielm)
-            (local-set-key (kbd "C-c C-c") #'eval-defun)
-            (local-set-key (kbd "C-c C-b") #'eval-buffer)))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Init-mini.el ends here
+;;; init-mini.el ends here
