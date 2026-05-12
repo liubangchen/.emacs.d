@@ -158,6 +158,7 @@
 
 ;; Keybindings
 (global-set-key (kbd "<C-return>") #'rectangle-mark-mode)
+(global-set-key (kbd "s-r") #'revert-buffer-quick)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-mini.el ends here
