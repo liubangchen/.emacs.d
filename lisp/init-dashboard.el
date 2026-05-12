@@ -51,7 +51,9 @@
            ("S" . open-setting-files)
            ("U" . update-config-and-packages)
            ("q" . quit-dashboard))
-    :hook (dashboard-mode . (lambda () (setq-local frame-title-format nil)))
+    :hook (dashboard-mode . (lambda ()
+                              (setq-local frame-title-format nil
+                                          global-hl-line-mode nil)))
     :init
     (setq dashboard-banner-logo-title "CENTAUR EMACS - Enjoy Programming & Writing"
           dashboard-startup-banner (or centaur-logo 'official)
@@ -157,8 +159,7 @@
           (tabspaces-switch-or-create-workspace tabspaces-default-tab))
 
         ;; Recover layout
-        (when (bound-and-true-p tab-bar-history-mode)
-          (tab-bar-history-back))))))
+        (centaur-recover-layout)))))
 
 (provide 'init-dashboard)
 

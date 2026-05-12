@@ -48,7 +48,7 @@
   (tabspaces-use-filtered-buffers-as-default t)
   (tabspaces-default-tab "Default")
   (tabspaces-remove-to-default t)
-  (tabspaces-exclude-buffers '("*eat*" "*vterm*" "*shell*" "*eshell*"))
+  (tabspaces-exclude-buffers '("*eat*" "*ghostel*" "*shell*" "*eshell*"))
 
   ;; sessions
   (tabspaces-session (not centaur-dashboard))

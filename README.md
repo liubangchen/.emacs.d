@@ -352,9 +352,9 @@ Centaur Emacs will then recognize and import these environment variables properl
 
 See issue #33 for more details.
 
-### How do I use zoom-window in Centaur Emacs?
+### How do I view the keybindings?
 
-The zoom-window feature allows you to temporarily maximize/minimize windows:
+You can use `describe-personal-keybindings` and `which-key` to view all keybindings.
 
 **:memo: Reference**: See issue [#169](https://github.com/seagle0128/.emacs.d/issues/169#issuecomment-590035527) for usage instructions.
 

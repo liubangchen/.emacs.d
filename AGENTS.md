@@ -125,12 +125,17 @@ daemonp          ; Daemon mode
 
 ### File Headers
 
-Mandatory for all `.el` files:
+**Core init files** (`lisp/init-*.el`):
+```elisp
+;; <filename> --- <description>	-*- lexical-binding: t -*-
+```
+
+**User-editable and entry point files** (`custom.el`, `env.el`, `early-init.el`, `init.el`, `init-mini.el`):
 ```elisp
 ;;; <filename> --- <description> -*- lexical-binding: t no-byte-compile: t -*-
 ```
 
-**`no-byte-compile: t` is project-wide policy** - prevents native compilation issues.
+**`no-byte-compile: t` is required** for user-editable files and entry points to prevent native compilation issues. Core init files do NOT need this flag.
 
 ### Naming
 
