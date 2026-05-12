@@ -196,7 +196,6 @@
 		          tabulated-list-entries)))))
     (advice-add #'list-processes--refresh :after #'my/list-processes--prettify)))
 
-;; Misc
 (if (boundp 'use-short-answers)
     (setq use-short-answers t)
   (fset 'yes-or-no-p 'y-or-n-p))
