@@ -36,6 +36,15 @@
             (lambda ()
               (setq-local cursor-type 'bar))))
 
+(use-package vterm
+  :commands (vterm vterm-other-window)
+  :init
+  ;; early-init.el 将 load-suffixes 限制为 (".elc" ".el")，
+  ;; 需要在加载 vterm 前恢复动态模块后缀，否则找不到 vterm-module.dylib/.so
+  (dolist (suffix (list module-file-suffix ".so" ".dylib"))
+    (when (and suffix (not (member suffix load-suffixes)))
+      (push suffix load-suffixes))))
+
 (use-package claude-code-ide
   :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
   :bind ("C-c C-'" . claude-code-ide-menu)
@@ -140,11 +149,11 @@ macOS 需要 pngpaste，Linux 需要 xclip。"
         (user-error "从剪贴板提取图片失败"))))
 
   (with-eval-after-load 'claude-code-ide-transient
-    (transient-append-suffix 'claude-code-ide-menu '(0 2 -1)
+    (transient-append-suffix 'claude-code-ide-menu '(1 2 -1)
       '("@" "@ buffer file" my/claude-code-ide-at-buffer))
-    (transient-append-suffix 'claude-code-ide-menu '(0 2 -1)
+    (transient-append-suffix 'claude-code-ide-menu '(1 2 -1)
       '("f" "@ project file" my/claude-code-ide-at-project-file))
-    (transient-append-suffix 'claude-code-ide-menu '(0 2 -1)
+    (transient-append-suffix 'claude-code-ide-menu '(1 2 -1)
       '("I" "Paste image" my/claude-code-ide-paste-image))))
 
 (provide 'init-ml)
