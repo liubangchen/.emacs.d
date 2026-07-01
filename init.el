@@ -60,16 +60,6 @@
 ;; Optimize `auto-mode-alist'
 (setq auto-mode-case-fold nil)
 
-;; PERF: Restore file-name-handler-alist after startup.
-;; It was set to nil in early-init.el for faster startup.
-(unless (or (daemonp) noninteractive init-file-debug)
-  (add-hook 'emacs-startup-hook
-            (lambda ()
-              (setq file-name-handler-alist
-                    (delete-dups (append file-name-handler-alist
-                                         centaur--file-name-handler-alist))))
-            101))
-
 ;;
 ;; Configure Load Path
 ;;
