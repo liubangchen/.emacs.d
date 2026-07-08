@@ -352,8 +352,8 @@
     :color amaranth :quit-key ("q" "C-g"))
    ("Fold"
     (("t" hs-toggle-all "toggle all")
-     ("a" hs-show-all "show all")
-     ("i" hs-hide-all "hide all")
+     ("a" hs-show-all "show all" :exit t)
+     ("i" hs-hide-all "hide all" :exit t)
      ("g" hs-toggle-hiding "toggle hiding")
      ("c" hs-cycle "cycle block")
      ("s" hs-show-block "show block")
@@ -416,13 +416,15 @@
                    (concat
                     " "
                     (propertize
-                     (if (char-displayable-p ?⏷) "⏷" "...")
-                     'face 'shadow)
-                    (propertize
-                     (format " (%d lines)"
+                     (format "%s(%d lines)..."
+                             (and (char-displayable-p ?⏷) "⏷ ")
                              (count-lines (overlay-start ov)
                                           (overlay-end ov)))
-                     'face '(:inherit shadow :height 0.8))
+                     'face '(:inherit shadow :height 0.8)
+                     'mouse-face 'highlight
+                     'local-map (let ((map (make-sparse-keymap)))
+                                  (define-key map [mouse-1] #'hs-show-block)
+                                  map))
                     " "))))
   (setq hs-set-up-overlay #'hs-display-code-line-counts))
 
@@ -440,7 +442,9 @@
       (set-clipboard-coding-system 'gbk) ; for wsl
       (setq interprogram-cut-function
             (lambda (text)
-              (start-process "xclip"  nil xclip-program "--trim-newline" "--type" "text/plain;charset=utf-8" text))))))
+              (start-process "xclip" nil xclip-program
+                             "--trim-newline" "--type"
+                             "text/plain;charset=utf-8" text))))))
 
 ;; Open files as another user
 (unless sys/win32p

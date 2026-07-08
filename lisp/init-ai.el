@@ -53,13 +53,6 @@
           :key (lambda () (getenv "DEEPSEEK_API_KEY"))
           :models '(deepseek-chat deepseek-coder)))
 
-  (gptel-make-openai "Nvidia"
-    :host "integrate.api.nvidia.com"
-    :endpoint "/v1/chat/completions"
-    :stream t
-    :key 'gptel-api-key
-    :models '(z-ai/glm4.7 minimaxai/minimax-m2.1 deepseek-ai/deepseek-v3.1-terminus))
-
   (gptel-make-openai "ChatGLM"
     :host "open.bigmodel.cn"
     :endpoint "/api/paas/v4/chat/completions"
