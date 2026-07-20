@@ -6,13 +6,13 @@
 (setq python-interpreter "~/.pyenv/shims/python3")
 (setq python-shell-interpreter "~/.pyenv/shims/python3")
 
-(use-package aidermacs
-  :bind (("C-c M-a" . aidermacs-transient-menu))
-  :config
-  (setq aidermacs-auto-commits nil
-        aidermacs-exit-kills-buffer t
-        aidermacs-extra-args '("--thinking-tokens" "128k")
-        aidermacs-backend 'vterm))
+;; (use-package aidermacs
+;;   :bind (("C-c M-a" . aidermacs-transient-menu))
+;;   :config
+;;   (setq aidermacs-auto-commits nil
+;;         aidermacs-exit-kills-buffer t
+;;         aidermacs-extra-args '("--thinking-tokens" "128k")
+;;         aidermacs-backend 'vterm))
 
 (use-package gterm
   ;; 使用 cxa 的 fork（PR #4），修复 ghostty 1.3.2+ 编译问题
