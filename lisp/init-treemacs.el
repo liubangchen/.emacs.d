@@ -76,9 +76,11 @@
     :init (treemacs-nerd-icons-config))
 
   (use-package treemacs-magit
+    :if (package-installed-p 'treemacs-magit)
     :demand t)
 
   (use-package treemacs-tab-bar
+    :if (package-installed-p 'treemacs-tab-bar)
     :demand t
     :config (treemacs-set-scope-type 'Tabs)))
 
