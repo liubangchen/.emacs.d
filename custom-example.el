@@ -17,9 +17,7 @@
 ;; (setq centaur-completion-style 'minibuffer)    ; Completion display style: minibuffer or childframe
 ;; (setq centaur-frame-maximized-on-startup t)    ; Maximize frame on startup or not: t or nil
 ;; (setq centaur-dashboard nil)                   ; Display dashboard at startup or not: t or nil
-;; (setq centaur-lsp 'lsp-mode)                   ; Set LSP client: lsp-mode, eglot or nil
-;; (setq centaur-lsp-format-on-save t)            ; Auto format buffers on save: t or nil
-;; (setq centaur-lsp-format-on-save-ignore-modes '(c-mode c++-mode python-mode markdown-mode)) ; Ignore format on save for some languages
+;; (setq centaur-lsp nil)                         ; Enable lsp or not: t or nil
 ;; (setq centaur-tree-sitter nil)                 ; Enable tree-sitter or not: t or nil. Only available in 29+.
 ;; (setq centaur-chinese-calendar t)              ; Support Chinese calendar or not: t or nil
 ;; (setq centaur-player t)                        ; Enable players or not: t or nil
@@ -47,11 +45,11 @@
                                                       (t 100))))
 
     ;; Set mode-line font
-    ;; (cl-loop for font in '("Arial" "Helvetica" "Times New Roman")
-    ;;          when (font-available-p font)
-    ;;          return (progn
-    ;;                   (set-face-attribute 'mode-line nil :family font :inherit 'variable-pitch)
-    ;;                   (set-face-attribute 'mode-line-inactive nil :family font :inherit 'variable-pitch)))
+    (cl-loop for font in '("Arial" "Helvetica" "Times New Roman")
+             when (font-available-p font)
+             return (progn
+                      (set-face-attribute 'mode-line nil :family font :inherit 'variable-pitch)
+                      (set-face-attribute 'mode-line-inactive nil :family font :inherit 'variable-pitch)))
 
     ;; Specify font for all unicode characters
     (cl-loop for font in '("Apple Symbols" "Segoe UI Symbol" "Symbola" "Symbol")
