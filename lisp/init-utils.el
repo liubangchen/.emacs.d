@@ -99,7 +99,7 @@
         (which-key-add-major-mode-key-based-replacements
           mode (car map) (cdr map))))))
 
-;; Show 'which-key' in child frame
+;; Show 'which-key' in the child frame
 (use-package which-key-posframe
   :diminish
   :defines posframe-border-width
@@ -110,7 +110,7 @@
   :hook ((which-key-mode server-after-make-frame)
          .
          (lambda ()
-           (if (childframe-completion-workable-p)
+           (if (and which-key-mode (childframe-completion-workable-p))
                (which-key-posframe-mode 1)
              (which-key-posframe-mode -1))))
   :init
@@ -138,6 +138,7 @@
 (use-package grep
   :ensure nil
   :autoload grep-apply-setting
+  :custom (grep-use-headings t)
   :init
   (when (executable-find "rg")
     (grep-apply-setting
