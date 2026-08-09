@@ -46,9 +46,8 @@
 ;;
 (use-package gptel
   :diminish
-  :functions (gptel-make-openai gptel-make-anthropic
-               gptel-make-deepseek gptel-make-gemini
-               gptel-make-ollama)
+  :functions (gptel-make-openai gptel-make-deepseek
+               gptel-make-anthropic gptel-make-gemini)
   :bind (("C-<f12>"   . gptel)
          ("C-M-<f12>" . gptel-menu))
   :hook (gptel-mode . gptel-highlight-mode)
@@ -73,36 +72,29 @@
     :key 'gptel-api-key
     :models '(glm-5.2 glm-5.2-flash glm-4.7 glm-4.7-flash))
 
-  (gptel-make-openai "Moonshot"
-    :host "api.moonshot.cn"
-    :key 'gptel-api-key
-    :stream t
-    :models '(kimi-latest kimi-k2-0711-preview))
-
-  (gptel-make-anthropic "Claude"
-    :stream t
-    :key 'gptel-api-key
-    :models '(deepseek-chat deepseek-reasoner))
-
   ;; Qwen (Alibaba Cloud)
   (gptel-make-openai "Qwen"
     :host "dashscope.aliyuncs.com"
     :endpoint "/compatible-mode/v1/chat/completions"
     :stream t
     :key 'gptel-api-key
-    :models '(qwen-plus qwen-turbo-latest qwen-max))
+    :models '(qwen-plus qwen-turbo qwen-max))
+
+  (gptel-make-openai "Moonshot"
+    :host "api.moonshot.cn" ;; or "api.moonshot.ai" for the global site
+    :key 'gptel-api-key
+    :stream t
+    :models '(kimi-latest kimi-k2-0711-preview))
 
   ;; Gemini (Google)
   (gptel-make-gemini "Gemini"
     :key 'gptel-api-key
-    :stream t
-    :models '(gemini-2.5-flash gemini-2.5-pro))
+    :stream t)
 
   ;; Claude (Anthropic)
   (gptel-make-anthropic "Claude"
     :stream t
-    :key 'gptel-api-key
-    :models '(claude-sonnet-4-20250514 claude-haiku-3-5-20241022)))
+    :key 'gptel-api-key))
 
 ;; Generate commit messages for magit
 (use-package gptel-magit
