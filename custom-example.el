@@ -73,9 +73,11 @@
 (centaur-setup-fonts)
 (add-hook 'window-setup-hook #'centaur-setup-fonts)
 (add-hook 'server-after-make-frame-hook #'centaur-setup-fonts)
+(add-hook 'after-load-theme-hook #'centaur-setup-fonts)
 
 ;; Mail
 ;; (setq message-send-mail-function 'smtpmail-send-it
+;;       send-mail-function #'smtpmail-send-it
 ;;       smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil))
 ;;       smtpmail-auth-credentials '(("smtp.gmail.com" 587
 ;;                                    user-mail-address nil))

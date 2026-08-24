@@ -89,25 +89,24 @@
 (add-to-list 'custom-theme-load-path
              (expand-file-name "themes/" user-emacs-directory))
 (if (centaur-compatible-theme-p centaur-theme)
-    (progn
-      ;; Make certain buffers grossly incandescent
-      (use-package solaire-mode
-        :commands solaire-global-mode
-        :init (solaire-global-mode 1)
-        :config (add-to-list 'solaire-mode-remap-alist
-                             '(ghostel-default . solaire-default-face)))
-
-      ;; Excellent themes
-      (use-package doom-themes
-        :functions (centaur-compatible-theme-p
-                    centaur-load-theme
-                    doom-themes-visual-bell-config
-                    refresh-ns-appearance)
-        :init (centaur-load-theme centaur-theme t)
-        :config (doom-themes-visual-bell-config)))
+    ;; Excellent themes
+    (use-package doom-themes
+      :functions (centaur-compatible-theme-p
+                  centaur-load-theme
+                  doom-themes-visual-bell-config
+                  refresh-ns-appearance)
+      :init (centaur-load-theme centaur-theme t)
+      :config (doom-themes-visual-bell-config))
   (progn
-    (warn "The current theme may be incompatible!")
+    (message "The current theme `%s' may be incompatible" centaur-theme)
     (centaur-load-theme centaur-theme t)))
+
+;; Make certain buffers grossly incandescent
+(use-package solaire-mode
+  :commands solaire-global-mode
+  :init (solaire-global-mode 1)
+  :config (add-to-list 'solaire-mode-remap-alist
+                       '(ghostel-default . solaire-default-face)))
 
 ;; Mode-line
 (use-package doom-modeline
@@ -270,7 +269,7 @@
   :functions font-available-p
   :config
   ;; Install nerd fonts automatically only in GUI
-  ;; For macOS, may install via "brew install font-symbols-only-nerd-font"
+  ;; On macOS, use "brew install font-symbols-only-nerd-font"
   (when (and (display-graphic-p)
              (not (font-available-p nerd-icons-font-family)))
     (nerd-icons-install-fonts t)))

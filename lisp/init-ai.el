@@ -75,11 +75,12 @@
     :key 'gptel-api-key
     :models '(qwen-plus qwen-turbo qwen-max))
 
-  (gptel-make-openai "Moonshot"
+  ;; Kimi (Moonshot)
+  (gptel-make-openai "Kimi"
     :host "api.moonshot.cn" ;; or "api.moonshot.ai" for the global site
     :key 'gptel-api-key
     :stream t
-    :models '(kimi-latest kimi-k2-0711-preview))
+    :models '(kimi-k3 kimi-k2.7-code kimi-k2.7-code-highspeed kimi-k2.6 kimi-k2.5))
 
   ;; Gemini (Google)
   (gptel-make-gemini "Gemini"
@@ -130,7 +131,7 @@
       (defun centaur-review-commit ()
         "Send the commit at point to agent-shell for review."
         (interactive)
-        (if-let ((commit (magit-commit-p (magit-thing-at-point 'git-revision t))))
+        (if-let* ((commit (magit-commit-p (magit-thing-at-point 'git-revision t))))
             (agent-shell-insert
              :submit t
              :text (format "Review commit: %s" commit))

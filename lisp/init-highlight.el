@@ -159,6 +159,10 @@ FACE defaults to inheriting from default and highlight."
 (use-package display-fill-column-indicator
   :ensure nil
   :functions adjust-fill-column-indicator-stipple
+  :custom-face (fill-column-indicator ((((class color) (background light))
+                                        (:foreground "gray75"))
+                                       (((class color) (background dark))
+                                        (:foreground "gray25"))))
   :hook (prog-mode . display-fill-column-indicator-mode)
   :config
   ;; Setup fill column indicator with stipple
@@ -261,6 +265,7 @@ FACE defaults to inheriting from default and highlight."
 ;; Highlight uncommitted changes using VC
 (use-package diff-hl
   :defines diff-hl-show-hunk-function diff-hl-show-hunk-posframe-internal-border-color
+  :functions my/diff-hl-fringe-bmp-function
   :commands (diff-hl-flydiff-mode diff-hl-margin-mode)
   :custom-face
   (diff-hl-change ((t (:inherit custom-changed :foreground unspecified :background unspecified))))
@@ -296,7 +301,7 @@ FACE defaults to inheriting from default and highlight."
       (vector (if sys/linuxp #b11111100 #b11100000))
       1 8
       '(center t)))
-  (setq diff-hl-fringe-bmp-function 'my/diff-hl-fringe-bmp-function)
+  (setq diff-hl-fringe-bmp-function #'my/diff-hl-fringe-bmp-function)
 
   ;; Highlight on-the-fly
   (diff-hl-flydiff-mode 1))
