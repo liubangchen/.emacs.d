@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        emacs-version: [28.2, 29.4, 30.2]
+        emacs-version: [28.2, 29.4, 30.2, 31.1]
         experimental: [false]
         include:
           - os: ubuntu-latest
@@ -51,5 +51,6 @@ jobs:
                         (user-init-file (locate-user-emacs-file \"init.el\")))
                     (setq package-check-signature nil)
                     (load early-init-file)
+                    (setq load-path-filter-function nil)
                     (load user-init-file))" \
           --eval "(message \"Testing...done\")"
