@@ -57,7 +57,7 @@
       (default-load-suffixes load-suffixes)
       (default-load-file-rep-suffixes load-file-rep-suffixes))
   (setq file-name-handler-alist nil
-        load-suffixes '(".elc" ".el")
+        load-suffixes '(".elc" ".el" ".so" ".dylib")
         load-file-rep-suffixes '(""))
   (add-hook 'emacs-startup-hook
             (lambda ()
