@@ -41,6 +41,7 @@
 ;; Prettify Symbols (e.g., display “lambda” as “λ”)
 (use-package prog-mode
   :ensure nil
+  :functions centaur-treesit-available-p
   :hook (prog-mode . prettify-symbols-mode)
   :init
   (setq-default prettify-symbols-alist centaur-prettify-symbols-alist)
@@ -48,22 +49,25 @@
 
 ;; Tree-sitter support
 (when (centaur-treesit-available-p)
-  ;; Automatic Tree-sitter grammar management
-  (use-package treesit-auto
-    :functions centaur-treesit-available-p
-    :hook (after-init . global-treesit-auto-mode)
-    :init (setq treesit-auto-install 'prompt)
-    :config
-    ;; `rust-mode' will handle tree-sitter
-    (delete 'rust treesit-auto-langs)))
+  (if (boundp 'treesit-enabled-modes)
+      ;; Built into Emacs 31+
+      (use-package treesit
+        :ensure nil
+        :custom (treesit-enabled-modes '(not rust-mode markdown-mode)))
+    ;; Automatic Tree-sitter grammar management
+    (use-package treesit-auto
+      :defines treesit-auto-langs
+      :custom (treesit-auto-install 'prompt)
+      :hook (after-init . global-treesit-auto-mode)
+      :config
+      ;; `rust-mode' will handle tree-sitter
+      (delete 'rust treesit-auto-langs))))
 
 ;; Show function arglist or variable docstring
 (use-package eldoc
   :ensure nil
-  :diminish
   :config
   (use-package eldoc-mouse
-    :diminish
     :bind (:map eldoc-mouse-mode-map
            ("C-h ." . eldoc-mouse-pop-doc-at-cursor))
     :hook eglot-managed-mode
@@ -89,12 +93,10 @@
 
 ;; Code styles
 (use-package editorconfig
-  :diminish
   :hook after-init)
 
 ;; Reformat buffer stably
 (use-package apheleia
-  :diminish
   :hook (after-init . apheleia-global-mode))
 
 ;; Run commands quickly
@@ -132,8 +134,6 @@
                         (lambda ()
                           (setq-local devdocs-current-docs docs))))))
         devdocs-major-mode-docs-alist)
-
-  (setq devdocs-data-dir (expand-file-name "devdocs" user-emacs-directory))
 
   (defun devdocs-dwim()
     "Look up a DevDocs documentation entry.

@@ -212,7 +212,6 @@ prepended to the element after the #+HEADER: tag."
 ;; Prettify UI
 (when emacs/>=29p
   (use-package org-modern
-    :diminish
     :autoload org-modern-mode org-modern-agenda
     :custom (org-modern-table nil)
     :hook ((org-mode . (lambda ()
@@ -228,14 +227,12 @@ prepended to the element after the #+HEADER: tag."
 ;; Paste with org-mode markup and link
 (use-package org-rich-yank
   :after org
-  :diminish
   :bind (:map org-mode-map
          ("C-M-y" . org-rich-yank)))
 
 ;; Auto-toggle Org elements
 (when emacs/>=29p
   (use-package org-appear
-    :diminish
     :hook org-mode
     :custom
     (org-appear-autoentities t)
@@ -248,13 +245,11 @@ prepended to the element after the #+HEADER: tag."
 
 ;; Table of contents
 (use-package toc-org
-  :diminish
   :hook org-mode)
 
 ;; Preview
 (use-package org-preview-html
   :after org
-  :diminish
   :functions xwidget-workable-p
   :bind (:map org-mode-map
          ("C-c C-h" . org-preview-html-mode))
@@ -265,12 +260,10 @@ prepended to the element after the #+HEADER: tag."
 (if emacs/>=29.2p
     (use-package dslide
       :after org
-      :diminish
       :bind (:map org-mode-map
              ("s-<f7>" . dslide-deck-start)))
   (use-package org-tree-slide
     :after org
-    :diminish
     :defines org-tree-slide-mode-map
     :bind (:map org-mode-map
            ("s-<f7>" . org-tree-slide-mode)
@@ -285,7 +278,6 @@ prepended to the element after the #+HEADER: tag."
 (when (and (fboundp 'sqlite-available-p)
            (sqlite-available-p))
   (use-package org-roam
-    :diminish
     :functions centaur-browse-url org-roam-db-autosync-mode
     :defines org-roam-graph-viewer
     :bind (("C-c n l" . org-roam-buffer-toggle)

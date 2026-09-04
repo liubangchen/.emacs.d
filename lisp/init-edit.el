@@ -79,7 +79,6 @@
 ;; Automatically reload files was modified by external program
 (use-package autorevert
   :ensure nil
-  :diminish
   :hook (after-init . global-auto-revert-mode))
 
 ;; Pass a URL to a WWW browser
@@ -177,12 +176,10 @@
 
 ;; Jump to Chinese characters
 (use-package ace-pinyin
-  :diminish
   :hook (after-init . ace-pinyin-global-mode))
 
 ;; Show number of matches in mode-line while searching
 (use-package anzu
-  :diminish
   :bind (([remap query-replace] . anzu-query-replace)
          ([remap query-replace-regexp] . anzu-query-replace-regexp)
          :map isearch-mode-map
@@ -192,16 +189,10 @@
 
 ;; Redefine M-< and M-> for some modes
 (use-package beginend
-  :diminish beginend-global-mode
-  :functions diminish
-  :hook (after-init . beginend-global-mode)
-  :config (mapc (lambda (pair)
-                  (diminish (cdr pair)))
-                beginend-modes))
+  :hook (after-init . beginend-global-mode))
 
 ;; Drag stuff (lines, words, region, etc...) around
 (use-package drag-stuff
-  :diminish
   :autoload drag-stuff-define-keys
   :hook (after-init . drag-stuff-global-mode)
   :config
@@ -320,7 +311,6 @@
 
 ;; Hungry deletion
 (use-package hungry-delete
-  :diminish
   :hook (after-init . global-hungry-delete-mode)
   :init (setq hungry-delete-chars-to-skip " \t\f\v"
               hungry-delete-except-modes
@@ -343,13 +333,11 @@
 ;; Handling capitalized subwords in a nomenclature
 (use-package subword
   :ensure nil
-  :diminish
   :hook (prog-mode minibuffer-setup))
 
 ;; Flexible text folding
 (use-package hideshow
   :ensure nil
-  :diminish hs-minor-mode
   :pretty-hydra
   ((:title (pretty-hydra-title "HideShow" 'octicon "nf-oct-fold")
     :color amaranth :quit-key ("q" "C-g"))

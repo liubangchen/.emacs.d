@@ -185,7 +185,10 @@ interactively.  Turn the filename into a URL with function
 (defun reload-init-file ()
   "Reload Emacs configurations."
   (interactive)
-  (load user-init-file))
+  (when (yes-or-no-p "Really reload Emacs configurations?")
+    (load early-init-file)
+    (load user-init-file)
+    (run-hooks 'after-init-hook 'window-setup-hook 'emacs-startup-hook)))
 (defalias 'centaur-reload-init-file #'reload-init-file)
 
 ;; Browse the homepage
@@ -220,10 +223,10 @@ Also opens the custom-post file in another window if it exists."
 (defun byte-compile-site-lisp ()
   "Compile packages in site-lisp directory."
   (interactive)
-  (let ((dir (locate-user-emacs-file "site-lisp")))
+  (let ((default-directory (locate-user-emacs-file "site-lisp")))
     (if (fboundp 'async-byte-recompile-directory)
-        (async-byte-recompile-directory dir)
-      (byte-recompile-directory dir 0 t))))
+        (async-byte-recompile-directory default-directory)
+      (byte-recompile-directory default-directory 0 t))))
 
 (defun native-compile-elpa ()
   "Native-compile packages in elpa directory."
@@ -234,9 +237,9 @@ Also opens the custom-post file in another window if it exists."
 (defun native-compile-site-lisp ()
   "Native compile packages in site-lisp directory."
   (interactive)
-  (let ((dir (locate-user-emacs-file "site-lisp")))
+  (let ((default-directory (locate-user-emacs-file "site-lisp")))
     (if (fboundp 'native-compile-async)
-        (native-compile-async dir t))))
+        (native-compile-async default-directory t))))
 
 (defun icons-displayable-p ()
   "Return non-nil if icons are displayable."
@@ -382,12 +385,12 @@ Return the fastest package archive."
 (defun update-config ()
   "Update Centaur Emacs configurations to the latest version."
   (interactive)
-  (let ((dir (expand-file-name user-emacs-directory)))
-    (if (file-exists-p dir)
-        (let ((default-directory dir))
+  (let ((default-directory user-emacs-directory))
+    (if (file-exists-p default-directory)
+        (progn
           (message "Updating configurations...")
           (vc-update))
-      (message "\"%s\" doesn't exist" dir))))
+      (warn "\"%s\" doesn't exist" default-directory))))
 (defalias 'centaur-update-config #'update-config)
 
 (defun update-packages ()
@@ -408,23 +411,23 @@ Return the fastest package archive."
 (defun update-dotfiles ()
   "Update the dotfiles to the latest version."
   (interactive)
-  (let ((dir (expand-file-name "~/.dotfiles/")))
-    (if (file-exists-p dir)
-        (let ((default-directory dir))
+  (let ((default-directory "~/.dotfiles/"))
+    (if (file-exists-p default-directory)
+        (progn
           (message "Updating dotfiles...")
           (vc-update))
-      (message "\"%s\" doesn't exist" dir))))
+      (warn "\"%s\" doesn't exist" default-directory))))
 (defalias 'centaur-update-dotfiles #'update-dotfiles)
 
 (defun update-org ()
   "Update Org files to the latest version."
   (interactive)
-  (let ((dir (expand-file-name "~/org/")))
-    (if (file-exists-p dir)
-        (let ((default-directory dir))
-          (message "Updating org files...")
+  (let ((default-directory "~/org/"))
+    (if (file-exists-p default-directory)
+        (progn
+          (message "Updating org files %s..." default-directory)
           (vc-update))
-      (message "\"%s\" doesn't exist" dir))))
+      (warn "\"%s\" doesn't exist" default-directory))))
 (defalias 'centaur-update-org #'update-org)
 
 (defun update-all ()
@@ -539,7 +542,6 @@ Return the fastest package archive."
      ;; System-appearance themes
      (use-package auto-dark
        :ensure t
-       :diminish
        :commands auto-dark-mode
        :init
        (setq auto-dark-themes `((,(alist-get 'dark centaur-system-themes))

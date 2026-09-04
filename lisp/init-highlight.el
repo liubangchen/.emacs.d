@@ -103,7 +103,6 @@ FACE defaults to inheriting from default and highlight."
 
 ;; Highlight symbols
 (use-package symbol-overlay
-  :diminish
   :functions (easy-kill easy-kill-destroy-candidate)
   :custom-face
   (symbol-overlay-default-face ((t (:inherit region :background unspecified :foreground unspecified))))
@@ -130,7 +129,6 @@ FACE defaults to inheriting from default and highlight."
          (iedit-mode      . turn-off-symbol-overlay)
          (iedit-mode-end  . turn-on-symbol-overlay))
   :config
-  ;; Disable symbol highlighting while selecting
   (defun turn-off-symbol-overlay (&rest _)
     "Turn off symbol highlighting."
     (interactive)
@@ -142,6 +140,7 @@ FACE defaults to inheriting from default and highlight."
     (when (derived-mode-p 'prog-mode 'yaml-mode 'yaml-ts-mode)
       (symbol-overlay-mode 1)))
 
+  ;; Disable symbol highlighting while selecting
   (advice-add #'activate-mark :after #'turn-off-symbol-overlay)
   (advice-add #'deactivate-mark :after #'turn-on-symbol-overlay)
   (advice-add #'easy-kill :after #'turn-off-symbol-overlay)
@@ -149,7 +148,6 @@ FACE defaults to inheriting from default and highlight."
 
 ;; Mark occurrences of current region (selection)
 (use-package region-occurrences-highlighter
-  :diminish hi-lock-mode
   :bind (:map region-occurrences-highlighter-nav-mode-map
          ("M-n" . region-occurrences-highlighter-next)
          ("M-p" . region-occurrences-highlighter-prev))
@@ -195,7 +193,6 @@ FACE defaults to inheriting from default and highlight."
 
 ;; Colorize color names in buffers
 (use-package colorful-mode
-  :diminish
   :custom
   (colorful-use-prefix t)
   (colorful-prefix-string "■")
@@ -231,18 +228,20 @@ FACE defaults to inheriting from default and highlight."
     (add-to-list 'hl-todo-keyword-faces `(,keyword . "#e45649")))
   (dolist (keyword '("TRICK" "WORKAROUND"))
     (add-to-list 'hl-todo-keyword-faces `(,keyword . "#d0bf8f")))
-  (dolist (keyword '("DEBUG" "STUB"))
-    (add-to-list 'hl-todo-keyword-faces `(,keyword . "#7cb8bb")))
 
-  ;; Integrate into flymake
-  (with-eval-after-load 'flymake
-    (add-hook 'flymake-diagnostic-functions #'hl-todo-flymake))
-
-  ;; Integrate into magit
+  ;; Highlight TODO keywords in Magit
   (with-eval-after-load 'magit
     (add-hook 'magit-log-wash-summary-hook #'hl-todo-search-and-highlight t)
     (add-hook 'magit-revision-wash-message-hook #'hl-todo-search-and-highlight t))
 
+  ;; Search TODO keywords in consult
+  (when emacs/>=29p
+    (use-package consult-todo
+      :bind (("C-c c h" . consult-todo)
+             :map hl-todo-mode-map
+             ("C-c t l" . consult-todo))))
+
+  ;; Search TODO keywords in rg
   (defun hl-todo-rg (regexp &optional files dir)
     "Use `rg' to find all TODO or similar keywords."
     (interactive
@@ -316,7 +315,6 @@ FACE defaults to inheriting from default and highlight."
 ;; Pulse modified region
 (when emacs/>=29p
   (use-package goggles
-    :diminish
     :hook (prog-mode text-mode conf-mode)))
 
 (provide 'init-highlight)

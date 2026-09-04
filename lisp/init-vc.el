@@ -45,11 +45,6 @@
             (setq magit-commit-show-diff nil
                   magit-diff-refine-hunk nil)))
 
-;; Prime cache before Magit refresh
-(use-package magit-prime
-  :diminish
-  :hook after-init)
-
 ;; Show TODOs in Magit
 (use-package magit-todos
   :after magit-status
@@ -117,7 +112,8 @@
     (advice-add #'git-messenger:format-detail :around #'my/git-messenger:format-detail)
 
     (defun my/git-messenger:popup-message ()
-      "Popup message with `posframe', `pos-tip', `lv' or `message', and dispatch actions with `hydra'."
+      "Popup message with `posframe', `pos-tip', `lv' or `message'.
+And dispatch actions with `hydra' in echo area."
       (interactive)
       (let* ((hydra-hint-display-type 'message)
              (vcs (git-messenger:find-vcs))
@@ -170,7 +166,6 @@
 ;; Resolve diff3 conflicts
 (use-package smerge-mode
   :ensure nil
-  :diminish
   :pretty-hydra
   ((:title (pretty-hydra-title "Smerge" 'octicon "nf-oct-diff")
     :color pink :quit-key ("q" "C-g"))

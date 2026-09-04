@@ -37,30 +37,23 @@
   :bind (:map tabspaces-command-map
          ("C-r"   . tabspaces-restore-session)
          ("C-M-r" . tabspaces-restore-session-alt)
-         ("C-s"   . tabspaces-save-session)
-         ("C-w"   . tabspaces-save-current-project-session))
+         ("C-s"   . tabspaces-save-session))
   :hook ((after-init . tabspaces-mode)
          (tabspaces-mode . tab-bar-history-mode))
   :custom
   ;; tab-bar
   (tab-bar-show nil)                    ; don't display tab-bar
   (tab-bar-history-limit 30)
-  (tab-bar-new-tab-choice "*scratch*")
 
   ;; options
   (tabspaces-use-filtered-buffers-as-default t)
-  (tabspaces-default-tab "Default")
-  (tabspaces-remove-to-default t)
-  (tabspaces-include-buffers '("*scratch*"))
   (tabspaces-exclude-buffers '("*Messages*" "*Compile-Log*" "*ghostel*" "*shell*" "*eshell*"))
-  (tabspaces-fully-resolve-paths t)  ; Resolve relative project paths to absolute
-  (tabspaces-project-switch-opens-workspace t)
 
   ;; sessions
   (tabspaces-session (not centaur-dashboard))
   (tabspaces-session-auto-restore (not centaur-dashboard))
-  (tabspaces-session-file (concat user-emacs-directory "tabspaces/tabsession.el"))
-  (tabspaces-session-project-session-store (concat user-emacs-directory "tabspaces/"))
+  (tabspaces-session-file (locate-user-emacs-file "tabspaces/tabsession.el"))
+  (tabspaces-session-project-session-store (locate-user-emacs-file "tabspaces"))
   (tabspaces-session-auto-save-delay 300)  ; Save after 5 idle minutes
   :config
   (defun tabspaces-restore-session-alt ()
@@ -92,6 +85,9 @@
         "Set workspace buffer list for consult-buffer.")
       (add-to-list 'consult-buffer-sources 'consult-source-workspace))
 
+    ;; Backup tabspaces sessions
+    (defconst tabspaces--keep-days 14
+      "How long (days) to keep tabspaces sessions.")
     (defun tabspaces--delete-old-files (dir days)
       "Delete backup files of DIR, with timestamp suffix older than DAYS days."
       (let ((cutoff (time-subtract (current-time)
@@ -105,32 +101,24 @@
       "Prepare for saving session."
       ;; Backup session
       (when tabspaces-session
-        (let ((dir (expand-file-name "tabspaces" user-emacs-directory)))
+        (let ((dir (locate-user-emacs-file "tabspaces")))
           (unless (file-exists-p dir)
             (mkdir dir))
-          ;; Delete the sessions that are older than 14 days
-          (tabspaces--delete-old-files dir 14))
+          ;; Cleanup the old sessions
+          (tabspaces--delete-old-files dir tabspaces--keep-days))
 
         (when (file-exists-p tabspaces-session-file)
           (copy-file tabspaces-session-file
                      (format "%s.%s" tabspaces-session-file (format-time-string "%Y%m%d"))
                      t)))
-
-      ;; Cleanup
-      (and (fboundp 'helpful-kill-buffers)
-           (helpful-kill-buffers))
-
-      (and (fboundp 'magit-mode-get-buffers)
-           (mapc #'kill-buffer (magit-mode-get-buffers)))
-
-      (and (fboundp 'posframe-delete-all)
-           (posframe-delete-all)))
-    (advice-add #'tabspaces--save-session-smart :before #'tabspaces--prepare-save-session)
-
-    (defun tabspaces--bury-messages (&rest _)
-      "Bury *Messages* buffer."
-      (quit-windows-on messages-buffer-name))
-    (advice-add #'tabspaces-restore-session :after #'tabspaces--bury-messages)))
+      ;; Cleanup dummies
+      (when (fboundp 'helpful-kill-buffers)
+        (helpful-kill-buffers))
+      (when (fboundp 'magit-mode-get-buffers)
+        (mapc #'kill-buffer (magit-mode-get-buffers)))
+      (when (fboundp 'posframe-delete-all)
+        (posframe-delete-all)))
+    (advice-add #'tabspaces--save-session-smart :before #'tabspaces--prepare-save-session)))
 
 (provide 'init-workspace)
 

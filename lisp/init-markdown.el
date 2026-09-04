@@ -88,6 +88,12 @@
   ;; 使用 C-c C-x C-m 或 M-x markdown-toggle-markup-hiding 临时切换
   (setq markdown-hide-markup t)
 
+  ;; Support `mermaid'
+  (add-to-list 'markdown-code-lang-modes '("mermaid" . mermaid-mode))
+  (use-package markdown-mermaid
+    :bind (:map markdown-mode-map
+           ("C-c M" . markdown-mermaid-preview)))
+
   ;; ----- 表格自动对齐 -----
   ;; markdown-mode 内置：在表格中按 TAB 时自动格式化对齐
   (setq markdown-table-align-p t)
@@ -264,32 +270,37 @@
                 (expand-file-name buffer-file-name)))
       (apheleia-mode -1)))
   (add-hook 'html-mode-hook #'my/disable-apheleia-in-markdown-cache)
-  (add-hook 'mhtml-mode-hook #'my/disable-apheleia-in-markdown-cache))
+  (add-hook 'mhtml-mode-hook #'my/disable-apheleia-in-markdown-cache)
 
-;; Table of contents
-(use-package markdown-toc
-  :diminish
-  :bind (:map markdown-mode-command-map
-         ("r" . markdown-toc-generate-or-refresh-toc))
-  :hook markdown-mode
-  :init (setq markdown-toc-indentation-space 2
-              markdown-toc-header-toc-title "\n## Table of Contents"
-              markdown-toc-user-toc-structure-manipulation-fn 'cdr)
-  :config
-  (with-no-warnings
-    (define-advice markdown-toc-generate-toc (:around (fn &rest args) lsp)
-      "Generate or refresh toc after disabling lsp."
-      (cond
-       ((bound-and-true-p eglot--manage-mode)
-        (eglot--manage-mode -1)
-        (apply fn args)
-        (eglot--manage-mode 1))
-       ((bound-and-true-p lsp-managed-mode)
-        (lsp-managed-mode -1)
-        (apply fn args)
-        (lsp-managed-mode 1))
-       (t
-        (apply fn args))))))
+  ;; Preview with webkit
+  (defun my/markdown-export-and-preview ()
+    "Preview with `xwidget' if applicable, otherwise with the default browser."
+    (centaur-browse-url-of-file (markdown-export)))
+  (advice-add #'markdown-export-and-preview :override #'my/markdown-export-and-preview))
+
+  ;; Table of contents
+  (use-package markdown-toc
+    :bind (:map markdown-mode-command-map
+           ("r" . markdown-toc-generate-or-refresh-toc))
+    :hook markdown-mode
+    :init (setq markdown-toc-indentation-space 2
+                markdown-toc-header-toc-title "\n## Table of Contents"
+                markdown-toc-user-toc-structure-manipulation-fn 'cdr)
+    :config
+    (with-no-warnings
+      (define-advice markdown-toc-generate-toc (:around (fn &rest args) lsp)
+        "Generate or refresh toc after disabling lsp."
+        (cond
+         ((bound-and-true-p eglot--manage-mode)
+          (eglot--manage-mode -1)
+          (apply fn args)
+          (eglot--manage-mode 1))
+         ((bound-and-true-p lsp-managed-mode)
+          (lsp-managed-mode -1)
+          (apply fn args)
+          (lsp-managed-mode 1))
+         (t
+          (apply fn args))))))
 
 ;; Preview markdown files
 ;; @see https://github.com/seagle0128/grip-mode?tab=readme-ov-file#prerequisite
@@ -299,7 +310,10 @@
   :autoload grip-mode
   :init
   (with-eval-after-load 'markdown-mode
-    (bind-key "g" #'grip-mode markdown-mode-command-map))
+    (bind-key "C-g" #'grip-mode markdown-mode-command-map))
+
+  (with-eval-after-load 'markdown-ts-mode
+    (bind-key "C-c C-g" #'grip-mode markdown-ts-mode-map))
 
   (with-eval-after-load 'org
     (bind-key "C-c C-g" #'grip-mode org-mode-map))

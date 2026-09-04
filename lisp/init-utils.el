@@ -35,55 +35,70 @@
 
 ;; Display available keybindings in popup
 (use-package which-key
-  :diminish
+  :custom
+  (which-key-dont-use-unicode nil)
+  (which-key-max-description-length 30)
+  (which-key-lighter nil)
+  (which-key-show-remaining-keys t)
   :bind ("C-h M-m" . which-key-show-major-mode)
   :hook ((after-init server-after-make-frame) . which-key-mode)
-  :init (setq which-key-max-description-length 30
-              which-key-lighter nil
-              which-key-show-remaining-keys t)
   :config
   ;; Key prefix descriptions
-  (dolist (map '(("M-s h" . "highlight")
-                 ("M-s s" . "symbol-overlay")
-                 ("C-c &" . "yasnippet")
-                 ("C-c @" . "hideshow")
-                 ("C-c c" . "consult")
-                 ("C-c d" . "dict")
-                 ("C-c l" . "link-hint")
-                 ("C-c n" . "org-roam")
-                 ("C-c o" . "org")
-                 ("C-c t" . "hl-todo")
-                 ("C-c C-a" . "activities")
-                 ("C-c C-z" . "browse")
-                 ("C-x 8" . "unicode")
-                 ("C-x 8 e" . "emoji")
-                 ("C-x @" . "modifior")
-                 ("C-x a" . "abbrev")
-                 ("C-x c" . "colorful")
-                 ("C-x n" . "narrow")
-                 ("C-x p" . "project")
-                 ("C-x r" . "rect & bookmark")
-                 ("C-x t" . "tab & treemacs")
-                 ("C-x w" . "window & highlight")
-                 ("C-x w ^" . "detach")
-                 ("C-x w f" . "flip")
-                 ("C-x w o" . "rotate windows")
-                 ("C-x w r" . "rotate layout")
-                 ("C-x x" . "buffer")
-                 ("C-x C-a" . "edebug")
-                 ("C-x RET" . "coding-system")
-                 ("C-x X" . "edebug")
-                 ("C-x v b" . "vc-branch")
-                 ("C-x v M" . "vc-mergebase")))
+  (dolist (map '(("M-s h"     . "highlight")
+                 ("M-s s"     . "symbol-overlay")
+                 ("C-c &"     . "yasnippet")
+                 ("C-c @"     . "hideshow")
+                 ("C-c a"     . "ai")
+                 ("C-c c"     . "consult")
+                 ("C-c d"     . "dict")
+                 ("C-c l"     . "link-hint")
+                 ("C-c n"     . "org-roam")
+                 ("C-c o"     . "org")
+                 ("C-c t"     . "hl-todo")
+                 ("C-c C-a"   . "activities")
+                 ("C-c C-z"   . "browse")
+                 ("C-x 8"     . "unicode")
+                 ("C-x 8 e"   . "emoji")
+                 ("C-x @"     . "modifior")
+                 ("C-x a"     . "abbrev")
+                 ("C-x c"     . "colorful")
+                 ("C-x n"     . "narrow")
+                 ("C-x p"     . "project")
+                 ("C-x r"     . "rect & bookmark")
+                 ("C-x t"     . "tab & treemacs")
+                 ("C-x w"     . "window & highlight")
+                 ("C-x w ^"   . "detach")
+                 ("C-x w f"   . "flip")
+                 ("C-x w o"   . "rotate windows")
+                 ("C-x w r"   . "rotate layout")
+                 ("C-x x"     . "buffer")
+                 ("C-x C-a"   . "edebug")
+                 ("C-x RET"   . "coding-system")
+                 ("C-x X"     . "edebug")
+                 ("C-x v b"   . "vc-branch")
+                 ("C-x v w"   . "vc-working-tree")
+                 ("C-x v E"   . "vc-outgoing")
+                 ("C-x v M"   . "vc-mergebase")
+                 ("C-x v T"   . "vc-unintegrated")
+                 ("C-x v T R" . "vc-remote-unintegrated")))
     (which-key-add-key-based-replacements (car map) (cdr map)))
 
   ;; Mode-specific key replacements
   (dolist (mode-map '((org-mode
-                       ("C-c \"" . "org-plot")
+                       ("C-c \""  . "org-plot")
                        ("C-c C-v" . "org-babel")
                        ("C-c C-x" . "org-misc"))
                       (python-mode
+                       ("C-c C-i" . "python-import")
                        ("C-c C-t" . "python-skeleton"))
+                      (python-ts-mode
+                       ("C-c C-i" . "python-import")
+                       ("C-c C-t" . "python-skeleton"))
+                      (rust-mode
+                       ("C-c C-c" . "rust-build"))
+                      (markdown-ts-mode
+                       ("C-c C-x" . "markdown-toggle")
+                       ("C-c C-v" . "markdown-code-block"))
                       (markdown-mode
                        ("C-c C-a" . "markdown-link")
                        ("C-c C-c" . "markdown-command")
@@ -104,7 +119,6 @@
 
 ;; Show 'which-key' in the child frame
 (use-package which-key-posframe
-  :diminish
   :defines posframe-border-width
   :functions childframe-completion-workable-p
   :commands which-key-posframe-mode
@@ -124,7 +138,9 @@
 
 ;; Persistent the scratch buffer
 (use-package persistent-scratch
-  :diminish
+  :custom
+  (persistent-scratch-backup-file-name-format "%Y-%m-%d")
+  (persistent-scratch-backup-directory (locate-user-emacs-file "persistent-scratch"))
   :bind (:map persistent-scratch-mode-map
          ([remap kill-buffer] . (lambda (&rest _)
                                   (interactive)
@@ -132,40 +148,23 @@
          ([remap revert-buffer] . persistent-scratch-restore)
          ([remap revert-buffer-quick] . persistent-scratch-restore))
   :hook ((after-init . persistent-scratch-autosave-mode)
-         (lisp-interaction-mode . persistent-scratch-mode))
-  :init (setq persistent-scratch-backup-file-name-format "%Y-%m-%d"
-              persistent-scratch-backup-directory
-              (expand-file-name "persistent-scratch" user-emacs-directory)))
+         (lisp-interaction-mode . persistent-scratch-mode)))
 
 ;; Search tools
 (use-package grep
   :ensure nil
-  :autoload grep-apply-setting
-  :custom (grep-use-headings t)
-  :init
-  (when (executable-find "rg")
-    (grep-apply-setting
-     'grep-command "rg --color=auto --null -nH --no-heading -e ")
-    (grep-apply-setting
-     'grep-template "rg --color=auto --null --no-heading -g '!*/' -e <R> <D>")
-    (grep-apply-setting
-     'grep-find-command '("rg --color=auto --null -nH --no-heading -e ''" . 38))
-    (grep-apply-setting
-     'grep-find-template "rg --color=auto --null -nH --no-heading -e <R> <D>")))
+  :custom (grep-use-headings t))
 
 ;; Writable `grep' buffer
 (use-package wgrep
-  :init (setq wgrep-auto-save-buffer t
-              wgrep-change-readonly-file t))
+  :custom
+  (wgrep-auto-save-buffer t)
+  (wgrep-change-readonly-file t))
 
 ;; Fast search tool `ripgrep'
 (use-package rg
+  :defines rg-custom-type-aliases
   :hook (after-init . rg-enable-default-bindings)
-  :bind (:map rg-global-map
-         ("c" . rg-dwim-current-dir)
-         ("f" . rg-dwim-current-file)
-         ("m" . rg-menu))
-  :init (setq rg-show-columns t)
   :config (add-to-list 'rg-custom-type-aliases '("tmpl" . "*.tmpl")))
 
 ;; A Simple and cool pomodoro timer
@@ -182,7 +181,6 @@
 
 ;; Nice writing
 (use-package olivetti
-  :diminish
   :bind ("<f7>" . olivetti-mode)
   :init (setq olivetti-body-width 0.62))
 
@@ -286,8 +284,20 @@
 
 ;; Misc
 (use-package file-info
-  :bind ("C-c c i" . file-info-show))
-(use-package reveal-in-folder)
+  :functions posframe-poshandler-frame-center
+  :commands file-info-show
+  :bind ("C-c c i" . my/file-info-show)
+  :config
+  (defun my/file-info-show ()
+    "Show info about file inside via hydra."
+    (interactive)
+    (let ((hydra-posframe-show-params
+           (plist-put (copy-alist hydra-posframe-show-params)
+                      :poshandler #'posframe-poshandler-frame-center)))
+      (file-info-show))))
+
+(use-package reveal-in-folder
+  :bind ("C-c R" . reveal-in-folder))
 
 (provide 'init-utils)
 

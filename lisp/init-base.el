@@ -79,7 +79,6 @@
 
 ;; Garbage Collector Magic Hack
 (use-package gcmh
-  :diminish
   :hook (emacs-startup . gcmh-mode)
   :init (setq gcmh-idle-delay 'auto
               gcmh-auto-idle-delay-factor 10
@@ -149,11 +148,10 @@
 
 ;; Misc.
 (use-package simple
-  :diminish visual-line-mode
   :ensure nil
   :hook ((after-init . size-indication-mode)
          (text-mode . visual-line-mode)
-         ((prog-mode markdown-mode conf-mode) . enable-trailing-whitespace))
+         ((prog-mode markdown-mode markdown-ts-mode conf-mode) . enable-trailing-whitespace))
   :init
   (setq column-number-mode t
         line-number-mode t
