@@ -87,7 +87,6 @@
                     (self-insert-command 1)))))
   :hook (((org-babel-after-execute org-mode) . org-redisplay-inline-images) ; display image
          (org-indent-mode . (lambda()
-                              (diminish 'org-indent-mode)
                               ;; HACK: Prevent text moving around while using brackets
                               ;; @see https://github.com/seagle0128/.emacs.d/issues/88
                               (make-variable-buffer-local 'show-paren-mode)

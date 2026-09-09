@@ -55,6 +55,7 @@
                  ("C-c n"     . "org-roam")
                  ("C-c o"     . "org")
                  ("C-c t"     . "hl-todo")
+                 ("C-c z"     . "kirigami")
                  ("C-c C-a"   . "activities")
                  ("C-c C-z"   . "browse")
                  ("C-x 8"     . "unicode")

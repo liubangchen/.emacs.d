@@ -53,7 +53,7 @@
   (tabspaces-session (not centaur-dashboard))
   (tabspaces-session-auto-restore (not centaur-dashboard))
   (tabspaces-session-file (locate-user-emacs-file "tabspaces/tabsession.el"))
-  (tabspaces-session-project-session-store (locate-user-emacs-file "tabspaces"))
+  (tabspaces-session-project-session-store (locate-user-emacs-file "tabspaces/"))
   (tabspaces-session-auto-save-delay 300)  ; Save after 5 idle minutes
   :config
   (defun tabspaces-restore-session-alt ()

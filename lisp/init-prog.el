@@ -64,10 +64,9 @@
       (delete 'rust treesit-auto-langs))))
 
 ;; Show function arglist or variable docstring
-(use-package eldoc
-  :ensure nil
-  :config
+(when (childframe-workable-p)
   (use-package eldoc-mouse
+    :functions childframe-workable-p
     :bind (:map eldoc-mouse-mode-map
            ("C-h ." . eldoc-mouse-pop-doc-at-cursor))
     :hook eglot-managed-mode
