@@ -67,7 +67,9 @@
 (when (childframe-workable-p)
   (use-package eldoc-mouse
     :functions childframe-workable-p
-    :bind (:map eldoc-mouse-mode-map
+    :bind (:map emacs-lisp-mode-map
+           ("C-h ." . eldoc-mouse-pop-doc-at-cursor)
+           :map eglot-mode-map
            ("C-h ." . eldoc-mouse-pop-doc-at-cursor))
     :hook eglot-managed-mode
     :init
