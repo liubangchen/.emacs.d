@@ -33,6 +33,7 @@
 ;; Emacs command shell
 (use-package eshell
   :ensure nil
+  :after esh-mode
   :defines eshell-prompt-function
   :bind (:map eshell-mode-map
          ([remap recenter-top-bottom] . eshell/clear))
@@ -109,21 +110,7 @@
     :defines eshell-highlight-prompt
     :autoload (epe-theme-lambda epe-theme-dakrone epe-theme-pipeline)
     :init (setq eshell-highlight-prompt nil
-                eshell-prompt-function #'epe-theme-lambda))
-
-  ;; `eldoc' support
-  (use-package esh-help
-    :commands esh-help-eldoc-command
-    :preface
-    (defun my/eshell-enable-esh-help-eldoc ()
-      "Enable `esh-help' Eldoc support in the current Eshell buffer."
-      (setq-local eldoc-documentation-function
-                  #'esh-help-eldoc-command))
-    :hook (eshell-mode . my/eshell-enable-esh-help-eldoc))
-
-  ;; `cd' to frequent directory in `eshell'
-  (use-package eshell-z
-    :hook (eshell-mode . (lambda () (require 'eshell-z)))))
+                eshell-prompt-function #'epe-theme-lambda)))
 
 (provide 'init-eshell)
 
