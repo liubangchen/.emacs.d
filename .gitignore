@@ -8,6 +8,7 @@
 *.tmp
 *bak/
 .DS_Store
+.agent-shell/
 .aider*
 .cache/
 .cask/
@@ -38,6 +39,7 @@
 /nov-places
 /package-quickstart.el
 /places
+/project-window-list
 /projects
 /recentf
 /rime
@@ -45,13 +47,13 @@
 /tabsession.el
 /tramp
 README.html
-.agent-shell/
 agent/
 anaconda-mode/
 auto-save-list/
 cnfonts/
 devdocs-browser/
 devdocs/
+easysession/
 eca/
 eclipse.jdt.ls/
 eln-cache/
