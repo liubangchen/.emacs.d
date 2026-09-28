@@ -113,6 +113,8 @@
   :custom
   (doom-modeline-icon centaur-icon)
   (doom-modeline-minor-modes t)
+  (doom-modeline-hud t)
+  (doom-modeline-project-name nil)
   :hook after-init
   :bind (:map doom-modeline-mode-map
          ("C-<f6>" . doom-modeline-hydra/body))
@@ -159,6 +161,8 @@
       "workspace" :toggle doom-modeline-workspace-name)
      ("g s" (setq doom-modeline-spell (not doom-modeline-spell))
       "spell" :toggle doom-modeline-spell)
+     ("g b" (setq doom-modeline-battery (not doom-modeline-battery))
+      "battery" :toggle doom-modeline-battery)
      ("g g" (setq doom-modeline-github (not doom-modeline-github))
       "github" :toggle doom-modeline-github)
      ("g n" (setq doom-modeline-gnus (not doom-modeline-gnus))
@@ -254,6 +258,8 @@
       "set height" :exit t)
      ("x b" (set-from-minibuffer 'doom-modeline-bar-width)
       "set bar width" :exit t)
+     ("x u" (set-from-minibuffer 'doom-modeline-hud-width)
+      "set hud width" :exit t)
      ("x g" (set-from-minibuffer 'doom-modeline-github-interval)
       "set github interval" :exit t)
      ("x p" (set-from-minibuffer 'doom-modeline-project-name)
