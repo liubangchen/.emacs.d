@@ -49,8 +49,7 @@
   :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
   :bind ("C-c C-'" . claude-code-ide-menu)
   :config
-  (unless (executable-find "claude")
-    (setq claude-code-ide-cli-path "claude-internal"))
+  (setq claude-code-ide-cli-path "tclaude")
   (claude-code-ide-emacs-tools-setup)
 
   ;; 修复 C-x 1 无法关闭 claude side window 的问题
