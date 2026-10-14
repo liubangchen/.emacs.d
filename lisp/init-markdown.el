@@ -65,6 +65,9 @@
          (ext (or extension ".html")))
     (concat my/markdown-cache-dir base ext)))
 
+(eval-when-compile
+  (require 'init-const))
+
 (use-package markdown-mode
   :ensure t
   :mode ("\\.md\\'" . gfm-mode)
@@ -278,12 +281,26 @@
     (centaur-browse-url-of-file (markdown-export)))
   (advice-add #'markdown-export-and-preview :override #'my/markdown-export-and-preview))
 
+(when (and emacs/>=31p
+           (centaur-treesit-available-p))
+  ;; Built into Emacs 31+
+  (use-package markdown-ts-mode
+    :ensure nil
+    :functions centaur-treesit-available-p
+    :mode ("\\.md\\'" "\\.mdx\\'" "\\.markdown\\'")
+    :custom (markdown-ts-ellipsis " ⌄")
+    :config (require 'markdown-ts-mode-x))
+
+  ;; Reveal Markdown source at point
+  (use-package markdown-ts-appear
+    :hook (markdown-ts-mode . markdown-ts-appear-mode)))
+
 ;; Preview markdown files
 ;; @see https://github.com/seagle0128/grip-mode?tab=readme-ov-file#prerequisite
 (use-package grip-mode
-  :defines markdown-mode-command-map org-mode-map grip-update-after-change grip-use-mdopen
+  :defines markdown-mode-command-map markdown-ts-mode-map org-mode-map
   :functions auth-source-user-and-password
-  :autoload grip-mode
+  :commands grip-mode
   :init
   (with-eval-after-load 'markdown-mode
     (bind-key "C-g" #'grip-mode markdown-mode-command-map))
@@ -293,12 +310,10 @@
 
   (with-eval-after-load 'org
     (bind-key "C-c C-g" #'grip-mode org-mode-map))
-
-  (setq grip-update-after-change nil)
-
-  ;; mdopen doesn't need credentials, and only support external browsers
-  (if (executable-find "mdopen")
-      (setq grip-use-mdopen t)
+  :config
+  ;; `grip' requires credentials
+  (when (and (memq grip-command '(auto grip))
+             (executable-find "grip"))
     (when-let* ((credential (and (require 'auth-source nil t)
                                  (auth-source-user-and-password "api.github.com"))))
       (setq grip-github-user (car credential)

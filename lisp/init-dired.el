@@ -36,7 +36,6 @@
 ;; Directory operations
 (use-package dired
   :ensure nil
-  :defines ls-lisp-use-insert-directory-program
   :bind (:map dired-mode-map
          ("C-c C-p" . wdired-change-to-wdired-mode))
   :config
@@ -47,19 +46,26 @@
   (setq dired-recursive-deletes 'always
         dired-recursive-copies 'always)
 
-  (if (and (or sys/macp sys/unixp)
-           (string= insert-directory-program "ls"))
+  ;; Show directory first
+  (setq dired-listing-switches "-alh --group-directories-first")
+
+  (when (or sys/macp sys/unixp)
+    (if (executable-find "gls")
+        ;; Use GNU ls in `coreutils' if available.
+        (setq insert-directory-program "gls")
       ;; Suppress the warning: `ls does not support --dired'.
       (setq dired-use-ls-dired nil
-            dired-listing-switches "-alh")
-    ;; Show directory first
-    (setq dired-listing-switches "-alh --group-directories-first")))
+            dired-listing-switches "-alh"))))
 
-;; Quick sort dired buffers via hydra
-(use-package dired-quick-sort
-  :after dired
-  :bind (:map dired-mode-map
-         ("S" . hydra-dired-quick-sort/body)))
+;; Quick sort dired buffers
+(when (or sys/linuxp sys/cygwinp
+          (and (or sys/macp sys/unixp)
+               (executable-find "gls")))
+  (use-package dired-quick-sort
+    :after dired
+    :bind (:map dired-mode-map
+           ("S" . dired-quick-sort-transient))
+    :hook (dired-mode . dired-quick-sort-set-switches)))
 
 ;; Show git info in dired
 (use-package dired-git-info
