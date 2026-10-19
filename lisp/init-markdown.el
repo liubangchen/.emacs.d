@@ -293,6 +293,7 @@
 
   ;; Reveal Markdown source at point
   (use-package markdown-ts-appear
+    :custom (markdown-ts-appear-table-reveal 'table)
     :hook (markdown-ts-mode . markdown-ts-appear-mode)))
 
 ;; Preview markdown files
@@ -304,10 +305,8 @@
   :init
   (with-eval-after-load 'markdown-mode
     (bind-key "C-g" #'grip-mode markdown-mode-command-map))
-
   (with-eval-after-load 'markdown-ts-mode
     (bind-key "C-c C-g" #'grip-mode markdown-ts-mode-map))
-
   (with-eval-after-load 'org
     (bind-key "C-c C-g" #'grip-mode org-mode-map))
   :config
