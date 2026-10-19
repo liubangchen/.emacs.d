@@ -21,8 +21,9 @@ $for(header-includes)$
   $header-includes$
 $endfor$
 
-  <!-- LXGW WenKai Mono 字体 -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-mono-webfont@1.1.0/style.css" />
+  <!-- LXGW WenKai 字体 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-bold.css" />
 
   <!-- highlight.js 代码着色 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css"
@@ -83,17 +84,148 @@ $endfor$
   </script>
 
   <style>
-    /* ===== 全局布局 ===== */
-    .markdown-body {
-      box-sizing: border-box;
-      min-width: 200px;
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 45px;
-      font-family: "LXGW WenKai Mono", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    :root {
+      color-scheme: light;
+      --page: #f8f9f8;
+      --surface: #fcfdfc;
+      --toolbar: #f1f3f2;
+      --text: #303833;
+      --heading: #1d2823;
+      --muted: #647169;
+      --border: #dce2de;
+      --accent: #256a60;
+      --accent-soft: #e1efeb;
+      --code-bg: #edf1ef;
+      --keyword: #286d83;
+      --string: #386b42;
+      --number: #a04943;
+      --function: #76528f;
+      --comment: #5f7067;
+      --selection: #d3e7de;
+      --overlay: rgba(0, 0, 0, 0.3);
+      --shadow: rgba(0, 0, 0, 0.08);
+      --body-font: "LXGW WenKai", "PingFang SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --code-font: "Sarasa Mono SC", "Noto Sans Mono CJK SC", "Source Han Mono SC", "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
     }
-    @media (max-width: 767px) {
-      .markdown-body { padding: 15px; }
+
+    /* ===== 全局布局 ===== */
+    html {
+      background: var(--page);
+      scroll-behavior: smooth;
+    }
+    .markdown-body, .markdown-body * {
+      letter-spacing: 0;
+    }
+    .markdown-body {
+      /* Keep the cached GitHub stylesheet on the same fonts and palette. */
+      --fontStack-sansSerif: var(--body-font);
+      --fontStack-monospace: var(--code-font);
+      --fgColor-default: var(--text);
+      --fgColor-muted: var(--muted);
+      --fgColor-accent: var(--accent);
+      --bgColor-default: var(--page);
+      --bgColor-muted: var(--toolbar);
+      --bgColor-neutral-muted: var(--code-bg);
+      --borderColor-default: var(--border);
+      --borderColor-muted: var(--border);
+      --borderColor-neutral-muted: var(--border);
+      --borderColor-accent-emphasis: var(--accent);
+      --focus-outlineColor: var(--accent);
+      box-sizing: border-box;
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      margin: 0 auto;
+      padding: 72px clamp(16px, 4vw, 80px);
+      background: var(--page);
+      color: var(--text);
+      font-family: var(--body-font);
+      font-size: 17px;
+      line-height: 1.75;
+      overflow-wrap: break-word;
+      text-align: start;
+    }
+    .markdown-body h1, .markdown-body h2, .markdown-body h3,
+    .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+      padding-bottom: 0;
+      border-bottom: 0;
+      color: var(--heading);
+      font-weight: 600;
+      line-height: 1.4;
+      scroll-margin-top: 16px;
+      overflow-wrap: anywhere;
+    }
+    .markdown-body h1 { font-size: 29px; margin: 0 0 24px; }
+    .markdown-body h2 { font-size: 23px; margin: 34px 0 14px; }
+    .markdown-body h3 { font-size: 19px; margin: 26px 0 12px; }
+    .markdown-body h4 { font-size: 17px; margin: 20px 0 10px; }
+    .markdown-body h5 { font-size: 15px; margin: 20px 0 10px; }
+    .markdown-body h6 { font-size: 14px; margin: 20px 0 10px; color: var(--muted); }
+    .markdown-body p { margin: 0 0 18px; }
+    .markdown-body strong { font-weight: 600; color: var(--heading); }
+    .markdown-body em { color: var(--muted); }
+    .markdown-body a {
+      color: var(--accent);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+    .markdown-body ul, .markdown-body ol {
+      padding-left: 1.6em;
+      margin: 0 0 20px;
+    }
+    .markdown-body ul ul, .markdown-body ul ol,
+    .markdown-body ol ul, .markdown-body ol ol {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    .markdown-body li { padding-left: 3px; margin: 5px 0; }
+    .markdown-body li + li { margin-top: 5px; }
+    .markdown-body li > p { margin-top: 10px; }
+    .markdown-body li::marker { color: var(--muted); }
+    .markdown-body hr {
+      height: 1px;
+      border: 0;
+      background: var(--border);
+      margin: 30px 0;
+    }
+    .markdown-body blockquote {
+      margin: 18px 0 24px;
+      padding: 10px 18px;
+      border-left: 3px solid var(--accent);
+      background: var(--toolbar);
+      color: var(--muted);
+    }
+    .markdown-body blockquote p { margin-bottom: 9px; }
+    .markdown-body blockquote p:last-child { margin-bottom: 0; }
+    .markdown-body h1 + blockquote { font-size: 14px; line-height: 1.7; }
+    .markdown-body h1 + blockquote p { margin-bottom: 4px; }
+    .markdown-body table {
+      box-sizing: border-box;
+      max-width: 100%;
+      overflow-x: auto;
+      margin: 16px 0 24px;
+      font-size: 15px;
+      line-height: 1.65;
+    }
+    .markdown-body table th, .markdown-body table td {
+      padding: 11px 14px;
+      vertical-align: top;
+      border: 1px solid var(--border);
+    }
+    .markdown-body table th {
+      background: var(--toolbar);
+      color: var(--heading);
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .markdown-body table tr { background: var(--surface); border-color: var(--border); }
+    .markdown-body table tr:nth-child(even) { background: var(--page); }
+    .markdown-body table tr:hover td { background: var(--accent-soft); }
+    .markdown-body ::selection { background: var(--selection); color: var(--heading); }
+    .markdown-body button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
     }
 
     /* ===== 左侧抽屉式 TOC ===== */
@@ -101,7 +233,7 @@ $endfor$
     .toc-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.3);
+      background: var(--overlay);
       z-index: 1000;
       opacity: 0;
       visibility: hidden;
@@ -120,14 +252,15 @@ $endfor$
       width: 300px;
       max-width: 80vw;
       height: 100vh;
-      background: #f6f8fa;
-      border-right: 1px solid #d0d7de;
+      height: 100dvh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
       z-index: 1001;
       transform: translateX(-100%);
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       flex-direction: column;
-      box-shadow: 4px 0 16px rgba(0, 0, 0, 0.08);
+      box-shadow: 4px 0 16px var(--shadow);
     }
     .toc-sidebar.open {
       transform: translateX(0);
@@ -139,14 +272,14 @@ $endfor$
       align-items: center;
       justify-content: space-between;
       padding: 16px 20px;
-      border-bottom: 1px solid #d0d7de;
+      border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
     .toc-sidebar-header h3 {
       margin: 0;
       font-size: 0.95em;
       font-weight: 600;
-      color: #24292f;
+      color: var(--heading);
       display: flex;
       align-items: center;
       gap: 8px;
@@ -161,13 +294,13 @@ $endfor$
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #656d76;
+      color: var(--muted);
       font-size: 18px;
       transition: background 0.15s, color 0.15s;
     }
     .toc-sidebar-close:hover {
-      background: #eaeef2;
-      color: #24292f;
+      background: var(--toolbar);
+      color: var(--heading);
     }
 
     /* 侧边栏内容（可滚动） */
@@ -187,12 +320,13 @@ $endfor$
     }
     .toc-sidebar-content li {
       margin: 0;
+      padding-left: 0;
       line-height: 1.4;
     }
     .toc-sidebar-content a {
       display: block;
       padding: 6px 10px;
-      color: #24292f;
+      color: var(--text);
       text-decoration: none;
       border-radius: 6px;
       font-size: 0.88em;
@@ -200,12 +334,12 @@ $endfor$
       word-break: break-word;
     }
     .toc-sidebar-content a:hover {
-      background: #eaeef2;
-      color: #0969da;
+      background: var(--toolbar);
+      color: var(--accent);
     }
     .toc-sidebar-content a.active {
-      background: #ddf4ff;
-      color: #0969da;
+      background: var(--accent-soft);
+      color: var(--accent);
       font-weight: 500;
     }
 
@@ -217,21 +351,21 @@ $endfor$
       width: 40px;
       height: 40px;
       border-radius: 8px;
-      background: #f6f8fa;
-      border: 1px solid #d0d7de;
+      background: var(--surface);
+      border: 1px solid var(--border);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 999;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px var(--shadow);
       transition: opacity 0.2s, transform 0.2s, background 0.15s;
-      color: #656d76;
+      color: var(--muted);
       font-size: 20px;
     }
     .toc-toggle-btn:hover {
-      background: #eaeef2;
-      color: #24292f;
+      background: var(--toolbar);
+      color: var(--heading);
     }
     .toc-toggle-btn.hidden {
       opacity: 0;
@@ -240,121 +374,180 @@ $endfor$
     }
 
     /* ===== 代码块美化 ===== */
-    pre, code {
-      /* 中英文等宽字体栈：确保中文宽度 = 2×英文宽度（ASCII art 对齐） */
-      font-family:
-        "Sarasa Mono SC",      /* 更纱黑体等宽：CJK 最佳 2:1 等宽 */
-        "Noto Sans Mono CJK SC", /* Google CJK 等宽 */
-        "Source Han Mono SC",   /* Adobe 思源等宽 */
-        "PingFang SC",         /* macOS 内置，接近等宽 */
-        "Menlo", "Monaco",     /* macOS 英文等宽回退 */
-        "Consolas",            /* Windows 回退 */
-        monospace;
+    .markdown-body pre, .markdown-body code, .markdown-body kbd,
+    .markdown-body samp, .markdown-body tt {
+      font-family: var(--code-font);
+      font-variant-ligatures: none;
     }
-    pre {
+    .markdown-body pre {
+      box-sizing: border-box;
+      max-width: 100%;
+      margin: 16px 0 24px;
       border-radius: 6px;
-      border: 1px solid #d0d7de;
-      padding: 16px;
+      border: 1px solid var(--border);
+      background: var(--code-bg);
+      color: var(--text);
+      padding: 17px 20px;
       overflow-x: auto;
-      font-size: 0.85em;
-      line-height: 1.5;
+      font-size: 14px;
+      line-height: 1.65;
+      tab-size: 4;
       position: relative;
     }
-    pre code {
-      background: none !important;
-      padding: 0 !important;
-      border: none !important;
+    .markdown-body :not(pre) > code, .markdown-body tt {
+      background: var(--code-bg);
+      color: var(--text);
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 0.86em;
+      overflow-wrap: anywhere;
+    }
+    .markdown-body pre code {
+      background: none;
+      color: inherit;
+      padding: 0;
+      border: none;
       font-size: inherit;
+      line-height: inherit;
+      white-space: pre;
+    }
+    .markdown-body pre .hljs {
+      padding: 0;
+      background: none;
+      color: inherit;
+      overflow: visible;
+    }
+    .markdown-body div.sourceCode {
+      max-width: 100%;
+      overflow: visible;
     }
     /* 代码块语言标签 */
-    pre[data-lang]::before {
+    .markdown-body pre[data-lang] { padding-top: 30px; }
+    .markdown-body pre[data-lang]::before {
       content: attr(data-lang);
       position: absolute;
-      top: 6px;
-      right: 10px;
-      font-size: 0.75em;
-      color: #8b949e;
+      top: 7px;
+      right: 12px;
+      font-size: 11px;
+      color: var(--comment);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0;
     }
 
     /* ===== Mermaid 图表 ===== */
-    pre.mermaid {
+    .markdown-body pre.mermaid {
       text-align: center;
       background: transparent !important;
       border: none !important;
       padding: 16px 0;
       overflow-x: auto;
     }
-    pre.mermaid svg {
+    .markdown-body pre.mermaid svg {
       max-width: 100%;
       height: auto;
     }
 
-    /* ===== 行内代码 ===== */
-    code:not(pre code) {
-      background: rgba(175, 184, 193, 0.2);
-      padding: 0.2em 0.4em;
-      border-radius: 4px;
-      font-size: 0.85em;
-    }
-
     /* ===== 无语言代码块（伪代码/树状结构）专属配色 ===== */
-    pre.nohighlight {
-      background: #fafbfc;
-      border-color: #e1e4e8;
-      color: #393a34;
-    }
-    pre.nohighlight code {
-      color: inherit;
+    .markdown-body pre.nohighlight {
+      background: var(--code-bg);
+      border-color: var(--border);
+      color: var(--text);
     }
     /* 树状结构符号（├── └── │ ─ → ★ ） */
-    pre.nohighlight .nh-tree {
-      color: #8b949e;
+    .markdown-body pre.nohighlight .nh-tree {
+      color: var(--comment);
     }
     /* 关键词（if, else, true, false, null, return 等） */
-    pre.nohighlight .nh-keyword {
-      color: #cf222e;
+    .markdown-body pre.nohighlight .nh-keyword {
+      color: var(--keyword);
       font-weight: 500;
     }
     /* 数字 */
-    pre.nohighlight .nh-number {
-      color: #0550ae;
+    .markdown-body pre.nohighlight .nh-number {
+      color: var(--number);
     }
     /* 字符串（引号内容） */
-    pre.nohighlight .nh-string {
-      color: #0a3069;
+    .markdown-body pre.nohighlight .nh-string {
+      color: var(--string);
     }
     /* 函数/方法调用（xxx(...)） */
-    pre.nohighlight .nh-func {
-      color: #8250df;
+    .markdown-body pre.nohighlight .nh-func {
+      color: var(--function);
     }
     /* 类型/类名（大写开头的标识符） */
-    pre.nohighlight .nh-type {
-      color: #953800;
+    .markdown-body pre.nohighlight .nh-type {
+      color: var(--function);
     }
     /* 操作符（= → > < + - * / ） */
-    pre.nohighlight .nh-op {
-      color: #cf222e;
+    .markdown-body pre.nohighlight .nh-op {
+      color: var(--keyword);
     }
     /* 注释风格文本（// # -- 开头） */
-    pre.nohighlight .nh-comment {
-      color: #6e7781;
+    .markdown-body pre.nohighlight .nh-comment {
+      color: var(--comment);
       font-style: italic;
     }
     /* SQL 关键词（SELECT, INSERT, UPDATE, DELETE, FROM, WHERE 等） */
-    pre.nohighlight .nh-sql {
-      color: #0550ae;
+    .markdown-body pre.nohighlight .nh-sql {
+      color: var(--keyword);
       font-weight: 500;
     }
     /* 标签/标注（WARN, ERROR, INFO, NOTE, Phase 等） */
-    pre.nohighlight .nh-label {
-      color: #bf8700;
+    .markdown-body pre.nohighlight .nh-label {
+      color: var(--number);
       font-weight: 600;
     }
     /* 括号内的参数说明 */
-    pre.nohighlight .nh-param {
-      color: #57606a;
+    .markdown-body pre.nohighlight .nh-param {
+      color: var(--comment);
+    }
+
+    /* ===== highlight.js / Pandoc 与正文配色协调 ===== */
+    .markdown-body .hljs-doctag, .markdown-body .hljs-keyword,
+    .markdown-body .hljs-selector-tag, .markdown-body .hljs-selector-pseudo,
+    .markdown-body .hljs-operator, .markdown-body .hljs-variable.language_,
+    .markdown-body .hljs-meta .hljs-keyword,
+    .markdown-body pre .kw, .markdown-body pre .cf, .markdown-body pre .op {
+      color: var(--keyword);
+    }
+    .markdown-body .hljs-string, .markdown-body .hljs-regexp,
+    .markdown-body .hljs-meta .hljs-string,
+    .markdown-body .hljs-attr, .markdown-body .hljs-attribute,
+    .markdown-body .hljs-name,
+    .markdown-body .hljs-template-tag, .markdown-body .hljs-template-variable,
+    .markdown-body pre .st, .markdown-body pre .ch, .markdown-body pre .ss {
+      color: var(--string);
+    }
+    .markdown-body .hljs-number, .markdown-body .hljs-literal,
+    .markdown-body .hljs-symbol, .markdown-body .hljs-bullet,
+    .markdown-body .hljs-variable, .markdown-body .hljs-meta,
+    .markdown-body .hljs-selector-attr, .markdown-body .hljs-selector-class,
+    .markdown-body .hljs-selector-id,
+    .markdown-body pre .dv, .markdown-body pre .fl, .markdown-body pre .bn {
+      color: var(--number);
+    }
+    .markdown-body pre .hljs-title,
+    .markdown-body .hljs-title.class_.inherited__, .markdown-body .hljs-type,
+    .markdown-body .hljs-built_in,
+    .markdown-body pre .fu, .markdown-body pre .dt {
+      color: var(--function);
+    }
+    .markdown-body .hljs-comment, .markdown-body .hljs-quote,
+    .markdown-body .hljs-code, .markdown-body .hljs-formula,
+    .markdown-body pre .co, .markdown-body pre .cv, .markdown-body pre .an {
+      color: var(--comment);
+      font-style: italic;
+    }
+    .markdown-body .hljs-subst, .markdown-body .hljs-emphasis,
+    .markdown-body .hljs-strong { color: var(--text); }
+    .markdown-body .hljs-section { color: var(--heading); }
+    .markdown-body .hljs-addition {
+      color: var(--string);
+      background: var(--accent-soft);
+    }
+    .markdown-body .hljs-deletion {
+      color: var(--number);
+      background: var(--toolbar);
     }
 
     /* ===== 回到顶部按钮 ===== */
@@ -365,8 +558,8 @@ $endfor$
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: #0969da;
-      color: #fff;
+      background: var(--accent);
+      color: var(--page);
       border: none;
       cursor: pointer;
       font-size: 18px;
@@ -377,7 +570,7 @@ $endfor$
       transform: translateY(10px);
       transition: opacity 0.3s, transform 0.3s;
       pointer-events: none;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 8px var(--shadow);
       z-index: 999;
     }
     .back-to-top.visible {
@@ -387,67 +580,36 @@ $endfor$
     }
     .back-to-top:hover { opacity: 1; }
 
-    /* ===== 标题锚点平滑滚动 ===== */
-    html { scroll-behavior: smooth; }
-
-    /* ===== 标题悬停锚点链接 ===== */
-    h1, h2, h3, h4, h5, h6 {
-      scroll-margin-top: 16px;
-    }
-
     /* ===== 暗色模式 ===== */
     @media (prefers-color-scheme: dark) {
-      body { background: #0d1117; }
-      .markdown-body { color: #c9d1d9; }
-      .markdown-body a { color: #58a6ff; }
-
-      .toc-sidebar {
-        background: #161b22;
-        border-right-color: #30363d;
-        box-shadow: 4px 0 16px rgba(0, 0, 0, 0.3);
+      :root {
+        color-scheme: dark;
+        --page: #1d201f;
+        --surface: #202422;
+        --toolbar: #252b28;
+        --text: #d4ddd7;
+        --heading: #e6ede8;
+        --muted: #a2b2a8;
+        --border: #38453d;
+        --accent: #86c6b8;
+        --accent-soft: #293f36;
+        --code-bg: #272e2a;
+        --keyword: #89bfce;
+        --string: #b1c59c;
+        --number: #ddaaa0;
+        --function: #c1abd5;
+        --comment: #a0b3a5;
+        --selection: #3d594a;
+        --overlay: rgba(0, 0, 0, 0.5);
+        --shadow: rgba(0, 0, 0, 0.3);
       }
-      .toc-sidebar-header { border-bottom-color: #30363d; }
-      .toc-sidebar-header h3 { color: #c9d1d9; }
-      .toc-sidebar-close { color: #8b949e; }
-      .toc-sidebar-close:hover { background: #1c2128; color: #c9d1d9; }
-      .toc-sidebar-content a { color: #c9d1d9; }
-      .toc-sidebar-content a:hover { background: #1c2128; color: #58a6ff; }
-      .toc-sidebar-content a.active { background: #1a2332; color: #58a6ff; }
-      .toc-overlay { background: rgba(0, 0, 0, 0.5); }
-      .toc-toggle-btn {
-        background: #161b22;
-        border-color: #30363d;
-        color: #8b949e;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .toc-overlay, .toc-sidebar, .toc-toggle-btn,
+      .toc-sidebar-close, .toc-sidebar-content a, .back-to-top {
+        transition: none;
       }
-      .toc-toggle-btn:hover { background: #1c2128; color: #c9d1d9; }
-
-      pre {
-        background: #161b22 !important;
-        border-color: #30363d;
-      }
-      code:not(pre code) {
-        background: rgba(110, 118, 129, 0.25);
-      }
-
-      /* 无语言代码块暗色配色 */
-      pre.nohighlight {
-        background: #161b22 !important;
-        border-color: #30363d;
-        color: #c9d1d9;
-      }
-      pre.nohighlight .nh-tree { color: #484f58; }
-      pre.nohighlight .nh-keyword { color: #ff7b72; font-weight: 500; }
-      pre.nohighlight .nh-number { color: #79c0ff; }
-      pre.nohighlight .nh-string { color: #a5d6ff; }
-      pre.nohighlight .nh-func { color: #d2a8ff; }
-      pre.nohighlight .nh-type { color: #ffa657; }
-      pre.nohighlight .nh-op { color: #ff7b72; }
-      pre.nohighlight .nh-comment { color: #8b949e; font-style: italic; }
-      pre.nohighlight .nh-sql { color: #79c0ff; font-weight: 500; }
-      pre.nohighlight .nh-label { color: #e3b341; font-weight: 600; }
-      pre.nohighlight .nh-param { color: #8b949e; }
-
-      .back-to-top { background: #58a6ff; }
     }
   </style>
 $if(math)$
