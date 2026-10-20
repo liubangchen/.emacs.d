@@ -42,23 +42,17 @@
 (use-package gptel
   :functions (gptel-make-openai gptel-make-deepseek
                gptel-make-anthropic gptel-make-gemini)
+  :autoload gptel-get-backend
   :bind (("C-<f12>"   . gptel)
          ("C-M-<f12>" . gptel-menu)
          ("C-c a g"   . gptel)
          ("C-c a G"   . gptel-menu))
   :hook (gptel-mode . gptel-highlight-mode)
   :config
-  ;; Register backends and setup models
-  ;; Securing API keys with authinfo (see `auth-sources')
-  ;; format: "machine {HOST} login apikey password {token}"
-  (setq gptel-model 'deepseek-chat
-        gptel-backend
-        (gptel-make-openai "DeepSeek"
-          :host "api.deepseek.com"
-          :endpoint "/chat/completions"
-          :stream t
-          :key (lambda () (getenv "DEEPSEEK_API_KEY"))
-          :models '(deepseek-chat deepseek-coder)))
+  ;; DeepSeek
+  (gptel-make-deepseek "DeepSeek"
+    :stream t
+    :key 'gptel-api-key)
 
   ;; GLM
   (gptel-make-openai "GLM"
@@ -91,7 +85,11 @@
   ;; Claude (Anthropic)
   (gptel-make-anthropic "Claude"
     :stream t
-    :key 'gptel-api-key))
+    :key 'gptel-api-key)
+
+  ;; Set default model and backend
+  (setq gptel-model 'deepseek-flash
+        gptel-backend (gptel-get-backend "DeepSeek")))
 
 (when emacs/>=29p
   ;; Generate commit messages for magit
